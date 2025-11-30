@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sommaire - Maths Expertes (Terminale)</title>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        /* CSS */
+        :root {
+            --primary-color: #3f51b5; /* Bleu Indigo */
+            --accent-color: #ffc107; /* Jaune Ambre */
+            --bg-color: #f4f4f9;
+            --text-color: #333;
+            --header-bg: #e8eaf6;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2em;
+            letter-spacing: 1px;
+        }
+
+        main {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .section:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-header {
+            background-color: var(--header-bg);
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .section-header:hover {
+            background-color: #d8dae6;
+        }
+
+        .toggle-icon {
+            font-size: 1.5em;
+            transition: transform 0.3s ease;
+        }
+
+        .content {
+            padding: 15px 20px;
+            border-top: none;
+            display: none; /* Masqué par défaut */
+        }
+
+        .content.active .toggle-icon {
+            transform: rotate(90deg);
+        }
+
+        .content ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .content li {
+            padding: 8px 0;
+            border-bottom: 1px dotted #eee;
+        }
+
+        .content li:last-child {
+            border-bottom: none;
+        }
+
+        /* Style pour les formules LaTeX */
+        .latex-formula {
+            display: block;
+            margin: 10px 0;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-left: 5px solid var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>📚 Sommaire Maths Expertes 📐</h1>
+        <p>Terminale Générale - Programmes de la Spécialité Mathématiques</p>
+    </header>
+
+    <main>
+        
+        <section class="section">
+            <div class="section-header" onclick="toggleContent(this)">
+                <span>🔢 1. Arithmétique</span>
+                <span class="toggle-icon">▶</span>
+            </div>
+            <div class="content">
+                <ul>
+                    <li>Divisibilité et Division euclidienne
+                        <span class="latex-formula">
+                            $$ a = bq + r \quad \text{avec } 0 \le r < |b| $$
+                        </span>
+                    </li>
+                    <li>Congruences dans $\mathbb{Z}$
+                        <span class="latex-formula">
+                            $$ a \equiv b \pmod{n} $$
+                        </span>
+                    </li>
+                    <li>Nombres premiers et Décomposition en facteurs premiers</li>
+                    <li>PGCD, PPCM et Algorithme d'Euclide</li>
+                    <li>Théorèmes de **Bézout** et de **Gauss**</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header" onclick="toggleContent(this)">
+                <span>📊 2. Matrices</span>
+                <span class="toggle-icon">▶</span>
+            </div>
+            <div class="content">
+                <ul>
+                    <li>Définitions et Opérations (Addition, Multiplication par un scalaire)
+                        <span class="latex-formula">
+                            $$ A = \begin{pmatrix} a & b \\ c & d \end{pmatrix} $$
+                        </span>
+                    </li>
+                    <li>Multiplication de matrices
+                        <span class="latex-formula">
+                            $$ (A \times B)_{ij} = \sum_{k=1}^n A_{ik} B_{kj} $$
+                        </span>
+                    </li>
+                    <li>Matrices carrées (Identité $I$, Inverse $A^{-1}$)</li>
+                    <li>Utilisation des matrices pour les systèmes d'équations</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header" onclick="toggleContent(this)">
+                <span>🌀 3. Nombres Complexes</span>
+                <span class="toggle-icon">▶</span>
+            </div>
+            <div class="content">
+                <ul>
+                    <li>Forme algébrique : $z = x + iy$</li>
+                    <li>Conjugué d'un nombre complexe : $\bar{z}$</li>
+                    <li>Module et distance : $|z| = \sqrt{x^2 + y^2}$</li>
+                    <li>Forme trigonométrique et exponentielle
+                        <span class="latex-formula">
+                            $$ z = |z|(\cos\theta + i\sin\theta) = |z|e^{i\theta} $$
+                        </span>
+                    </li>
+                    <li>Interprétation géométrique et Transformations</li>
+                    <li>Racines $n$-ièmes de l'unité</li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+</div>
+
+<script>
+    // JAVASCRIPT
+    /**
+     * Fonction pour basculer l'affichage du contenu d'une section.
+     * @param {HTMLElement} header L'élément d'en-tête de la section cliquée.
+     */
+    function toggleContent(header) {
+        // Sélectionne l'élément parent (<section>)
+        const section = header.parentElement;
+        // Sélectionne l'élément de contenu
+        const content = section.querySelector('.content');
+        // Sélectionne l'icône
+        const icon = header.querySelector('.toggle-icon');
+
+        // Bascule l'affichage du contenu
+        if (content.style.display === "block") {
+            content.style.display = "none";
+            icon.style.transform = "rotate(0deg)";
+        } else {
+            content.style.display = "block";
+            icon.style.transform = "rotate(90deg)";
+        }
+    }
+</script>
+
+</body>
+</html>
