@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arithmétique - Diapositives d'Exercices (Interactif Responsif)</title>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            }
+        };
+    </script>
+    <style>
+        /* --- Styles de Base (Ordinateur/Tablette) --- */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Empêche le défilement général */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        .slide-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 5vh 10vw; /* Padding fluid */
+            box-sizing: border-box;
+            background-color: #ffffff;
+            color: #333;
+            transition: opacity 0.5s ease-in-out;
+            opacity: 0;
+            visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Centré verticalement sur grand écran */
+            overflow-y: hidden; /* Pas de défilement par défaut */
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            overflow-y: auto; /* Permet le défilement pour les longs contenus/solutions */
+        }
+
+        h1 {
+            color: #0056b3;
+            font-size: 5vh;
+            border-bottom: 3px solid #0056b3;
+            padding-bottom: 10px;
+            margin-bottom: 3vh;
+            text-align: center;
+        }
+        
+        h2 {
+            color: #0056b3;
+            font-size: 5vh;
+            text-align: center;
+            margin-bottom: 3vh;
+        }
+
+        h3 {
+            color: #4a4a4a;
+            font-size: 3vh;
+            margin-bottom: 2vh;
+            border-left: 5px solid #0056b3;
+            padding-left: 10px;
+        }
+
+        .content {
+            font-size: 2.8vh;
+            line-height: 1.5;
+            margin-top: 2vh;
+        }
+
+        ol, ul {
+            padding-left: 25px;
+            margin-top: 1.5vh;
+        }
+
+        /* --- Styles pour les Indices (HINTS) --- */
+        .hint-button {
+            padding: 8px 15px;
+            font-size: 1.8vh;
+            cursor: pointer;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 3vh;
+            transition: background-color 0.3s;
+        }
+        
+        .multi-step-toggle, .next-hint-button {
+            background-color: #f0ad4e; /* Orange pour le bouton d'indice principal et secondaire */
+        }
+
+        .multi-step-toggle:hover, .next-hint-button:hover {
+            background-color: #ec971f;
+        }
+        
+        /* Style spécifique pour le bouton d'aide d'Euclide */
+        .euclide-help-button {
+            background-color: #5cb85c; /* Vert pour l'aide Méthode */
+        }
+        .euclide-help-button:hover {
+            background-color: #4cae4c;
+        }
+
+        .hint-group {
+            margin-top: 3vh;
+        }
+
+        .hint-content {
+            margin-top: 1.5vh;
+            margin-bottom: 1.5vh;
+            padding: 15px;
+            border: 1px dashed #f0ad4e;
+            background-color: #fff9e6;
+            color: #8a6d3b;
+            font-style: italic;
+            font-size: 2.2vh;
+        }
+
+        .next-hint-button {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            padding: 6px 12px;
+            font-size: 1.6vh;
+        }
+        
+        /* Style spécifique pour le contenu d'aide d'Euclide */
+        .euclide-help-content {
+            border: 1px dashed #5cb85c;
+            background-color: #e6ffe6;
+            color: #3c763d;
+            font-style: normal;
+        }
+        .euclide-help-content ul {
+            list-style-type: decimal;
+            font-size: 2.2vh;
+            margin-left: 0;
+            padding-left: 20px;
+        }
+        
+        /* --- Styles pour les SOLUTIONS (SOLUTIONS) --- */
+        .solution-toggle {
+            background-color: #28a745; /* Vert pour le bouton de solution */
+            margin-left: 10px;
+        }
+        .solution-toggle:hover {
+            background-color: #1e7e34;
+        }
+
+        .solution-container {
+            border-top: 2px solid #28a745;
+            padding-top: 20px;
+            margin-top: 4vh;
+            display: none;
+            background-color: #f8f9fa;
+        }
+        
+        .solution-step {
+            margin-bottom: 1.5vh;
+            padding: 15px;
+            border-left: 5px solid #28a745;
+            background-color: #e6ffe6;
+            font-size: 2.2vh;
+            line-height: 1.4;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .solution-step strong {
+            color: #1e7e34;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 2.5vh;
+        }
+
+        .solution-navigation {
+            text-align: right;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .solution-navigation button {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.8vh;
+            transition: background-color 0.3s;
+        }
+        .solution-navigation button:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+        .solution-navigation button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        /* Navigation Grande Taille */
+        .navigation {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10;
+        }
+
+        .navigation button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .navigation button:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+        
+        .navigation button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .slide-number {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            font-size: 1.8vh;
+            color: #777;
+        }
+        
+        /* --- AJUSTEMENTS RESPONSIFS (Écran Mobile/Petit) --- */
+        @media (max-width: 600px) {
+            
+            /* Défilement et alignement sur mobile */
+            .slide {
+                padding: 8vw 5vw 100px 5vw; /* Réduit le padding et laisse de la place pour la navigation */
+                justify-content: flex-start; /* Aligne le contenu en haut */
+            }
+
+            /* Réduction des tailles de police */
+            h1 {
+                font-size: 5vw;
+                margin-bottom: 3vw;
+            }
+
+            h2 {
+                font-size: 7vw;
+            }
+            
+            h3 {
+                font-size: 4vw;
+            }
+
+            .content {
+                font-size: 3.5vw;
+            }
+            
+            .multi-step-toggle, .next-hint-button, .solution-toggle {
+                font-size: 3vw;
+                margin-top: 2vh;
+            }
+            
+            .hint-content {
+                font-size: 3vw;
+                padding: 10px;
+            }
+            
+            .euclide-help-content ul {
+                font-size: 3vw;
+            }
+
+            .solution-step {
+                font-size: 3.2vw;
+                padding: 10px;
+            }
+
+            .solution-step strong {
+                font-size: 3.5vw;
+            }
+            
+            .solution-navigation button {
+                font-size: 3vw;
+            }
+
+            /* Repositionnement et stylisation de la navigation */
+            .navigation {
+                bottom: 0;
+                right: 0;
+                left: 0;
+                display: flex;
+                justify-content: space-around;
+                width: 100%;
+                background-color: #ffffff; /* Fond blanc pour la barre de nav */
+                padding: 10px 0;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.1); /* Ombre légère pour détacher du contenu */
+            }
+
+            .navigation button {
+                flex-grow: 1;
+                max-width: 45%;
+                padding: 12px 5px;
+                font-size: 4vw;
+                margin: 0 5px;
+            }
+            
+            /* Repositionnement du numéro de diapositive */
+            .slide-number {
+                top: 10px;
+                bottom: auto;
+                left: 10px;
+                font-size: 3.5vw;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="slide-container">
+    
+    <div class="slide active">
+        <h2>Arithmétique : PGCD et PPCM</h2>
+        <h3 style="text-align: center;">Diapositives d'Exercices (1 exercice / 1 slide)</h3>
+    </div>
+
+    <div class="slide">
+        <h1>Partie 1, Exercice 1 : Décomposition en Facteurs Premiers</h1>
+        <div class="content">
+            Décomposer les nombres $N_1 = 360$ et $N_2 = 504$ en produits de facteurs premiers.
+        </div>
+        
+        <div style="display: flex; justify-content: flex-start; margin-top: 3vh;">
+            <button class="hint-button multi-step-toggle">Afficher l'indice</button>
+            <button class="hint-button solution-toggle">Afficher la Solution Détaillée</button>
+        </div>
+
+        <div class="hint-group" style="display: none;">
+            <div class="hint-content hint-step-1">
+                Indice Étape 1 : Commencez par les plus petits nombres premiers ($2, 3, 5, 7, \dots$) et divisez autant de fois que possible.
+            </div>
+            <button class="hint-button next-hint-button" data-next-step="2">Indice Étape 2</button>
+            <div class="hint-content hint-step-2" style="display: none;">
+                Indice Étape 2 : La forme de la décomposition doit être : $360 = 2^a \times 3^b \times 5^c$ et $504 = 2^d \times 3^e \times 7^f$.
+            </div>
+        </div>
+
+        <div class="solution-container">
+            <div class="solution-step" data-step="1">
+                <strong>Étape 1 : Décomposition de $N_1 = 360$</strong>
+                <p>On divise par les nombres premiers successifs :</p>
+                $$360 \div 2 = 180$$
+                $$180 \div 2 = 90$$
+                $$90 \div 2 = 45$$
+                $$45 \div 3 = 15$$
+                $$15 \div 3 = 5$$
+                $$5 \div 5 = 1$$
+                <p>Donc $360 = 2 \times 2 \times 2 \times 3 \times 3 \times 5 = 2^3 \times 3^2 \times 5^1$.</p>
+            </div>
+            <div class="solution-step" data-step="2">
+                <strong>Étape 2 : Décomposition de $N_2 = 504$</strong>
+                <p>On divise par les nombres premiers successifs :</p>
+                $$504 \div 2 = 252$$
+                $$252 \div 2 = 126$$
+                $$126 \div 2 = 63$$
+                $$63 \div 3 = 21$$
+                $$21 \div 3 = 7$$
+                $$7 \div 7 = 1$$
+                <p>Donc $504 = 2 \times 2 \times 2 \times 3 \times 3 \times 7 = 2^3 \times 3^2 \times 7^1$.</p>
+            </div>
+            <div class="solution-navigation">
+                <button class="next-solution-step">Étape Suivante</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide">
+        <h1>Partie 1, Exercice 2 : PGCD et PPCM par Décomposition</h1>
+        <div class="content">
+            À l'aide des décompositions précédentes ($N_1=360$ et $N_2=504$) :
+            <ol>
+                <li>Déterminer $\text{PGCD}(360, 504)$.</li>
+                <li>Déterminer $\text{PPCM}(360, 504)$.</li>
+            </ol>
+        </div>
+        
+        <div style="display: flex; justify-content: flex-start; margin-top: 3vh;">
+            <button class="hint-button multi-step-toggle">Afficher l'indice</button>
+            <button class="hint-button solution-toggle">Afficher la Solution Détaillée</button>
+        </div>
+
+        <div class="hint-group" style="display: none;">
+            <div class="hint-content hint-step-1">
+                Indice Étape 1 (PGCD) : Pour le $\text{PGCD}$, on ne prend que les facteurs premiers <strong>communs</strong> aux deux décompositions, avec le <strong>plus petit</strong> exposant.
+            </div>
+            <button class="hint-button next-hint-button" data-next-step="2">Indice Étape 2</button>
+            <div class="hint-content hint-step-2" style="display: none;">
+                Indice Étape 2 (PPCM) : Pour le $\text{PPCM}$, on prend <strong>tous</strong> les facteurs premiers (communs ou non), avec le <strong>plus grand</strong> exposant.
+            </div>
+        </div>
+        
+        <div class="solution-container">
+            <div class="solution-step" data-step="1">
+                <strong>Étape 1 : Rappel des décompositions</strong>
+                $$360 = 2^3 \times 3^2 \times 5^1$$
+                $$504 = 2^3 \times 3^2 \times 7^1$$
+                <p>Les facteurs communs sont $2$ et $3$.</p>
+            </div>
+            <div class="solution-step" data-step="2">
+                <strong>Étape 2 : Calcul du $\text{PGCD}(360, 504)$</strong>
+                <p>On prend les facteurs communs avec le plus petit exposant :</p>
+                $$\text{PGCD}(360, 504) = 2^{\min(3, 3)} \times 3^{\min(2, 2)}$$
+                $$\text{PGCD}(360, 504) = 2^3 \times 3^2 = 8 \times 9 = \mathbf{72}$$
+            </div>
+            <div class="solution-step" data-step="3">
+                <strong>Étape 3 : Calcul du $\text{PPCM}(360, 504)$</strong>
+                <p>On prend tous les facteurs avec le plus grand exposant :</p>
+                $$\text{PPCM}(360, 504) = 2^{\max(3, 3)} \times 3^{\max(2, 2)} \times 5^{\max(1, 0)} \times 7^{\max(0, 1)}$$
+                $$\text{PPCM}(360, 504) = 2^3 \times 3^2 \times 5^1 \times 7^1 = 8 \times 9 \times 5 \times 7 = \mathbf{2520}$$
+            </div>
+            <div class="solution-navigation">
+                <button class="next-solution-step">Étape Suivante</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide">
+        <h1>Partie 1, Exercice 3 : PGCD par Algorithme d'Euclide</h1>
+        <div class="content">
+            Calculer le $\text{PGCD}$ des nombres $a=306$ et $b=126$ en détaillant toutes les étapes de l'algorithme d'Euclide.
+        </div>
+        
+        <div style="display: flex; justify-content: flex-start; margin-top: 3vh;">
+            <button class="hint-button euclide-help-button multi-step-toggle">Aide sur l'Algorithme d'Euclide</button>
+            <button class="hint-button solution-toggle">Afficher la Solution Détaillée</button>
+        </div>
+
+        <div class="hint-group euclide-help-content" style="display: none;">
+            <div class="hint-content hint-step-1 euclide-help-content">
+                Aide Étape 1 : Le principe de l'algorithme est d'utiliser la division euclidienne ($a = bq + r$). L'objectif est de trouver le dernier reste non nul.
+            </div>
+            <button class="hint-button euclide-help-button next-hint-button" data-next-step="2">Procédure</button>
+            <div class="hint-content hint-step-2 euclide-help-content" style="display: none;">
+                Aide Étape 2 : La procédure est la suivante :
+                <ul>
+                    <li><strong>Étape 1 :</strong> Diviser le plus grand nombre par le plus petit ($a$ par $b$).</li>
+                    <li><strong>Étape 2 :</strong> Remplacer le diviseur ($b$) par le reste ($r$).</li>
+                    <li><strong>Étape 3 :</strong> Répéter l'opération jusqu'à ce que le reste soit $0$.</li>
+                </ul>
+            </div>
+            <button class="hint-button euclide-help-button next-hint-button" data-next-step="3">Résultat</button>
+            <div class="hint-content hint-step-3 euclide-help-content" style="display: none;">
+                Aide Étape 3 : Le $\text{PGCD}$ est le <strong>dernier reste non nul</strong> de la série d'opérations.
+            </div>
+        </div>
+        
+        <div class="solution-container">
+            <div class="solution-step" data-step="1">
+                <strong>Étape 1 : Division de $306$ par $126$</strong>
+                $$306 = 2 \times 126 + 54$$
+                <p>Le reste est $54 \neq 0$.</p>
+            </div>
+            <div class="solution-step" data-step="2">
+                <strong>Étape 2 : Division de $126$ par $54$</strong>
+                $$126 = 2 \times 54 + 18$$
+                <p>Le reste est $18 \neq 0$.</p>
+            </div>
+            <div class="solution-step" data-step="3">
+                <strong>Étape 3 : Division de $54$ par $18$</strong>
+                $$54 = 3 \times 18 + 0$$
+                <p>Le reste est $0$. L'algorithme s'arrête.</p>
+            </div>
+            <div class="solution-step" data-step="4">
+                <strong>Conclusion</strong>
+                <p>Le $\text{PGCD}$ est le dernier reste non nul, soit $\mathbf{18}$.</p>
+            </div>
+            <div class="solution-navigation">
+                <button class="next-solution-step">Étape Suivante</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide">
+        <h1>Partie 1, Exercice 4 : Vérification de la Relation Fondamentale</h1>
+        <div class="content">
+            En utilisant le $\text{PGCD}(306, 126)$ trouvé à l'exercice précédent, calculer le $\text{PPCM}(306, 126)$ à l'aide de la relation :
+            $$\text{PGCD}(a, b) \times \text{PPCM}(a, b) = a \times b$$
+        </div>
+        
+        <div style="display: flex; justify-content: flex-start; margin-top: 3vh;">
+            <button class="hint-button multi-step-toggle">Afficher l'indice</button>
+            <button class="hint-button solution-toggle">Afficher la Solution Détaillée</button>
+        </div>
+
+        <div class="hint-group" style="display: none;">
+            <div class="hint-content hint-step-1">
+                Indice Étape 1 : L'objectif est de trouver $\text{PPCM}(a, b)$. Il faut isoler cette quantité dans la formule donnée.
+            </div>
+            <button class="hint-button next-hint-button" data-next-step="2">Indice Étape 2</button>
+            <div class="hint-content hint-step-2" style="display: none;">
+                Indice Étape 2 : Réécrivez la relation sous la forme : $\text{PPCM}(a, b) = \dfrac{a \times b}{\text{PGCD}(a, b)}$
+            </div>
+        </div>
+        
+        <div class="solution-container">
+            <div class="solution-step" data-step="1">
+                <strong>Étape 1 : Définition de la formule et des données</strong>
+                <p>Formule : $\text{PPCM}(a, b) = \dfrac{a \times b}{\text{PGCD}(a, b)}$</p>
+                <p>Données : $a=306$, $b=126$, et $\text{PGCD}(306, 126) = 18$ (d'après l'exercice 3).</p>
+            </div>
+            <div class="solution-step" data-step="2">
+                <strong>Étape 2 : Application numérique</strong>
+                $$\text{PPCM}(306, 126) = \dfrac{306 \times 126}{18}$$
+            </div>
+            <div class="solution-step" data-step="3">
+                <strong>Étape 3 : Calcul final</strong>
+                $$\text{PPCM}(306, 126) = \dfrac{38556}{18} = \mathbf{2142}$$
+            </div>
+            <div class="solution-navigation">
+                <button class="next-solution-step">Étape Suivante</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide">
+        <h1>Partie 2, Exercice 1 : Propriété du PGCD (Preuve)</h1>
+        <div class="content">
+            Soient $a$ et $b$ deux entiers naturels non nuls. Démontrer que tout diviseur commun à $a$ et $b$ est également un diviseur de $a-b$.
+            <br><br>
+            En déduire que $\text{PGCD}(a, b) = \text{PGCD}(a-b, b)$.
+        </div>
+        
+        <div style="display: flex; justify-content: flex-start; margin-top: 3vh;">
+            <button class="hint-button multi-step-toggle">Afficher l'indice</button>
+            <button class="hint-button solution-toggle">Afficher la Solution Détaillée</button>
+        </div>
+        
+        <div class="hint-group" style="display: none;">
+            <div class="hint-content hint-step-1">
+                Indice Étape 1 : Utiliser la définition de la divisibilité. Si $d$ divise $a$ et $b$, alors $a = kd$ et $b = ld$ où $k$ et $l$ sont des entiers.
+            </div>
+            <button class="hint-button next-hint-button" data-next-step="2">Indice Étape 2</button>
+            <div class="hint-content hint-step-2" style="display: none;">
+                Indice Étape 2 : Pour la déduction, vous devez montrer que l'ensemble des diviseurs communs de $(a, b)$ est le même que l'ensemble des diviseurs communs de $(a-b, b)$.
+            </div>
+        </div>
+
+        <div class="solution-container">
+            <div class="solution-step" data-step="1">
+                <strong>Étape 1 : Démonstration que $d$ divise $a-b$</strong>
+                <p>Soit $d$ un diviseur commun à $a$ et $b$. Par définition, il existe des entiers $k$ et $l$ tels que $a = kd$ et $b = ld$.</p>
+                <p>Alors $a - b = kd - ld = (k - l)d$.</p>
+                <p>Puisque $k$ et $l$ sont des entiers, $k-l$ est un entier. Donc, $a-b$ est un multiple de $d$. Par conséquent, $\mathbf{d}$ <strong>divise</strong> $\mathbf{a-b}$.</p>
+            </div>
+            <div class="solution-step" data-step="2">
+                <strong>Étape 2 : Déduction que $\text{Div}(a, b) = \text{Div}(a-b, b)$</strong>
+                <p>L'ensemble des diviseurs communs de $(a, b)$ est $\text{Div}(a) \cap \text{Div}(b)$.</p>
+                <ul>
+                    <li>D'après l'Étape 1, tout diviseur de $a$ et $b$ est un diviseur de $a-b$. Donc $\text{Div}(a) \cap \text{Div}(b) \subset \text{Div}(a-b) \cap \text{Div}(b)$.</li>
+                    <li>Réciproquement, si $d'$ divise $a-b$ et $b$, alors il divise $(a-b) + b = a$. Donc $\text{Div}(a-b) \cap \text{Div}(b) \subset \text{Div}(a) \cap \text{Div}(b)$.</li>
+                </ul>
+                <p>Puisque les deux ensembles de diviseurs communs sont égaux, $\text{PGCD}(a, b) = \text{PGCD}(a-b, b)$.</p>
+            </div>
+            <div class="solution-navigation">
+                <button class="next-solution-step">Étape Suivante</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide">
+        <h1>Partie 2, Exercice 2 : Simplification de Fraction</h1>
+        <div class="content">
+            Rendre irréductible la fraction $F = \dfrac{108}{252}$ en utilisant le $\text{PGCD}$ des nombres $108$ et $252$.
+        </div>
+        
+        <div style="display: flex; justify-content: flex-start; margin-top: 3vh;">
+            <button class="hint-button multi-step-toggle">Afficher l'indice</button>
+            <button class="hint-button solution-toggle">Afficher la Solution Détaillée</button>
+        </div>
+        
+        <div class="hint-group" style="display: none;">
+            <div class="hint-content hint-step-1">
+                Indice Étape 1 : Une fraction est irréductible lorsque le numérateur et le dénominateur sont divisés par leur $\text{PGCD}$.
+            </div>
+            <button class="hint-button next-hint-button" data-next-step="2">Indice Étape 2</button>
+            <div class="hint-content hint-step-2" style="display: none;">
+                Indice Étape 2 : Utilisez l'Algorithme d'Euclide pour trouver $\text{PGCD}(252, 108)$.
+            </div>
+        </div>
+
+        <div class="solution-container">
+            <div class="solution-step" data-step="1">
+                <strong>Étape 1 : Calcul du $\text{PGCD}(252, 108)$ par l'algorithme d'Euclide</strong>
+                $$\mathbf{252} = 2 \times \mathbf{108} + 36$$
+                $$\mathbf{108} = 3 \times \mathbf{36} + 0$$
+                <p>Le dernier reste non nul est $36$. Donc $\text{PGCD}(252, 108) = \mathbf{36}$.</p>
+            </div>
+            <div class="solution-step" data-step="2">
+                <strong>Étape 2 : Simplification de la fraction</strong>
+                <p>Pour rendre la fraction irréductible, on divise le numérateur et le dénominateur par leur $\text{PGCD}$ :</p>
+                $$F = \dfrac{108}{252} = \dfrac{108 \div 36}{252 \div 36} = \mathbf{\dfrac{3}{7}}$$
+            </div>
+            <div class="solution-navigation">
+                <button class="next-solution-step">Étape Suivante</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="slide">
+        <h1>Partie 2, Exercice 3 : Problème d'Application (PPCM)</h1>
+        <div class="content">
+            Un phare A clignote toutes les $18$ secondes. Un phare B clignote toutes les $40$ secondes.
+            <br>
+            Ils clignotent en même temps à minuit. À quelle heure vont-ils clignoter à nouveau en même temps pour la première fois ?
+        </div>
+        
+        <div style="display: flex; justify-content: flex-start; margin-top: 3vh;">
+            <button class="hint-button multi-step-toggle">Afficher l'indice</button>
+            <button class="hint-button solution-toggle">Afficher la Solution Détaillée</button>
+        </div>
+
+        <div class="hint-group" style="display: none;">
+            <div class="hint-content hint-step-1">
+                Indice Étape 1 (Stratégie) : Pour les problèmes de "rendez-vous" ou de "cycles" cherchant le plus petit moment commun, on cherche le <strong>Plus Petit Commun Multiple ($\text{PPCM}$)</strong> des durées ($18$ et $40$ secondes).
+            </div>
+            <button class="hint-button next-hint-button" data-next-step="2">Indice Étape 2</button>
+            <div class="hint-content hint-step-2" style="display: none;">
+                Indice Étape 2 (Conversion) : Le résultat de votre $\text{PPCM}$ sera en secondes. N'oubliez pas de le convertir en minutes et secondes (ou directement en heures/minutes) pour donner l'heure finale.
+            </div>
+        </div>
+        
+        <div class="solution-container">
+            <div class="solution-step" data-step="1">
+                <strong>Étape 1 : Analyse et choix de la méthode</strong>
+                <p>On cherche le plus petit multiple commun des durées, soit $\text{PPCM}(18, 40)$.</p>
+                <p>On utilise la relation : $\text{PPCM}(a, b) = \dfrac{a \times b}{\text{PGCD}(a, b)}$.</p>
+            </div>
+            <div class="solution-step" data-step="2">
+                <strong>Étape 2 : Calcul du $\text{PGCD}(40, 18)$</strong>
+                $$\mathbf{40} = 2 \times \mathbf{18} + 4$$
+                $$\mathbf{18} = 4 \times \mathbf{4} + 2$$
+                $$\mathbf{4} = 2 \times \mathbf{2} + 0$$
+                <p>Donc $\text{PGCD}(18, 40) = 2$.</p>
+            </div>
+            <div class="solution-step" data-step="3">
+                <strong>Étape 3 : Calcul du $\text{PPCM}(18, 40)$</strong>
+                $$\text{PPCM}(18, 40) = \dfrac{18 \times 40}{2} = \dfrac{720}{2} = \mathbf{360} \text{ secondes}$$
+            </div>
+            <div class="solution-step" data-step="4">
+                <strong>Étape 4 : Conversion et conclusion</strong>
+                <p>$360$ secondes correspondent à $360 \div 60 = 6$ minutes.</p>
+                <p>Ils clignoteront en même temps <strong>6 minutes après minuit</strong>, soit à $\mathbf{00:06:00}$.</p>
+            </div>
+            <div class="solution-navigation">
+                <button class="next-solution-step">Étape Suivante</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="slide">
+        <h1>Partie 2, Exercice 4 : Problème d'Application (PGCD)</h1>
+        <div class="content">
+            Un artisan dispose de rouleaux de tissu de $175$ cm et de $280$ cm. Il veut des morceaux de même longueur, la plus grande possible.
+            <ol>
+                <li>Quelle est la longueur maximale d'un morceau de tissu ?</li>
+                <li>Combien de morceaux obtient-il au total ?</li>
+            </ol>
+        </div>
+        
+        <div style="display: flex; justify-content: flex-start; margin-top: 3vh;">
+            <button class="hint-button multi-step-toggle">Afficher l'indice</button>
+            <button class="hint-button solution-toggle">Afficher la Solution Détaillée</button>
+        </div>
+
+        <div class="hint-group" style="display: none;">
+            <div class="hint-content hint-step-1">
+                Indice Étape 1 (Stratégie) : Pour les problèmes de "partage maximal sans reste", on cherche le <strong>Plus Grand Commun Diviseur ($\text{PGCD}$)</strong> des longueurs ($280$ et $175$). Ce $\text{PGCD}$ donne la longueur maximale d'un morceau.
+            </div>
+            <button class="hint-button next-hint-button" data-next-step="2">Indice Étape 2</button>
+            <div class="hint-content hint-step-2" style="display: none;">
+                Indice Étape 2 (Calcul total) : Pour la question (b), divisez chaque longueur de rouleau ($280$ et $175$) par la longueur trouvée à la question (a), puis faites la somme des résultats.
+            </div>
+        </div>
+        
+        <div class="solution-container">
+            <div class="solution-step" data-step="1">
+                <strong>Étape 1 : Calcul du $\text{PGCD}(280, 175)$</strong>
+                <p>On utilise l'Algorithme d'Euclide pour trouver la plus grande longueur commune (PGCD) :</p>
+                $$\mathbf{280} = 1 \times \mathbf{175} + 105$$
+                $$\mathbf{175} = 1 \times \mathbf{105} + 70$$
+                $$\mathbf{105} = 1 \times \mathbf{70} + 35$$
+                $$\mathbf{70} = 2 \times \mathbf{35} + 0$$
+                <p>Le $\text{PGCD}$ est $\mathbf{35}$.</p>
+            </div>
+            <div class="solution-step" data-step="2">
+                <strong>Étape 2 : Réponse (a)</strong>
+                <p>La longueur maximale d'un morceau de tissu est de <strong>35 cm</strong>.</p>
+            </div>
+            <div class="solution-step" data-step="3">
+                <strong>Étape 3 : Calcul du nombre total de morceaux (b)</strong>
+                <ul>
+                    <li>Nombre de morceaux du rouleau de $280$ cm : $280 \div 35 = 8$</li>
+                    <li>Nombre de morceaux du rouleau de $175$ cm : $175 \div 35 = 5$</li>
+                    <li>Nombre total de morceaux : $8 + 5 = \mathbf{13}$</li>
+                </ul>
+            </div>
+            <div class="solution-navigation">
+                <button class="next-solution-step">Étape Suivante</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="slide">
+        <h1>Partie 3, Exercice 1 : Problème d'optimisation (PGCD)</h1>
+        <div class="content">
+            Un fleuriste a $252$ roses rouges et $180$ roses blanches. Il veut le plus grand nombre de bouquets identiques possible.
+            <ol>
+                <li>Quel est le nombre maximal de bouquets ?</li>
+                <li>Quelle est la composition de chaque bouquet ?</li>
+            </ol>
+        </div>
+        
+        <div style="display: flex; justify-content: flex-start; margin-top: 3vh;">
+            <button class="hint-button multi-step-toggle">Afficher l'indice</button>
+            <button class="hint-button solution-toggle">Afficher la Solution Détaillée</button>
+        </div>
+
+        <div class="hint-group" style="display: none;">
+            <div class="hint-content hint-step-1">
+                Indice Étape 1 (Question a) : Le nombre maximal de bouquets identiques correspond au $\text{PGCD}(252, 180)$.
+            </div>
+            <button class="hint-button next-hint-button" data-next-step="2">Indice Étape 2</button>
+            <div class="hint-content hint-step-2" style="display: none;">
+                Indice Étape 2 (Question b) : Pour trouver la composition d'un bouquet, divisez le nombre total de roses de chaque couleur ($252$ et $180$) par le nombre maximal de bouquets trouvé en (a).
+            </div>
+        </div>
+        
+        <div class="solution-container">
+            <div class="solution-step" data-step="1">
+                <strong>Étape 1 : Calcul du $\text{PGCD}(252, 180)$ (Question a)</strong>
+                <p>On utilise l'Algorithme d'Euclide :</p>
+                $$\mathbf{252} = 1 \times \mathbf{180} + 72$$
+                $$\mathbf{180} = 2 \times \mathbf{72} + 36$$
+                $$\mathbf{72} = 2 \times \mathbf{36} + 0$$
+                <p>Le $\text{PGCD}$ est $\mathbf{36}$.</p>
+            </div>
+            <div class="solution-step" data-step="2">
+                <strong>Étape 2 : Réponse (a) et (b)</strong>
+                <p>Le nombre maximal de bouquets est de $\mathbf{36}$ (réponse a).</p>
+            </div>
+            <div class="solution-step" data-step="3">
+                <strong>Étape 3 : Calcul de la composition (Question b)</strong>
+                <ul>
+                    <li>Nombre de roses rouges par bouquet : $252 \div 36 = 7$</li>
+                    <li>Nombre de roses blanches par bouquet : $180 \div 36 = 5$</li>
+                </ul>
+                <p>Chaque bouquet sera composé de <strong>7 roses rouges</strong> et <strong>5 roses blanches</strong>.</p>
+            </div>
+            <div class="solution-navigation">
+                <button class="next-solution-step">Étape Suivante</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide">
+        <h1>Partie 3, Exercice 2 : Problème de planification (PPCM)</h1>
+        <div class="content">
+            Un bus A part de son terminus toutes les $12$ minutes et un bus B part du même terminus toutes les $18$ minutes. Si les deux bus sont partis en même temps à 8h00 du matin, à quelle heure partiront-ils à nouveau ensemble pour la première fois ?
+        </div>
+        
+        <div style="display: flex; justify-content: flex-start; margin-top: 3vh;">
+            <button class="hint-button multi-step-toggle">Afficher l'indice</button>
+            <button class="hint-button solution-toggle">Afficher la Solution Détaillée</button>
+        </div>
+
+        <div class="hint-group" style="display: none;">
+            <div class="hint-content hint-step-1">
+                Indice Étape 1 (Calcul de l'intervalle) : L'intervalle de temps entre deux départs simultanés est donné par le $\text{PPCM}(12, 18)$ en minutes.
+            </div>
+            <button class="hint-button next-hint-button" data-next-step="2">Indice Étape 2</button>
+            <div class="hint-content hint-step-2" style="display: none;">
+                Indice Étape 2 (Heure finale) : Ajoutez le temps trouvé (en minutes) à l'heure de départ initiale (8h00) pour obtenir l'heure finale.
+            </div>
+        </div>
+        
+        <div class="solution-container">
+            <div class="solution-step" data-step="1">
+                <strong>Étape 1 : Calcul du $\text{PPCM}(12, 18)$</strong>
+                <p>On utilise la décomposition en facteurs premiers :</p>
+                $$12 = 2^2 \times 3^1$$
+                $$18 = 2^1 \times 3^2$$
+                <p>On prend tous les facteurs avec le plus grand exposant :</p>
+                $$\text{PPCM}(12, 18) = 2^{\max(2, 1)} \times 3^{\max(1, 2)} = 2^2 \times 3^2 = 4 \times 9 = \mathbf{36}$$
+            </div>
+            <div class="solution-step" data-step="2">
+                <strong>Étape 2 : Détermination de l'heure</strong>
+                <p>L'intervalle de temps est de <strong>36 minutes</strong>.</p>
+                <p>S'ils sont partis à $8$h$00$, ils partiront à nouveau ensemble à :</p>
+                $$8\text{h}00 + 36 \text{ minutes} = \mathbf{8\text{h}36}$$
+            </div>
+            <div class="solution-navigation">
+                <button class="next-solution-step">Étape Suivante</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide">
+        <h1>Partie 3, Exercice 3 : Problème de géométrie (PGCD)</h1>
+        <div class="content">
+            On souhaite carreler une pièce rectangulaire de $4,80$ mètres de long et $3,60$ mètres de large avec des dalles carrées. La taille des dalles doit être la plus grande possible et le carreleur ne doit pas couper les dalles.
+            <ol>
+                <li>Déterminer la longueur du côté de la plus grande dalle carrée utilisable (en centimètres).</li>
+                <li>Combien de dalles seront nécessaires pour couvrir toute la surface ?</li>
+            </ol>
+        </div>
+        
+        <div style="display: flex; justify-content: flex-start; margin-top: 3vh;">
+            <button class="hint-button multi-step-toggle">Afficher l'indice</button>
+            <button class="hint-button solution-toggle">Afficher la Solution Détaillée</button>
+        </div>
+
+        <div class="hint-group" style="display: none;">
+            <div class="hint-content hint-step-1">
+                Indice Étape 1 (Unités) : La question demande une réponse en centimètres. Convertissez les dimensions de la pièce : $4,80$ m $\to 480$ cm et $3,60$ m $\to 360$ cm.
+            </div>
+            <button class="hint-button next-hint-button" data-next-step="2">Indice Étape 2</button>
+            <div class="hint-content hint-step-2" style="display: none;">
+                Indice Étape 2 (Question a) : La plus grande taille de dalle carrée qui divise à la fois la longueur et la largeur est le $\text{PGCD}(480, 360)$.
+            </div>
+            <button class="hint-button next-hint-button" data-next-step="3">Indice Étape 3</button>
+            <div class="hint-content hint-step-3" style="display: none;">
+                Indice Étape 3 (Question b) : Le nombre total de dalles est égal au nombre de dalles sur la longueur multiplié par le nombre de dalles sur la largeur. Par exemple, si le $\text{PGCD}$ est $d$, le nombre de dalles est $\left(\dfrac{480}{d}\right) \times \left(\dfrac{360}{d}\right)$.
+            </div>
+        </div>
+        
+        <div class="solution-container">
+            <div class="solution-step" data-step="1">
+                <strong>Étape 1 : Conversion des unités</strong>
+                <p>Longueur : $4,80 \text{ m} = 480 \text{ cm}$.</p>
+                <p>Largeur : $3,60 \text{ m} = 360 \text{ cm}$.</p>
+            </div>
+            <div class="solution-step" data-step="2">
+                <strong>Étape 2 : Calcul du $\text{PGCD}(480, 360)$ (Question a)</strong>
+                <p>On cherche la plus grande taille qui divise $480$ et $360$ :</p>
+                $$\mathbf{480} = 1 \times \mathbf{360} + 120$$
+                $$\mathbf{360} = 3 \times \mathbf{120} + 0$$
+                <p>Le $\text{PGCD}$ est $\mathbf{120}$.</p>
+            </div>
+            <div class="solution-step" data-step="3">
+                <strong>Étape 3 : Réponse (a) et Calcul du nombre de dalles (Question b)</strong>
+                <p>La longueur du côté de la plus grande dalle est de <strong>120 cm</strong>.</p>
+                <ul>
+                    <li>Nombre de dalles sur la longueur : $480 \div 120 = 4$</li>
+                    <li>Nombre de dalles sur la largeur : $360 \div 120 = 3$</li>
+                </ul>
+            </div>
+            <div class="solution-step" data-step="4">
+                <strong>Étape 4 : Conclusion (b)</strong>
+                <p>Le nombre total de dalles nécessaires est $4 \times 3 = \mathbf{12}$ **dalles**.</p>
+            </div>
+            <div class="solution-navigation">
+                <button class="next-solution-step">Étape Suivante</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="slide">
+        <h1>Partie 3, Exercice 4 : Problème de construction (PPCM)</h1>
+        <div class="content">
+            Un jeu de construction propose des briques de $15$ mm et $21$ mm. On veut construire deux tours de même hauteur (une de chaque type).
+            <ol>
+                <li>Quelle est la hauteur minimale que ces deux tours peuvent atteindre ?</li>
+                <li>Combien de briques de chaque type faudra-t-il ?</li>
+            </ol>
+        </div>
+        
+        <div style="display: flex; justify-content: flex-start; margin-top: 3vh;">
+            <button class="hint-button multi-step-toggle">Afficher l'indice</button>
+            <button class="hint-button solution-toggle">Afficher la Solution Détaillée</button>
+        </div>
+
+        <div class="hint-group" style="display: none;">
+            <div class="hint-content hint-step-1">
+                Indice Étape 1 (Question a) : La hauteur minimale commune qui est un multiple des deux hauteurs est le $\text{PPCM}(15, 21)$.
+            </div>
+            <button class="hint-button next-hint-button" data-next-step="2">Indice Étape 2</button>
+            <div class="hint-content hint-step-2" style="display: none;">
+                Indice Étape 2 (Question b) : Pour trouver le nombre de briques de chaque type, divisez la hauteur minimale trouvée en (a) par la hauteur de la brique correspondante ($15$ mm ou $21$ mm).
+            </div>
+        </div>
+        
+        <div class="solution-container">
+            <div class="solution-step" data-step="1">
+                <strong>Étape 1 : Calcul du $\text{PPCM}(15, 21)$ (Question a)</strong>
+                <p>On cherche la hauteur minimale commune (PPCM).</p>
+                <p>Décomposition : $15 = 3^1 \times 5^1$ et $21 = 3^1 \times 7^1$.</p>
+                $$\text{PPCM}(15, 21) = 3^1 \times 5^1 \times 7^1 = 105$$
+            </div>
+            <div class="solution-step" data-step="2">
+                <strong>Étape 2 : Réponse (a) et (b)</strong>
+                <p>La hauteur minimale est de <strong>105 mm</strong>.</p>
+            </div>
+            <div class="solution-step" data-step="3">
+                <strong>Étape 3 : Calcul du nombre de briques (Question b)</strong>
+                <ul>
+                    <li>Nombre de briques de $15$ mm : $105 \div 15 = 7$</li>
+                    <li>Nombre de briques de $21$ mm : $105 \div 21 = 5$</li>
+                </ul>
+                <p>Il faudra <strong>7 briques de 15 mm</strong> et <strong>5 briques de 21 mm</strong>.</p>
+            </div>
+            <div class="solution-navigation">
+                <button class="next-solution-step">Étape Suivante</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="slide-number">
+    Diapositive <span id="current-slide-num">1</span> / <span id="total-slides"></span>
+</div>
+
+<div class="navigation">
+    <button id="prevBtn" disabled>Précédent</button>
+    <button id="nextBtn">Suivant</button>
+</div>
+
+<script>
+    const slides = document.querySelectorAll('.slide');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const currentNumSpan = document.getElementById('current-slide-num');
+    const totalNumSpan = document.getElementById('total-slides');
+    let currentSlide = 0;
+    const totalSlides = slides.length;
+
+    totalNumSpan.textContent = totalSlides;
+    
+    // --- GESTION DES INDICES MULTI-ÉTAPES ---
+
+    /**
+     * Gère l'affichage séquentiel des indices pour un groupe d'indices donné.
+     * @param {HTMLElement} slideElement - L'élément de la diapositive active.
+     */
+    function setupMultiStepHints(slideElement) {
+        // Cibler uniquement les boutons d'indice de la diapositive active
+        const mainToggle = slideElement.querySelector('.multi-step-toggle');
+        const hintGroup = slideElement.querySelector('.hint-group');
+
+        if (!mainToggle || !hintGroup) return; // Pas d'indice multi-étapes sur cette slide
+
+        // Récupérer tous les boutons de passage à l'étape suivante et les indices
+        const nextHintButtons = hintGroup.querySelectorAll('.next-hint-button');
+        const hintContents = hintGroup.querySelectorAll('.hint-content');
+        
+        // Initialiser l'état : tous les indices suivants sont cachés
+        hintGroup.style.display = 'none';
+        hintContents.forEach(content => content.style.display = 'none');
+        nextHintButtons.forEach(button => button.style.display = 'none');
+        
+        // Réinitialiser le texte du bouton principal
+        mainToggle.textContent = mainToggle.classList.contains('euclide-help-button') ? 'Aide sur l\'Algorithme d\'Euclide' : 'Afficher l\'indice';
+
+        // Logique pour le bouton principal de bascule
+        mainToggle.onclick = function() {
+            const isVisible = hintGroup.style.display === 'block';
+
+            if (isVisible) {
+                // Masquer tout
+                hintGroup.style.display = 'none';
+                hintContents.forEach(content => content.style.display = 'none');
+                nextHintButtons.forEach(button => button.style.display = 'none');
+                mainToggle.textContent = mainToggle.classList.contains('euclide-help-button') ? 'Aide sur l\'Algorithme d\'Euclide' : 'Afficher l\'indice';
+            } else {
+                // Afficher le groupe et la première étape
+                hintGroup.style.display = 'block';
+                const firstStep = hintGroup.querySelector('.hint-step-1');
+                if (firstStep) {
+                    firstStep.style.display = 'block';
+                }
+
+                // Afficher le bouton pour l'étape 2 (s'il existe)
+                const nextBtn = hintGroup.querySelector('.next-hint-button[data-next-step="2"]');
+                if (nextBtn) {
+                    nextBtn.style.display = 'block';
+                }
+                
+                // Mettre à jour le texte du bouton principal seulement s'il n'y a qu'une seule étape OU c'est le dernier indice
+                if (hintContents.length === 1 || !nextBtn) {
+                    mainToggle.textContent = mainToggle.classList.contains('euclide-help-button') ? 'Masquer l\'aide' : 'Masquer l\'indice';
+                } else {
+                    mainToggle.textContent = mainToggle.classList.contains('euclide-help-button') ? 'Aide sur l\'Algorithme d\'Euclide (Étape 1 affichée)' : 'Indice Étape 1 affiché';
+                }
+            }
+        };
+
+        // Logique pour les boutons d'étape suivante
+        nextHintButtons.forEach(button => {
+            button.onclick = function() {
+                const step = button.getAttribute('data-next-step');
+                const nextStepContent = hintGroup.querySelector(`.hint-step-${step}`);
+                
+                if (nextStepContent) {
+                    nextStepContent.style.display = 'block';
+                    button.style.display = 'none'; // Cacher le bouton de l'étape actuelle
+                    
+                    // Afficher le bouton de l'étape suivante
+                    const nextStep = parseInt(step) + 1;
+                    const nextBtn = hintGroup.querySelector(`.next-hint-button[data-next-step="${nextStep}"]`);
+                    
+                    if (nextBtn) {
+                        nextBtn.style.display = 'block';
+                        mainToggle.textContent = mainToggle.classList.contains('euclide-help-button') ? `Aide sur l\'Algorithme d\'Euclide (Étape ${step} affichée)` : `Indice Étape ${step} affiché`;
+                    } else {
+                        // Dernière étape, mettre à jour le texte du bouton principal
+                        mainToggle.textContent = mainToggle.classList.contains('euclide-help-button') ? 'Masquer l\'aide' : 'Masquer l\'indice';
+                    }
+                }
+            };
+        });
+    }
+
+    // --- GESTION DES SOLUTIONS DÉTAILLÉES PAR ÉTAPES ---
+
+    function setupSolution(slideElement) {
+        const solutionToggle = slideElement.querySelector('.solution-toggle');
+        const solutionContainer = slideElement.querySelector('.solution-container');
+        const solutionSteps = solutionContainer ? solutionContainer.querySelectorAll('.solution-step') : [];
+        const nextStepButton = solutionContainer ? solutionContainer.querySelector('.next-solution-step') : null;
+
+        if (!solutionToggle || !solutionContainer) return;
+
+        let currentSolutionStep = 0;
+        
+        // Initialiser/réinitialiser l'état
+        solutionContainer.style.display = 'none';
+        solutionSteps.forEach(step => {
+            step.style.opacity = 0;
+            step.style.display = 'none';
+        });
+        solutionToggle.textContent = 'Afficher la Solution Détaillée';
+        if (nextStepButton) nextStepButton.textContent = 'Étape Suivante';
+
+        // Logique pour le bouton principal de solution
+        solutionToggle.onclick = function() {
+            const isVisible = solutionContainer.style.display === 'block';
+
+            if (isVisible) {
+                // Masquer tout (Reset)
+                solutionContainer.style.display = 'none';
+                solutionSteps.forEach(step => {
+                    step.style.opacity = 0;
+                    step.style.display = 'none';
+                });
+                currentSolutionStep = 0;
+                solutionToggle.textContent = 'Afficher la Solution Détaillée';
+            } else {
+                // Afficher le container et la première étape
+                solutionContainer.style.display = 'block';
+                currentSolutionStep = 1;
+                
+                // Afficher la première étape
+                if (solutionSteps[0]) {
+                    solutionSteps[0].style.display = 'block';
+                    setTimeout(() => solutionSteps[0].style.opacity = 1, 10);
+                }
+
+                solutionToggle.textContent = 'Masquer la Solution';
+                
+                // Gérer le bouton de navigation
+                updateSolutionNavigation();
+            }
+        };
+
+        // Fonction pour afficher l'étape suivante
+        if (nextStepButton) {
+            nextStepButton.onclick = function() {
+                if (currentSolutionStep < solutionSteps.length) {
+                    currentSolutionStep++;
+                    
+                    const nextStep = solutionSteps[currentSolutionStep - 1];
+                    nextStep.style.display = 'block';
+                    setTimeout(() => {
+                        nextStep.style.opacity = 1;
+                        nextStep.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    }, 10);
+                    
+                    updateSolutionNavigation();
+                }
+            };
+        }
+        
+        // Fonction pour mettre à jour le bouton de navigation
+        function updateSolutionNavigation() {
+            if (!nextStepButton) return;
+
+            if (currentSolutionStep === solutionSteps.length) {
+                nextStepButton.textContent = 'Fin de la Solution';
+                nextStepButton.disabled = true;
+            } else {
+                nextStepButton.textContent = `Étape Suivante (${currentSolutionStep}/${solutionSteps.length})`;
+                nextStepButton.disabled = false;
+            }
+        }
+    }
+
+
+    // --- GESTION PRINCIPALE DES SLIDES ---
+    
+    function updateSlide() {
+        slides.forEach((slide, index) => {
+            slide.classList.remove('active');
+            if (index === currentSlide) {
+                slide.classList.add('active');
+                // Réinitialiser et configurer les indices et solutions pour la nouvelle diapositive active
+                setupMultiStepHints(slide);
+                setupSolution(slide);
+                slide.scrollTop = 0; // Remonter au début
+            }
+        });
+
+        // Mise à jour des boutons de navigation
+        prevBtn.disabled = currentSlide === 0;
+        nextBtn.disabled = currentSlide === totalSlides - 1;
+
+        // Mise à jour du numéro de diapositive
+        currentNumSpan.textContent = currentSlide + 1;
+    }
+
+    prevBtn.addEventListener('click', () => {
+        if (currentSlide > 0) {
+            currentSlide--;
+            updateSlide();
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if (currentSlide < totalSlides - 1) {
+            currentSlide++;
+            updateSlide();
+        }
+    });
+
+    // Gestion du clavier
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ') {
+            if (document.activeElement.tagName !== 'BUTTON') { // Évite de trigger si un bouton est sélectionné
+                nextBtn.click();
+            }
+        } else if (e.key === 'ArrowLeft') {
+            if (document.activeElement.tagName !== 'BUTTON') {
+                prevBtn.click();
+            }
+        }
+    });
+
+    // Initialisation
+    updateSlide();
+</script>
+
+</body>
+</html>
