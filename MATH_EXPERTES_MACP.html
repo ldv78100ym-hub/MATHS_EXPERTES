@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problème de Synthèse : Mathématiques Expertes</title>
+    
+    <script type="text/javascript" id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+    </script>
+    <script>
+        // Configuration de MathJax
+        window.MathJax = {
+          tex: {
+            inlineMath: [['\\(', '\\)']],
+            displayMath: [['$$', '$$']]
+          },
+          svg: {
+            fontCache: 'global'
+          }
+        };
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            line-height: 1.6;
+            margin: 40px;
+            color: #333;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        h1, h2, h3 {
+            font-weight: bold;
+            color: #1a5c6d;
+        }
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+        }
+        .header {
+            text-align: right;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+        .warning {
+            color: red;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px dashed red;
+            padding: 10px;
+        }
+        .question {
+            margin-bottom: 25px;
+            padding: 10px 0;
+            border-top: 1px dashed #ddd;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .input-group input[type="text"] {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 150px;
+            margin-right: 10px;
+        }
+        .submit-btn, .indice-btn {
+            border: none;
+            padding: 5px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin-left: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .indice-btn {
+            background-color: #f0ad4e;
+            color: white;
+        }
+        .indice-btn:hover {
+            background-color: #ec971f;
+        }
+        .submit-btn {
+            background-color: #007bff;
+            color: white;
+        }
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+        .result-message {
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        .indice-card {
+            background-color: #f9f9e0;
+            border: 1px solid #f0e68c;
+            padding: 10px;
+            margin-top: 10px;
+            margin-left: 20px;
+            border-radius: 5px;
+            display: none; 
+            font-size: 0.9em;
+        }
+        .solution-card {
+            background-color: #e6ffed; 
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            margin-top: 15px;
+            margin-left: 0;
+            border-radius: 5px;
+            display: none; 
+            font-size: 1em;
+        }
+        .solution-card strong {
+            color: #1a5c6d;
+        }
+    </style>
+</head>
+<body onload="generateNewProblem()">
+
+    <div class="header">
+        Terminale Générale - Maths Expertes
+    </div>
+    
+    <h1>Problème de Synthèse : Arithmétique, Probabilités, Matrices et Complexes</h1>
+    
+    <div class="warning">
+        CE DOCUMENT UTILISE DES VALEURS NUMÉRIQUES <u>GÉNÉRÉES ALÉATOIREMENT</u> AU CHARGEMENT DE LA PAGE. ACTUALISEZ POUR OBTENIR UN NOUVEL ENONCÉ.
+    </div>
+
+    <section id="enonce">
+        <h2>Énoncé du Problème : L'Évolution de Z</h2>
+        
+        <hr>
+
+        <section id="partie-a">
+            <h3>Partie A : Le Processus Arithmétique Déterminant</h3>
+            
+            <p>Soient \(a\) et \(b\) deux entiers naturels non nuls. On définit deux états arithmétiques \(E_A\) et \(E_B\) basés sur ces entiers :</p>
+            <ul>
+                <li>L'état \(E_A\) est atteint si \(\text{PGCD}(a, b) = 1\) (entiers premiers entre eux).</li>
+                <li>L'état \(E_B\) est atteint si \(\text{PGCD}(a, b) \ne 1\) (entiers non premiers entre eux).</li>
+            </ul>
+            
+            <p><strong>Données initiales :</strong> On choisit au départ \(a_0 = \mathbf{A0\_VAL}\) et \(b_0 = \mathbf{B0\_VAL}\).</p>
+            
+            <div class="question">
+                1. <strong>Déterminer</strong> l'état initial \(X_0\) (qui est soit \(E_A\) soit \(E_B\)).
+                <div class="input-group">
+                    <input type="text" id="input-q1" placeholder="Entrez E_A ou E_B">
+                    <button class="submit-btn" onclick="checkAnswer('q1', 'input-q1')">Vérifier</button>
+                    <button class="indice-btn" onclick="toggleIndice('q1')">Indice Q.1</button>
+                    <span id="result-q1" class="result-message"></span>
+                </div>
+                
+                <div id="indice-q1" class="indice-card">
+                    <p><strong>Carte 1 / Q.1 (Arithmétique)</strong><br>
+                    \(E_A\) ou \(E_B\)? Vérifiez si \(a_0\) et \(b_0\) sont <strong>premiers entre eux</strong> en calculant leur PGCD.</p>
+                </div>
+                <div id="solution-q1" class="solution-card">
+                    </div>
+            </div>
+
+            <div class="question">
+                2. On définit un nouvel entier \(k = \text{PPCM}(a_0, b_0)\).
+                <div class="input-group">
+                    <input type="text" id="input-q2" placeholder="Entrez la valeur de k">
+                    <button class="submit-btn" onclick="checkAnswer('q2', 'input-q2')">Vérifier</button>
+                    <button class="indice-btn" onclick="toggleIndice('q2')">Indice Q.2</button>
+                    <span id="result-q2" class="result-message"></span>
+                </div>
+                <div id="indice-q2" class="indice-card">
+                    <p><strong>Carte 2 / Q.2 (PPCM)</strong><br>
+                    Utilisez la relation fondamentale : \(a \times b = \text{PGCD}(a, b) \times \text{PPCM}(a, b)\).</p>
+                </div>
+                <div id="solution-q2" class="solution-card">
+                    </div>
+            </div>
+
+            <div class="question">
+                3. On pose \(a_1 = a_0 + 1\) et \(b_1 = k\). <strong>Déterminer</strong> l'état \(X_1\).
+                <div class="input-group">
+                    <input type="text" id="input-q3" placeholder="Entrez E_A ou E_B">
+                    <button class="submit-btn" onclick="checkAnswer('q3', 'input-q3')">Vérifier</button>
+                    <button class="indice-btn" onclick="toggleIndice('q3')">Indice Q.3</button>
+                    <span id="result-q3" class="result-message"></span>
+                </div>
+                <div id="indice-q3" class="indice-card">
+                    <p><strong>Carte 3 / Q.3 (Arithmétique)</strong><br>
+                    Calculez \(a_1\) et \(b_1\), puis vérifiez si \(\text{PGCD}(a_1, b_1)\) est égal à 1. $\text{PGCD}(a_0+1, k) = \mathbf{PGCD\_VAL}$.</p>
+                </div>
+                <div id="solution-q3" class="solution-card">
+                    </div>
+            </div>
+        </section>
+
+        <hr>
+
+        <section id="partie-b">
+            <h3>Partie B : La Chaîne de Markov et la Matrice de Transformation</h3>
+            
+            <p>Dans le plan complexe, on associe à l'état du système \(X_n\) (qui est soit \(E_A\) soit \(E_B\)) un nombre complexe \(Z_n\):</p>
+            <ul>
+                <li>Si \(X_n = E_A\), on associe le complexe \(Z_n = \frac{\sqrt{2}}{2} + i \frac{\sqrt{2}}{2}\).</li>
+                <li>Si \(X_n = E_B\), on associe le complexe \(Z_n = \frac{1}{2} + i \frac{\sqrt{3}}{2}\).</li>
+            </ul>
+            
+            <p>L'évolution de l'état du système \(X_n\) vers \(X_{n+1}\) suit une chaîne de Markov dont les probabilités de transition sont <strong>déterminées par les opérations arithmétiques</strong> :</p>
+            <ul>
+                <li id="p_a_a_li">La probabilité de rester dans \(E_A\) (passer de \(E_A\) à \(E_A\)) est \(P(E_A \to E_A) = \frac{1}{\text{PPCM}(\mathbf{N1\_PPCM\_1}, \mathbf{N1\_PPCM\_2})}\).</li>
+                <li id="p_b_a_li">La probabilité de passer de \(E_B\) à \(E_A\) est \(P(E_B \to E_A) = \frac{1}{\text{PGCD}(\mathbf{N2\_PGCD\_1}, \mathbf{N2\_PGCD\_2})}\).</li>
+            </ul>
+
+            <div class="question">
+                4. <strong>Déterminer</strong> la matrice de transition \(M\) de cette chaîne de Markov, en classant les états dans l'ordre \((E_A, E_B)\).
+                <div class="input-group">
+                    <input type="text" id="input-q4" placeholder="Entrez P(E_B -> E_B) ex: 4/5">
+                    <button class="submit-btn" onclick="checkAnswer('q4', 'input-q4')">Vérifier</button>
+                    <button class="indice-btn" onclick="toggleIndice('q4a')">Indice Q.4</button>
+                    <span id="result-q4" class="result-message"></span>
+                </div>
+                <div id="indice-q4a" class="indice-card">
+                    <p><strong>Carte 4 / Q.4 (Matrice)</strong><br>
+                    La somme des probabilités de chaque <strong>ligne</strong> de la matrice \(M\) doit être égale à 1.</p>
+                    <button class="indice-btn" style="background-color:#1a75ff;" onclick="toggleIndice('q4b')">Clé Matrice M</button>
+                </div>
+                <div id="indice-q4b" class="indice-card" style="background-color:#e0f7fa;">
+                    <p><strong>Carte 5 / Q.4 (Clé)</strong></p>
+                    <div id="matrix_m_key">
+                        </div>
+                </div>
+                <div id="solution-q4" class="solution-card">
+                    </div>
+            </div>
+
+            <div class="question">
+                5. On pose \(V_n = \begin{pmatrix} P(X_n = E_A) \\ P(X_n = E_B) \end{pmatrix}\). <strong>Justifier</strong> que \(V_{n+1} = M \cdot V_n\). 
+                <div class="input-group">
+                    <input type="text" id="input-q5" placeholder="Entrez la justification">
+                    <button class="submit-btn" onclick="checkAnswer('q5', 'input-q5')">Vérifier</button>
+                    <button class="indice-btn" onclick="toggleIndice('q5')">Indice Q.5</button>
+                    <span id="result-q5" class="result-message"></span>
+                </div>
+                <div id="indice-q5" class="indice-card">
+                    <p><strong>Carte 6 / Q.5 (Probabilités)</strong><br>
+                    Utilisez le principe des <strong>probabilités totales</strong> pour écrire \(P(X_{n+1}=E_A)\) en fonction de \(P(X_n=E_A)\) et \(P(X_n=E_B)\).</p>
+                </div>
+                <div id="solution-q5" class="solution-card">
+                    </div>
+            </div>
+
+            <div class="question">
+                6. <strong>Déterminer</strong> l'état probabiliste limite \(V = \lim_{n \to \infty} V_n\). 
+                <div class="input-group">
+                    <input type="text" id="input-q6" placeholder="Entrez p_A ex: N/D">
+                    <button class="submit-btn" onclick="checkAnswer('q6', 'input-q6')">Vérifier</button>
+                    <button class="indice-btn" onclick="toggleIndice('q6')">Indice Q.6</button>
+                    <span id="result-q6" class="result-message"></span>
+                </div>
+                <div id="indice-q6" class="indice-card">
+                    <p><strong>Carte 7 / Q.6 (État Limite)</strong><br>
+                    L'état stationnaire \(V = \begin{pmatrix} p_A \\ p_B \end{pmatrix}\) vérifie \(\mathbf{M \cdot V = V}\) et \(\mathbf{p_A + p_B = 1}\).</p>
+                </div>
+                <div id="solution-q6" class="solution-card">
+                    </div>
+            </div>
+        </section>
+
+        <hr>
+
+        <section id="partie-c">
+            <h3>Partie C : Transformation par Matrice et Nombres Complexes</h3>
+            
+            <p>Soit \(p_A\) la probabilité limite d'être dans l'état \(E_A\), et \(p_B\) celle d'être dans \(E_B\) (issues de la question 6).</p>
+            <p>On définit la matrice de transformation \(T\) :</p>
+            $$
+            T = \begin{pmatrix} p_A & -p_B \\ p_B & p_A \end{pmatrix}
+            $$
+            <p>Soit \(Z\) un nombre complexe quelconque. On note \(Z'\) l'affixe du point transformé de \(Z\) par l'application linéaire associée à \(T\).</p>
+
+            <div class="question">
+                7. <strong>Exprimer</strong> \(Z'\) en fonction de \(Z\) en utilisant \(T\). 
+                <div class="input-group">
+                    <input type="text" id="input-q7" placeholder="Entrez pA + i*pB ou N/D + iM/D">
+                    <button class="submit-btn" onclick="checkAnswer('q7', 'input-q7')">Vérifier</button>
+                    <button class="indice-btn" onclick="toggleIndice('q7')">Indice Q.7</button>
+                    <span id="result-q7" class="result-message"></span>
+                </div>
+                <div id="indice-q7" class="indice-card">
+                    <p><strong>Carte 8 / Q.7 (Complexe/Matrice)</strong><br>
+                    Recherchez la factorisation de \(Z' = x' + iy'\) sous la forme d'un produit complexe : \(\mathbf{Z' = \Omega Z}\). Quel est \(\mathbf{\Omega = p_A + i p_B}\)?</p>
+                </div>
+                <div id="solution-q7" class="solution-card">
+                    </div>
+            </div>
+
+            <div class="question">
+                8. On pose \(Z_A = \frac{\sqrt{2}}{2} + i \frac{\sqrt{2}}{2}\). <strong>Calculer</strong> le module et un argument du complexe \(Z'\). 
+                <div class="input-group">
+                    <input type="text" id="input-q8" placeholder="Entrez le module ex: sqrt(R)/D">
+                    <button class="submit-btn" onclick="checkAnswer('q8', 'input-q8')">Vérifier</button>
+                    <button class="indice-btn" onclick="toggleIndice('q8')">Indice Q.8</button>
+                    <span id="result-q8" class="result-message"></span>
+                </div>
+                <div id="indice-q8" class="indice-card">
+                    <p><strong>Carte 9 / Q.8 (Module/Argument)</strong><br>
+                    Utilisez les propriétés : \(|Z'| = |\Omega| \times |Z_A|\) et \(\arg(Z') = \arg(\Omega) + \arg(Z_A)\).</p>
+                </div>
+                <div id="solution-q8" class="solution-card">
+                    </div>
+            </div>
+
+            <div class="question">
+                9. <strong>Interpréter géométriquement</strong> la transformation du point d'affixe \(Z\) vers le point d'affixe \(Z'\) dans le plan complexe.
+                <div class="input-group">
+                    <input type="text" id="input-q9" placeholder="Entrez le type de transformation">
+                    <button class="submit-btn" onclick="checkAnswer('q9', 'input-q9')">Vérifier</button>
+                    <button class="indice-btn" onclick="toggleIndice('q9')">Indice Q.9</button>
+                    <span id="result-q9" class="result-message"></span>
+                </div>
+                <div id="indice-q9" class="indice-card">
+                    <p><strong>Carte 10 / Q.9 (Géométrie)</strong><br>
+                    Une multiplication complexe \(\mathbf{Z' = \Omega Z}\) représente toujours une <strong>similitude directe</strong> de centre l'origine. Précisez son rapport (\(|\Omega|\)) et son angle (\(\arg(\Omega)\)).</p>
+                </div>
+                <div id="solution-q9" class="solution-card">
+                    </div>
+            </div>
+        </section>
+    </section>
+	<div id="auteur-section" style="text-align: center; margin-top: 50px; padding-top: 20px; border-top: 1px dashed #ccc;">
+        <button id="show-auteur-btn" class="submit-btn" style="background-color: #333; margin-bottom: 10px;" onclick="toggleDisclaimer()">
+            Auteur et Droits d'Auteur
+        </button>
+        <div id="disclaimer-content" style="display: none; font-size: 0.9em; color: #555; max-width: 600px; margin: 10px auto; padding: 10px; border: 1px solid #ddd; border-radius: 5px; text-align: left;">
+            <p><strong>Auteur du problème :</strong> Yann Merdy</p>
+            <p><strong>Droits d'Auteur et Utilisation :</strong></p>
+            <p>Ce contenu, y compris l'énoncé, les solutions et le code interactif, est protégé par les droits d'auteur. <strong>Toute utilisation à des fins commerciales, y compris la revente, la distribution ou l'intégration dans des produits commerciaux, est strictement interdite sans autorisation écrite explicite de l'auteur.</strong></p>
+            <p>L'utilisation est limitée à des fins éducatives et personnelles non commerciales.</p>
+        </div>
+    </div>
+    <script>
+        let problemData = {}; 
+
+        // --- Fonctions Mathématiques de Base ---
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Calcule le plus grand commun diviseur (PGCD)
+        function pgcd(a, b) {
+            a = Math.abs(a);
+            b = Math.abs(b);
+            return b ? pgcd(b, a % b) : a;
+        }
+
+        // Calcule le plus petit commun multiple (PPCM)
+        function ppcm(a, b) {
+            // Évite la division par zéro ou l'overflow si a*b est trop grand (peu probable ici)
+            if (a === 0 || b === 0) return 0;
+            return (a * b) / pgcd(a, b);
+        }
+
+        // Simplifie une fraction [num, den]
+        function simplifyFraction(num, den) {
+            if (den === 0) return [num, 0];
+            const common = pgcd(num, den);
+            return [num / common, den / common];
+        }
+
+        // Renvoie une chaîne de caractères représentant une fraction simplifiée
+        function formatFraction(num, den) {
+            const [n, d] = simplifyFraction(num, den);
+            return d === 1 ? String(n) : `${n}/${d}`;
+        }
+        
+        // --- Randomisation de a0 et b0 pour la Partie A ---
+
+        function generateA0B0() {
+            let a0, b0, k, pgcd_a1_b1;
+            let attempts = 0;
+            // Boucle pour garantir que PGCD(a0, b0) = 1 (X0=EA) ET PGCD(a0+1, k) > 1 (X1=EB)
+            while (attempts < 100) {
+                // 1. Generate a0 (odd, 5 to 15)
+                a0 = getRandomInt(5, 15);
+                if (a0 % 2 === 0) { // S'assurer que a0 est impair
+                    a0 += 1;
+                }
+                
+                // 2. Generate b0 (even, 8 to 20)
+                b0 = getRandomInt(8, 20);
+                if (b0 % 2 !== 0) { // S'assurer que b0 est pair
+                    b0 += 1;
+                }
+                
+                if (b0 > 20) b0 = 20; // Limiter b0
+
+                // 3. Vérifier la condition X0=EA (PGCD(a0, b0) = 1)
+                if (pgcd(a0, b0) === 1) {
+                    k = a0 * b0; // PPCM(a0, b0) puisque PGCD est 1
+                    // 4. Vérifier la condition X1=EB (PGCD(a0+1, k) > 1). a0+1 est pair, k est pair, donc PGCD sera au moins 2.
+                    pgcd_a1_b1 = pgcd(a0 + 1, k);
+                    if (pgcd_a1_b1 > 1) {
+                        return { a0, b0, k, pgcd_a1_b1 };
+                    }
+                }
+                attempts++;
+            }
+            // Fallback pour assurer la cohérence si le loop échoue (peu probable)
+            return { a0: 5, b0: 8, k: 40, pgcd_a1_b1: 2 }; 
+        }
+
+
+        // --- Génération et Mise à Jour du Problème ---
+
+        function generateNewProblem() {
+            
+            // --- PARTIE A RANDOMISATION ---
+            const arithmData = generateA0B0();
+            const a0 = arithmData.a0;
+            const b0 = arithmData.b0;
+            const k = arithmData.k;
+            const pgcd_a1_b1 = arithmData.pgcd_a1_b1;
+
+            // --- PARTIE B RANDOMISATION ---
+            // N1 et N2 doivent être suffisamment grands et premiers entre eux pour PPCM et PGCD
+            const N1 = getRandomInt(4, 10); 
+            const N2 = getRandomInt(4, 6);
+
+            // Coherence for the arithmetical part (Partie B)
+            // P_AA = 1/N1, P_BA = 1/N2
+            // Simplification: use fixed small numbers for PPCM and PGCD arguments for N1 and N2
+            const N1_PPCM_1 = 2; 
+            const N1_PPCM_2 = N1 / pgcd(2, N1); // PPCM(2, x) = N1
+            const N2_PGCD_1 = N2 * 3;
+            const N2_PGCD_2 = N2 * 5; // PGCD(3*N2, 5*N2) = N2
+
+            // Calcul des probabilités de transition
+            const P_AB_frac = formatFraction(N1 - 1, N1);
+            const P_BB_frac = formatFraction(N2 - 1, N2);
+            
+            // Calcul de l'état limite p_A = P_BA / (P_BA + P_AB)
+            // p_A = (1/N2) / (1/N2 + (N1-1)/N1) = N1 / (N1 + N2(N1-1)) 
+            const p_A_num = N1;
+            const p_A_den = N1 + N1 * N2 - N2; 
+            const p_B_num = N1 * N2 - N2;
+            const p_B_den = p_A_den;
+
+            // Simplification des probabilités limites
+            const [p_A_s_num, p_A_s_den] = simplifyFraction(p_A_num, p_A_den);
+            const [p_B_s_num, p_B_s_den] = simplifyFraction(p_B_num, p_B_den);
+
+            // Calcul du module final |Z'| = sqrt(p_A^2 + p_B^2)
+            const R_num = p_A_s_num * p_A_s_num + p_B_s_num * p_B_s_num;
+            const R_den = p_A_s_den * p_A_s_den; 
+
+            // Stockage des données du problème (nécessaires pour la vérification)
+            problemData = {
+                // Réponses attendues (normalisées pour la vérification)
+                'q1': ['ea', 'e a', 'e_a'], 
+                'q2': [String(k)], 
+                'q3': ['eb', 'e b', 'e_b'],
+                'q4': [P_BB_frac, P_BB_frac.replace('/', '\\')], // P(E_B -> E_B)
+                'q5': ['probabilités totales', 'formule des probabilités totales', 'fpt'],
+                'q6': [formatFraction(p_A_s_num, p_A_s_den), formatFraction(p_A_s_num, p_A_s_den).replace('/', '\\')], // p_A
+                'q7': [`${formatFraction(p_A_s_num, p_A_s_den)} + i${formatFraction(p_B_s_num, p_A_s_den)}`, `pa + ipb`, `pa+ipb`], // p_A + i*p_B
+                'q8': [`sqrt(${R_num})/${p_A_s_den}`, `racine(${R_num})/${p_A_s_den}`], // Module
+                'q9': ['similitude directe', 'similitude', 'similitude de centre o'],
+                
+                // Paramètres pour l'affichage
+                a0: a0, b0: b0, k: k, pgcd_a1_b1: pgcd_a1_b1,
+                N1: N1, N2: N2,
+                p_A_num: p_A_s_num, p_A_den: p_A_s_den,
+                p_B_num: p_B_s_num,
+                R_num: R_num,
+                R_den: p_A_s_den
+            };
+
+            updateHTMLContent();
+        }
+
+        function updateHTMLContent() {
+            const data = problemData;
+
+            // 1. Mise à jour de la Partie A (Valeurs initiales) - C'EST LA CORRECTION CRUCIALE
+            document.querySelector('#partie-a p:last-of-type').innerHTML = `
+                <strong>Données initiales :</strong> On choisit au départ \\(a_0 = \\mathbf{${data.a0}}\\) et \\(b_0 = \\mathbf{${data.b0}}\\).
+            `;
+            document.querySelector('#indice-q3 p').innerHTML = `
+                <strong>Carte 3 / Q.3 (Arithmétique)</strong><br>
+                Calculez \(a_1\) et \(b_1\), puis vérifiez si \(\text{PGCD}(a_1, b_1)\) est égal à 1. $\\text{PGCD}(a_0+1, k) = \\mathbf{${data.pgcd_a1_b1}}$.
+            `;
+
+            // 2. Mise à jour de la Partie B (Probabilités de transition)
+            const P_AB_frac = formatFraction(data.N1 - 1, data.N1);
+            const P_BB_frac = formatFraction(data.N2 - 1, data.N2);
+            document.getElementById('p_a_a_li').innerHTML = `La probabilité de rester dans \\(E_A\\) (passer de \\(E_A\\) à \\(E_A\\)) est \\(P(E_A \\to E_A) = \\frac{1}{\\text{PPCM}(\\mathbf{${2}}, \\mathbf{${data.N1/pgcd(2, data.N1)}})} = \\frac{1}{\\mathbf{${data.N1}}}\\).`;
+            document.getElementById('p_b_a_li').innerHTML = `La probabilité de passer de \\(E_B\\) à \\(E_A\\) est \\(P(E_B \\to E_A) = \\frac{1}{\\text{PGCD}(\\mathbf{${data.N2*3}}, \\mathbf{${data.N2*5}})} = \\frac{1}{\\mathbf{${data.N2}}}\\).`;
+            
+            // 3. Mise à jour de la Matrice M (Q4 Key)
+            document.getElementById('matrix_m_key').innerHTML = `
+                $$ 
+                \\mathbf{M} = \\begin{pmatrix} 
+                    1/${data.N1} & 1/${data.N2} \\\\ 
+                    ${P_AB_frac} & ${P_BB_frac} 
+                \\end{pmatrix} 
+                $$
+            `;
+
+            // 4. Mise à jour de TOUTES les solutions
+            document.getElementById('solution-q1').innerHTML = `
+                <strong>Solution Q.1 : Détermination de l'état initial \\(X_0\\)</strong>
+                <p>Nous avons \\(a_0 = ${data.a0}\\) et \\(b_0 = ${data.b0}\\).</p>
+                $$ \\text{PGCD}(${data.a0}, ${data.b0}) = 1 $$
+                <p>Puisque le PGCD est 1, l'état initial est l'état \\(E_A\\). </p>
+                <p>$$\\mathbf{X_0 = E_A}$$</p>
+            `;
+
+            document.getElementById('solution-q2').innerHTML = `
+                <strong>Solution Q.2 : Calcul de \\(k\\)</strong>
+                <p>Puisque \\(\\text{PGCD}(${data.a0}, ${data.b0}) = 1\\), on a :</p>
+                $$ k = \\text{PPCM}(${data.a0}, ${data.b0}) = ${data.a0} \\times ${data.b0} = ${data.k} $$
+                <p>$$\\mathbf{k = ${data.k}}$$</p>
+            `;
+
+            document.getElementById('solution-q3').innerHTML = `
+                <strong>Solution Q.3 : Détermination de l'état \\(X_1\\)</strong>
+                <p>Nous avons \\(a_1 = ${data.a0} + 1 = ${data.a0+1}\\) et \\(b_1 = ${data.k}\\).</p>
+                $$ \\text{PGCD}(${data.a0+1}, ${data.k}) = ${data.pgcd_a1_b1} $$
+                <p>Puisque \\(\\text{PGCD}(a_1, b_1) = ${data.pgcd_a1_b1} \\ne 1\\), l'état \\(X_1\\) est l'état \\(E_B\\). </p>
+                <p>$$\\mathbf{X_1 = E_B}$$</p>
+            `;
+
+            document.getElementById('solution-q4').innerHTML = `
+                <strong>Solution Q.4 : Détermination de la matrice de transition \\(M\\)</strong>
+                <p>Probabilités données :</p>
+                <ul>
+                    <li>\(P(E_A \\to E_A) = 1/${data.N1}\)</li>
+                    <li>\(P(E_B \\to E_A) = 1/${data.N2}\)</li>
+                </ul>
+                <p>Probabilités complémentaires :</p>
+                <ul>
+                    <li>\(P(E_A \\to E_B) = 1 - 1/${data.N1} = ${P_AB_frac}\)</li>
+                    <li>\(P(E_B \\to E_B) = 1 - 1/${data.N2} = ${P_BB_frac}\)</li>
+                </ul>
+                $$
+                \\mathbf{M = \\begin{pmatrix}
+                    1/${data.N1} & 1/${data.N2} \\\\
+                    ${P_AB_frac} & ${P_BB_frac}
+                \\end{pmatrix}}
+                $$
+            `;
+
+            document.getElementById('solution-q5').innerHTML = `
+                <strong>Solution Q.5 : Justification de \\(V_{n+1} = M \\cdot V_n\\)</strong>
+                <p>L'égalité \\(\\mathbf{V_{n+1} = M \\cdot V_n}\\) découle directement de la formule des <strong>probabilités totales</strong> appliquée à une chaîne de Markov.</p>
+                <p>En détail : \\(\\mathbf{P(X_{n+1}=E_A) = P(X_n=E_A) \\cdot P(E_A \\to E_A) + P(X_n=E_B) \\cdot P(E_B \\to E_A)}\\), qui est la première ligne du produit matriciel.
+            `;
+
+            document.getElementById('solution-q6').innerHTML = `
+                <strong>Solution Q.6 : Détermination de l'état limite \\(V\\)</strong>
+                <p>L'état limite \\(V = \\begin{pmatrix} p_A \\\\ p_B \\end{pmatrix}\\) vérifie \\(\\mathbf{M \\cdot V = V}\\) et \\(p_A + p_B = 1\\).</p>
+                <p>La résolution du système donne :</p>
+                $$ p_A = \\frac{1/${data.N2}}{1/${data.N2} + 1 - 1/${data.N1}} = \\frac{${data.p_A_num}}{${data.p_A_den}} $$
+                $$ p_B = 1 - p_A = \\frac{${data.p_B_num}}{${data.p_A_den}} $$
+                <p>L'état limite est :</p>
+                $$
+                \\mathbf{V = \\begin{pmatrix} \\frac{${data.p_A_num}}{${data.p_A_den}} \\\\ \\frac{${data.p_B_num}}{${data.p_A_den}} \\end{pmatrix}}
+                $$
+            `;
+            
+            const omega_frac = `${formatFraction(data.p_A_num, data.p_A_den)} + i${formatFraction(data.p_B_num, data.p_A_den)}`;
+            document.getElementById('solution-q7').innerHTML = `
+                <strong>Solution Q.7 : Expression de \\(Z'\\) en fonction de \\(Z\\)</strong>
+                <p>L'application linéaire associée à la matrice \(T\) se traduit en multiplication complexe.</p>
+                $$ Z' = (p_A + i p_B) Z $$
+                <p>Avec les valeurs limites :</p>
+                $$ \\mathbf{Z' = \\left( ${omega_frac} \\right) Z} $$
+            `;
+
+            document.getElementById('solution-q8').innerHTML = `
+                <strong>Solution Q.8 : Module et Argument de \\(Z'\\)</strong>
+                <p>On pose \\(\\Omega = p_A + i p_B\\) et on a \\(|Z'| = |\\Omega| \\cdot |Z_A|\\). Avec \\(|Z_A|=1\\).</p>
+                <p><strong>Module de \\(Z'\\) :</strong></p>
+                $$ |\\Omega| = \\frac{1}{${data.R_den}} \\sqrt{${data.p_A_num}^2 + ${data.p_B_num}^2} = \\frac{\\sqrt{${data.R_num}}}{${data.R_den}} $$
+                <p>$$\\mathbf{|Z'| = \\frac{\\sqrt{${data.R_num}}}{${data.R_den}}}$$</p>
+                <p><strong>Argument de \\(Z'\\) :</strong></p>
+                $$ \\arg(Z') = \\arg(\\Omega) + \\arg(Z_A) = \\mathbf{\\arctan\\left(\\frac{${data.p_B_num}}{${data.p_A_num}}\\right) + \\frac{\\pi}{4} \\pmod{2\\pi}} $$
+            `;
+            
+            document.getElementById('solution-q9').innerHTML = `
+                <strong>Solution Q.9 : Interprétation géométrique</strong>
+                <p>La transformation \\(Z' = \\Omega Z\\) est une <strong>similitude directe</strong> de centre l'origine \\(O\\), caractérisée par :</p>
+                <ul>
+                    <li>un <strong>rapport</strong> \\(r = |\\Omega| = \\frac{\\sqrt{${data.R_num}}}{${data.R_den}}\\),</li>
+                    <li>et un <strong>angle</strong> \\(\\theta = \\arg(\\Omega) = \\arctan\\left(\\frac{${data.p_B_num}}{${data.p_A_num}}\\right)\\).</li>
+                </ul>
+            `;
+
+            // S'assurer que MathJax render le nouveau contenu caché immédiatement
+            MathJax.typeset();
+        }
+
+        function toggleIndice(id) {
+            const indiceCard = document.getElementById('indice-' + id);
+            if (indiceCard) {
+                // S'assure que MathJax traite le contenu si ce n'est pas déjà fait
+                MathJax.typeset([indiceCard]); 
+                indiceCard.style.display = (indiceCard.style.display === 'block' ? 'none' : 'block');
+            }
+        }
+
+        function normalizeAnswer(answer) {
+            // Fonction de normalisation pour la vérification de la réponse
+            return answer.toLowerCase().trim()
+                .replace(/\s+/g, '')
+                .replace(/[*()]/g, '')
+                .replace(/racine/g, 'sqrt') 
+                .replace(/\\/g, '/')
+                .replace(/ /g, '')
+                .replace(/i/g, 'i') // Garde le 'i'
+                .replace(/e_a/g, 'ea')
+                .replace(/e_b/g, 'eb');
+        }
+
+        function checkAnswer(qId, inputId) {
+            const inputElement = document.getElementById(inputId);
+            const userAnswer = normalizeAnswer(inputElement.value);
+            
+            const solutionCard = document.getElementById('solution-' + qId);
+            const resultElement = document.getElementById('result-' + qId);
+            
+            const acceptedAnswers = problemData[qId];
+            let isCorrect = acceptedAnswers.some(correct => userAnswer === normalizeAnswer(correct));
+
+            // Cas spéciaux pour Q7 (doit accepter pA+i pB avec les valeurs numériques)
+            if (qId === 'q7' && !isCorrect) {
+                const numVal = `${formatFraction(problemData.p_A_num, problemData.p_A_den)} + i${formatFraction(problemData.p_B_num, problemData.p_A_den)}`;
+                if (userAnswer === normalizeAnswer(numVal)) {
+                     isCorrect = true;
+                }
+            }
+
+            // Tolérance pour les réponses avec virgule (décimales) dans les fractions (Q6, Q8)
+            if (!isCorrect && (qId === 'q6' || qId === 'q8')) {
+                 let expectedValue;
+                 if (qId === 'q6') {
+                     expectedValue = problemData.p_A_num / problemData.p_A_den;
+                 } else {
+                     expectedValue = Math.sqrt(problemData.R_num) / problemData.R_den;
+                 }
+                 const userDecimal = parseFloat(userAnswer.replace(',', '.')); // Gère la virgule
+                 
+                 if (!isNaN(userDecimal) && Math.abs(userDecimal - expectedValue) < 0.01) {
+                     isCorrect = true;
+                 }
+            }
+
+
+            if (isCorrect) {
+                resultElement.innerHTML = '<span style="color: green;">✅ Correct ! Solution affichée.</span>';
+                if (solutionCard) {
+                    MathJax.typeset([solutionCard]);
+                    solutionCard.style.display = 'block';
+                }
+            } else {
+                resultElement.innerHTML = '<span style="color: red;">❌ Incorrect. Essayez encore, ou utilisez l\'indice.</span>';
+                if (solutionCard) {
+                    solutionCard.style.display = 'none';
+                }
+            }
+        }
+	function toggleDisclaimer() {
+            const disclaimer = document.getElementById('disclaimer-content');
+            const button = document.getElementById('show-auteur-btn');
+            if (disclaimer.style.display === 'block') {
+                disclaimer.style.display = 'none';
+                button.textContent = 'Auteur et Droits d\'Auteur';
+                button.style.backgroundColor = '#333';
+            } else {
+                disclaimer.style.display = 'block';
+                button.textContent = 'Masquer les Droits d\'Auteur';
+                button.style.backgroundColor = '#dc3545';
+            }
+        }00
+    </script>
+
+</body>
+</html>

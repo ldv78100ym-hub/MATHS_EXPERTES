@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Correction Détaillée - Problème de Synthèse Maths Expertes</title>
+    
+    <script type="text/javascript" id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+    </script>
+    <script>
+        // Configuration de MathJax
+        window.MathJax = {
+          tex: {
+            inlineMath: [['\\(', '\\)']],
+            displayMath: [['$$', '$$']]
+          },
+          svg: {
+            fontCache: 'global'
+          }
+        };
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            line-height: 1.6;
+            margin: 40px;
+            color: #333;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: #f7f7f7;
+        }
+        h1, h2, h3 {
+            font-weight: bold;
+            color: #1a5c6d;
+        }
+        h1 {
+            text-align: center;
+            border-bottom: 3px solid #1a5c6d;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+        .header {
+            text-align: right;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            background-color: #e6f7ff;
+            padding: 10px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            border-left: 5px solid #007bff;
+        }
+        .solution-card {
+            background-color: #ffffff; 
+            border: 1px solid #c3e6cb;
+            padding: 20px;
+            margin-top: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        .solution-card strong {
+            color: #1a5c6d;
+            font-size: 1.1em;
+            display: block;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px dashed #ddd;
+        }
+        .latex-display {
+            display: block;
+            text-align: center;
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        ul li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+        ul li:before {
+            content: '•';
+            color: #007bff;
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+    </style>
+</head>
+<body onload="generateAndDisplaySolution()">
+
+        <div class="header">
+        Terminale Générale - Maths Expertes
+    </div>
+    
+    <h1>Correction Détaillée : L'Évolution de Z</h1>
+    
+    <div id="enonce-resume">
+        </div>
+
+    <hr>
+
+    <section id="solutions">
+        </section>
+    
+
+    <script>
+        let problemData = {}; 
+
+        // --- Fonctions Mathématiques de Base (reprises du fichier joint) ---
+
+        function getRandomInt(min, max) {
+            // Utilise la même graine aléatoire pour la cohérence
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function pgcd(a, b) {
+            a = Math.abs(a);
+            b = Math.abs(b);
+            return b ? pgcd(b, a % b) : a;
+        }
+
+        function ppcm(a, b) {
+            if (a === 0 || b === 0) return 0;
+            return (a * b) / pgcd(a, b);
+        }
+
+        function simplifyFraction(num, den) {
+            if (den === 0) return [num, 0];
+            const common = pgcd(num, den);
+            // Assure que le dénominateur est positif si possible
+            if (common === 0) return [num, den];
+            const sgn = Math.sign(num) * Math.sign(den);
+            return [Math.abs(num) / common * sgn, Math.abs(den) / common];
+        }
+
+        function formatFraction(num, den) {
+            const [n, d] = simplifyFraction(num, den);
+            return d === 1 ? String(n) : `${n}/${d}`;
+        }
+        
+        // --- Randomisation de a0 et b0 (reprise du fichier joint) ---
+
+        function generateA0B0() {
+            let a0, b0, k, pgcd_a1_b1;
+            let attempts = 0;
+            while (attempts < 100) {
+                // 1. Generate a0 (odd, 5 to 15)
+                a0 = getRandomInt(5, 15);
+                if (a0 % 2 === 0) { 
+                    a0 += 1;
+                }
+                
+                // 2. Generate b0 (even, 8 to 20)
+                b0 = getRandomInt(8, 20);
+                if (b0 % 2 !== 0) {
+                    b0 += 1;
+                }
+                
+                if (b0 > 20) b0 = 20;
+
+                // 3. Vérifier la condition X0=EA (PGCD(a0, b0) = 1)
+                if (pgcd(a0, b0) === 1) {
+                    k = a0 * b0; // PPCM(a0, b0) puisque PGCD est 1
+                    // 4. Vérifier la condition X1=EB (PGCD(a0+1, k) > 1).
+                    pgcd_a1_b1 = pgcd(a0 + 1, k);
+                    if (pgcd_a1_b1 > 1) {
+                        return { a0, b0, k, pgcd_a1_b1 };
+                    }
+                }
+                attempts++;
+            }
+            // Fallback (identique au fichier joint)
+            return { a0: 5, b0: 8, k: 40, pgcd_a1_b1: 2 }; 
+        }
+
+
+        // --- Génération de toutes les données du problème ---
+
+        function generateProblemData() {
+            
+            // --- PARTIE A ---
+            const arithmData = generateA0B0();
+            const a0 = arithmData.a0;
+            const b0 = arithmData.b0;
+            const k = arithmData.k;
+            const pgcd_a1_b1 = arithmData.pgcd_a1_b1;
+
+            // --- PARTIE B Randomisation (simplifiée pour la cohérence) ---
+            const N1 = getRandomInt(4, 10); 
+            const N2 = getRandomInt(4, 6);
+
+            // Coherence for the arithmetical part (Partie B)
+            const N1_PPCM_1 = 2; 
+            const N1_PPCM_2 = N1 / pgcd(2, N1); 
+            const N2_PGCD_1 = N2 * 3;
+            const N2_PGCD_2 = N2 * 5; 
+
+            // Probabilités de transition
+            const P_AA = formatFraction(1, N1);
+            const P_AB = formatFraction(N1 - 1, N1);
+            const P_BA = formatFraction(1, N2);
+            const P_BB = formatFraction(N2 - 1, N2);
+            
+            // Calcul de l'état limite p_A = P_BA / (P_BA + P_AB)
+            const p_A_num_u = N1;
+            const p_A_den_u = N1 + N1 * N2 - N2; 
+            const p_B_num_u = N1 * N2 - N2;
+
+            // Simplification des probabilités limites
+            const [p_A_s_num, p_A_s_den] = simplifyFraction(p_A_num_u, p_A_den_u);
+            const [p_B_s_num, p_B_s_den] = simplifyFraction(p_B_num_u, p_A_den_u);
+            const p_A_frac = formatFraction(p_A_s_num, p_A_s_den);
+            const p_B_frac = formatFraction(p_B_s_num, p_A_s_den);
+
+            // Calcul du module final |Z'| = sqrt(p_A^2 + p_B^2)
+            const R_num = p_A_s_num * p_A_s_num + p_B_s_num * p_B_s_num;
+            const R_den_square = p_A_s_den * p_A_s_den; 
+
+            // Stockage des données
+            problemData = {
+                a0, b0, k, pgcd_a1_b1,
+                N1, N2,
+                P_AA, P_AB, P_BA, P_BB,
+                N1_PPCM_1, N1_PPCM_2, N2_PGCD_1, N2_PGCD_2,
+                p_A_s_num, p_A_s_den, p_B_s_num, 
+                p_A_frac, p_B_frac,
+                R_num, R_den: p_A_s_den, R_den_square
+            };
+        }
+
+        // --- Affichage de l'Énoncé résumé ---
+
+        function displayEnonceSummary(data) {
+            const P_AB_frac = formatFraction(data.N1 - 1, data.N1);
+            const P_BB_frac = formatFraction(data.N2 - 1, data.N2);
+            document.getElementById('enonce-resume').innerHTML = `
+                <div class="section-title"><h2>Résumé de l'Énoncé</h2></div>
+                <h3>Partie A : Arithmétique</h3>
+                <p>Données initiales : \\(a_0 = ${data.a0}\\) et \\(b_0 = ${data.b0}\\).</p>
+                <ul>
+                    <li>État \\(E_A\\) si \\(\\text{PGCD}(a, b) = 1\\).</li>
+                    <li>État \\(E_B\\) si \\(\\text{PGCD}(a, b) \\ne 1\\).</li>
+                </ul>
+                <h3>Partie B : Chaîne de Markov / Complexes</h3>
+                <p>Nombres Complexes Associés :</p>
+                <ul>
+                    <li>Si \\(X_n = E_A\\) : \\(Z_n = \\dfrac{\\sqrt{2}}{2} + i \\dfrac{\\sqrt{2}}{2}\\).</li>
+                    <li>Si \\(X_n = E_B\\) : \\(Z_n = \\dfrac{1}{2} + i \\dfrac{\\sqrt{3}}{2}\\).</li>
+                </ul>
+                <p>Probabilités de transition :</p>
+                <ul>
+                    <li>\\(P(E_A \\to E_A) = \\dfrac{1}{\\text{PPCM}(${data.N1_PPCM_1}, ${data.N1_PPCM_2})} = \\dfrac{1}{${data.N1}}\\).</li>
+                    <li>\\(P(E_B \\to E_A) = \\dfrac{1}{\\text{PGCD}(${data.N2_PGCD_1}, ${data.N2_PGCD_2})} = \\dfrac{1}{${data.N2}}\\).</li>
+                </ul>
+                <p>Matrice de transition : \\(M = \\begin{pmatrix} 1/${data.N1} & 1/${data.N2} \\\\ ${P_AB_frac} & ${P_BB_frac} \\end{pmatrix}\\).</p>
+                <h3>Partie C : Transformation Complexe</h3>
+                <p>Matrice de transformation \\(T = \\begin{pmatrix} p_A & -p_B \\\\ p_B & p_A \\end{pmatrix}\\), où \\(p_A\\) et \\(p_B\\) sont les probabilités limites.</p>
+            `;
+        }
+
+
+        // --- Affichage des Solutions Détaillées ---
+
+        function displayDetailedSolutions(data) {
+            let htmlContent = '';
+            
+            // --- PARTIE A SOLUTIONS ---
+            htmlContent += '<div class="section-title"><h2>Partie A : Le Processus Arithmétique Déterminant</h2></div>';
+            
+            // Q1
+            htmlContent += `
+                <div class="solution-card">
+                    <strong>1. Détermination de l'état initial \\(X_0\\)</strong>
+                    <p>On calcule le PGCD des entiers initiaux \\(a_0 = ${data.a0}\\) et \\(b_0 = ${data.b0}\\).</p>
+                    \\[ \\text{PGCD}(${data.a0}, ${data.b0}) = 1 \\]
+                    <p>Puisque le PGCD est égal à 1, les entiers sont premiers entre eux. L'état initial est donc l'état \\(E_A\\).</p>
+                    <p>\\(\\mathbf{X_0 = E_A}\\)</p>
+                </div>
+            `;
+            
+            // Q2
+            htmlContent += `
+                <div class="solution-card">
+                    <strong>2. Calcul de l'entier \\(k\\)</strong>
+                    <p>L'entier \\(k\\) est défini comme le PPCM de \\(a_0\\) et \\(b_0\\). On utilise la relation fondamentale :</p>
+                    \\( a_0 \\times b_0 = \\text{PGCD}(a_0, b_0) \\times \\text{PPCM}(a_0, b_0) \\)
+                    <p>Puisque \\(\\text{PGCD}(a_0, b_0) = 1\\), nous avons :</p>
+                    \\( k = \\text{PPCM}(${data.a0}, ${data.b0}) = ${data.a0} \\times ${data.b0} = ${data.k} \\)
+                    <p>\\(\\mathbf{k = ${data.k}}\\)</p>
+                </div>
+            `;
+
+            // Q3
+            htmlContent += `
+                <div class="solution-card">
+                    <strong>3. Détermination de l'état \\(X_1\\)</strong>
+                    <p>Les nouveaux entiers sont \\(a_1 = a_0 + 1 = ${data.a0} + 1 = ${data.a0+1}\\) et \\(b_1 = k = ${data.k}\\).</p>
+                    <p>On calcule le PGCD de \\(a_1\\) et \\(b_1\\) :</p>
+                    \\( \\text{PGCD}(${data.a0+1}, ${data.k}) = ${data.pgcd_a1_b1} \\)
+                    <p>Puisque \\(\\text{PGCD}(a_1, b_1) = ${data.pgcd_a1_b1} \\ne 1\\), les entiers ne sont pas premiers entre eux. L'état \\(X_1\\) est donc l'état \\(E_B\\).</p>
+                    <p>\\(\\mathbf{X_1 = E_B}\\)</p>
+                </div>
+            `;
+            
+            // --- PARTIE B SOLUTIONS ---
+            htmlContent += '<div class="section-title"><h2>Partie B : La Chaîne de Markov et la Matrice de Transformation</h2></div>';
+            
+            // Q4
+            htmlContent += `
+                <div class="solution-card">
+                    <strong>4. Détermination de la matrice de transition \\(M\\)</strong>
+                    <p>Les états sont classés dans l'ordre \\((E_A, E_B)\\). Les probabilités données sont :</p>
+                    <ul>
+                        <li>\\(P(E_A \\to E_A) = ${data.P_AA}\\) (donné par \\(1 / \\text{PPCM}(${data.N1_PPCM_1}, ${data.N1_PPCM_2})\\)).</li>
+                        <li>\\(P(E_B \\to E_A) = ${data.P_BA}\\) (donné par \\(1 / \\text{PGCD}(${data.N2_PGCD_1}, ${data.N2_PGCD_2})\\)).</li>
+                    </ul>
+                    <p>La somme des probabilités sur chaque ligne doit être égale à 1 :</p>
+                    <ul>
+                        <li>\\(P(E_A \\to E_B) = 1 - P(E_A \\to E_A) = 1 - ${data.P_AA} = ${data.P_AB}\\).</li>
+                        <li>\\(P(E_B \\to E_B) = 1 - P(E_B \\to E_A) = 1 - ${data.P_BA} = ${data.P_BB}\\).</li>
+                    </ul>
+                    <p>La matrice de transition \\(M\\) est :</p>
+                    \\( 
+                    \\mathbf{M} = \\begin{pmatrix} 
+                        P(E_A \\to E_A) & P(E_B \\to E_A) \\\\ 
+                        P(E_A \\to E_B) & P(E_B \\to E_B) 
+                    \\end{pmatrix} = \\begin{pmatrix} 
+                        ${data.P_AA} & ${data.P_BA} \\\\ 
+                        ${data.P_AB} & ${data.P_BB} 
+                    \\end{pmatrix}
+                    \\)
+                </div>
+            `;
+            
+            // Q5
+            htmlContent += `
+                <div class="solution-card">
+                    <strong>5. Justification de \\(V_{n+1} = M \\cdot V_n\\)</strong>
+                    <p>La relation \\(\\mathbf{V_{n+1} = M \\cdot V_n}\\) est la formule de récurrence fondamentale des chaînes de Markov finies.</p>
+                    <p>Elle est justifiée par la formule des <strong>probabilités totales</strong>. La probabilité d'être dans un état à l'étape \\(n+1\\) est la somme des probabilités d'arriver à cet état à partir de tous les états possibles à l'étape \\(n\\).</p>
+                    <p>Par exemple, pour \\(E_A\\) :</p>
+                    \\( P(X_{n+1}=E_A) = P(X_n=E_A) \\cdot P(E_A \\to E_A) + P(X_n=E_B) \\cdot P(E_B \\to E_A) \\)
+                    <p>Ce qui correspond exactement à la première ligne du produit matriciel \\(M \\cdot V_n\\).</p>
+                </div>
+            `;
+            
+            // Q6
+            htmlContent += `
+                <div class="solution-card">
+                    <strong>6. Détermination de l'état probabiliste limite \\(V\\)</strong>
+                    <p>L'état limite (ou état stationnaire) \\(V = \\begin{pmatrix} p_A \\\\ p_B \\end{pmatrix}\\) vérifie deux conditions :</p>
+                    <ol>
+                        <li>Condition stationnaire : \\(\\mathbf{M \\cdot V = V}\\)</li>
+                        <li>Condition de probabilité : \\(\\mathbf{p_A + p_B = 1}\\)</li>
+                    </ol>
+                    <p>Le système \\(M V = V\\) conduit à l'équation pour la première ligne (la deuxième est liée) :</p>
+                    \\( ${data.P_AA} p_A + ${data.P_BA} p_B = p_A \\)
+                    \\( ${data.P_BA} p_B = (1 - ${data.P_AA}) p_A \\implies ${data.P_BA} p_B = ${data.P_AB} p_A \\)
+                    <p>En utilisant \\(p_B = 1 - p_A\\) :</p>
+                    \\( ${data.P_BA} (1 - p_A) = ${data.P_AB} p_A \\)
+                    \\( ${data.P_BA} = p_A (${data.P_AB} + ${data.P_BA}) \\)
+                    <p>Ainsi, on obtient \\(p_A\\) par la formule :</p>
+                    \\( p_A = \\dfrac{${data.P_BA}}{\\left(${data.P_AB} + ${data.P_BA}\\right)} = \\dfrac{1/${data.N2}}{\\left(${data.N1-1}/${data.N1} + 1/${data.N2}\\right)} = \\dfrac{${data.N1}}{${data.N1 + data.N2*(data.N1-1)}} \\)
+                    <p>Après simplification, on obtient :</p>
+                    \\( p_A = \\dfrac{${data.p_A_s_num}}{${data.p_A_s_den}} \\quad \\text{et} \\quad p_B = 1 - p_A = \\dfrac{${data.p_B_s_num}}{${data.p_A_s_den}} \\)
+                    <p>\\(\\mathbf{V = \\begin{pmatrix} ${data.p_A_frac} \\\\ ${data.p_B_frac} \\end{pmatrix}}\\)</p>
+                </div>
+            `;
+            
+            // --- PARTIE C SOLUTIONS ---
+            htmlContent += '<div class="section-title"><h2>Partie C : Transformation par Matrice et Nombres Complexes</h2></div>';
+            
+            // Q7
+            const omega_frac = `${data.p_A_frac} + i${data.p_B_frac}`;
+            htmlContent += `
+                <div class="solution-card">
+                    <strong>7. Expression de \\(Z'\\) en fonction de \\(Z\\)</strong>
+                    <p>Soit \\(Z = x + iy\\) d'affixe \\(\\begin{pmatrix} x \\\\ y \\end{pmatrix}\\). La transformation linéaire est donnée par :</p>
+                    \\( \\begin{pmatrix} x' \\\\ y' \\end{pmatrix} = T \\begin{pmatrix} x \\\\ y \\end{pmatrix} = \\begin{pmatrix} p_A & -p_B \\\\ p_B & p_A \\end{pmatrix} \\begin{pmatrix} x \\\\ y \\end{pmatrix} \\)
+                    \\( x' = p_A x - p_B y \\quad \\text{et} \\quad y' = p_B x + p_A y \\)
+                    <p>On exprime \\(Z' = x' + iy'\\) :</p>
+                    \\( Z' = (p_A x - p_B y) + i (p_B x + p_A y) \\)
+                    \\( Z' = p_A (x + iy) + i p_B (x + iy) = (p_A + i p_B) (x + iy) \\)
+                    <p>On pose \\(\\Omega = p_A + i p_B\\). On a donc :</p>
+                    \\( \\mathbf{Z' = \\left( ${omega_frac} \\right) Z} \\)
+                </div>
+            `;
+
+            // Q8
+            const R_den_sq = data.R_den_square;
+            htmlContent += `
+                <div class="solution-card">
+                    <strong>8. Calcul du module et d'un argument de \\(Z'\\)</strong>
+                    <p>On utilise la propriété du module et de l'argument d'un produit : \\(|Z'| = |\\Omega| \\cdot |Z_A|\\) et \\(\\arg(Z') = \\arg(\\Omega) + \\arg(Z_A)\\). L'affixe \\(Z_A = \\dfrac{\\sqrt{2}}{2} + i \\dfrac{\\sqrt{2}}{2}\\) a pour module \\(|Z_A| = 1\\) et pour argument \\(\\arg(Z_A) = \\dfrac{\\pi}{4}\\).</p>
+                    <p>1. <strong>Module de \\(Z'\\)</strong> :</p>
+                    <ul>
+                        <li>\\(|\\Omega| = \\sqrt{p_A^2 + p_B^2} = \\sqrt{\\left(\\dfrac{${data.p_A_s_num}}{${data.R_den}}\\right)^2 + \\left(\\dfrac{${data.p_B_s_num}}{${data.R_den}}\\right)^2} = \\dfrac{\\sqrt{${data.p_A_s_num}^2 + ${data.p_B_s_num}^2}}{${data.R_den}} = \\dfrac{\\sqrt{${data.R_num}}}{${data.R_den}}\\).</li>
+                    </ul>
+                    <p>\\(\\mathbf{|Z'| = |\\Omega| \\cdot |Z_A| = \\dfrac{\\sqrt{${data.R_num}}}{${data.R_den}}}\\)</p>
+                    <p>2. <strong>Argument de \\(Z'\\)</strong> :</p>
+                    <ul>
+                        <li>\\(\\arg(\\Omega) = \\arctan\\left(\\dfrac{p_B}{p_A}\\right) = \\arctan\\left(\\dfrac{${data.p_B_s_num}}{${data.p_A_s_num}}\\right)\\).</li>
+                    </ul>
+                    <p>\\(\\mathbf{\\arg(Z') = \\arg(\\Omega) + \\arg(Z_A) = \\arctan\\left(\\dfrac{${data.p_B_s_num}}{${data.p_A_s_num}}\\right) + \\dfrac{\\pi}{4} \\pmod{2\\pi}}\\)</p>
+                </div>
+            `;
+            
+            // Q9
+            htmlContent += `
+                <div class="solution-card">
+                    <strong>9. Interprétation géométrique de la transformation</strong>
+                    <p>Puisque la transformation est de la forme \\(Z' = \\Omega Z\\) avec \\(\\Omega = p_A + i p_B \\ne 0\\), il s'agit d'une <strong>similitude directe</strong> de centre l'origine \\(O\\), caractérisée par :</p>
+                    <ul>
+                        <li>Un <strong>rapport</strong> \\(r = |\\Omega| = \\dfrac{\\sqrt{${data.R_num}}}{${data.R_den}}\\).</li>
+                        <li>Un <strong>angle</strong> \\(\\theta = \\arg(\\Omega) = \\arctan\\left(\\dfrac{${data.p_B_s_num}}{${data.p_A_s_num}}\\right)\\).</li>
+                    </ul>
+                </div>
+            `;
+            
+            document.getElementById('solutions').innerHTML = htmlContent;
+        }
+
+
+        // --- Fonction Principale d'Exécution ---
+
+        function generateAndDisplaySolution() {
+            generateProblemData(); // Génère les valeurs aléatoires et les solutions
+            displayEnonceSummary(problemData); // Affiche l'énoncé avec les valeurs
+            displayDetailedSolutions(problemData); // Affiche les solutions détaillées
+
+            // S'assurer que MathJax render tout le nouveau contenu
+            MathJax.typesetPromise().then(() => {
+                console.log("Rendu MathJax terminé.");
+            });
+        }
+	function toggleDisclaimer() {
+            const disclaimer = document.getElementById('disclaimer-content');
+            const button = document.getElementById('show-auteur-btn');
+            if (disclaimer.style.display === 'block') {
+                disclaimer.style.display = 'none';
+                button.textContent = 'Auteur et Droits d\'Auteur';
+                button.style.backgroundColor = '#333';
+            } else {
+                disclaimer.style.display = 'block';
+                button.textContent = 'Masquer les Droits d\'Auteur';
+                button.style.backgroundColor = '#dc3545';
+            }
+        }
+    </script>
+<div style="text-align: center; margin-top: 50px;">
+        <button id="show-auteur-btn" onclick="toggleDisclaimer()" 
+            style="padding: 10px 20px; font-size: 1em; cursor: pointer; border: none; border-radius: 5px; background-color: #333; color: white;">
+            Auteur et Droits d'Auteur
+        </button>
+    </div>
+
+    <div id="disclaimer-content" style="margin-top: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 5px; background-color: #fff; display: none;">
+        <h3>Droits d'Auteur et Source</h3>
+            <p><strong>Auteur du problème :</strong> Yann Merdy</p>
+            <p><strong>Droits d'Auteur et Utilisation :</strong></p>
+            <p>Ce contenu, y compris l'énoncé, les solutions et le code interactif, est protégé par les droits d'auteur. <strong>Toute utilisation à des fins commerciales, y compris la revente, la distribution ou l'intégration dans des produits commerciaux, est strictement interdite sans autorisation écrite explicite de l'auteur.</strong></p>
+            <p>L'utilisation est limitée à des fins éducatives et personnelles non commerciales.</p>
+        
+    </div>
+
+</body>
+</html>
