@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S3 : PGCD - Première Approche (Avancée)</title>
+    
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <script>
+        // Configuration MathJax pour les délimiteurs LaTeX
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']], // Délimiteurs inline $...$ et \(...\)
+                displayMath: [['$$', '$$'], ['\\[', '\\]']] // Délimiteurs display $$...$$ et \[...\]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+
+    <style>
+        /* Styles Généraux et de Mise en Page */
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.6;
+            margin: 0 auto;
+            max-width: 900px;
+            padding: 20px;
+            color: #333;
+        }
+        h1, h2 {
+            font-family: Arial, sans-serif;
+            color: #0056b3;
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        h1.session-title {
+            text-align: center;
+            font-size: 1.8em;
+            border-color: #ff9900; 
+        }
+        h2 {
+            font-size: 1.4em;
+            color: #ff9900; 
+            border-color: #e0e0e0;
+        }
+        .theme-principal {
+            text-align: center;
+            font-style: italic;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        /* Style pour les blocs d'énoncé (Définitions/Propriétés) */
+        .statement-block {
+            margin: 1.5em 0;
+            padding: 15px;
+            border-left: 5px solid;
+            background-color: #f9f9f9;
+        }
+        .definition {
+            border-color: #ff9900;
+        }
+        .propriete {
+            border-color: #00cc66; 
+        }
+        .statement-title {
+            font-weight: bold;
+            font-style: italic;
+            font-size: 1.1em;
+            margin-bottom: 0.5em;
+            display: block;
+        }
+        /* Listes romaines personnalisées */
+        ol.roman {
+            list-style-type: none;
+            counter-reset: item;
+        }
+        ol.roman > li {
+            text-indent: -1.5em;
+            margin-left: 1.5em;
+        }
+        ol.roman > li:before {
+            content: "(" counter(item, lower-roman) ") ";
+            counter-increment: item;
+            font-weight: bold;
+        }
+        .exercice-title {
+            font-size: 1.1em;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+        }
+        /* Styles pour les QUESTIONS dynamiques/statiques */
+        .question-box {
+            padding: 15px; 
+            margin-bottom: 15px; 
+            border: 1px solid #ccc;
+        }
+        .ex1-box { /* Diviseurs + */
+            background-color: #fff0f0; 
+            border-color: #cc0000;
+        }
+        .ex2-box { /* Diviseurs - */
+            background-color: #f0fff0; 
+            border-color: #009900;
+        }
+        .ex3-box { /* Propriétés */
+            background-color: #f5f5ff; 
+            border-color: #0000cc; 
+        }
+        .ex4-box { /* Avancé */
+            background-color: #fffcf5; /* Jaune très clair */
+            border-color: #ffb300; /* Orange/Or */
+        }
+        .dynamic-question-container {
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            flex-wrap: wrap; 
+        }
+        .pgcd-numbers {
+            font-size: 1.4em; 
+            font-weight: bold;
+            color: #cc0000;
+            margin: 0;
+            padding: 0;
+        }
+        .pgcd-numbers.ex2 {
+            color: #008080;
+        }
+        .pgcd-numbers.ex4 {
+            color: #ffb300;
+            font-size: 1.1em; /* Réduit la taille pour les questions algébriques/factorisées longues */
+        }
+        .btn-update {
+            padding: 10px 15px; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin: 10px 0;
+            transition: background-color 0.2s;
+        }
+        #btn-update-ex1 { background-color: #cc0000; }
+        #btn-update-ex1:hover { background-color: #a30000; }
+        #btn-update-ex2 { background-color: #008080; }
+        #btn-update-ex2:hover { background-color: #005959; }
+        #btn-update-ex3 { background-color: #0000cc; }
+        #btn-update-ex3:hover { background-color: #000080; }
+        #btn-update-ex4 { background-color: #ffb300; color: #333;}
+        #btn-update-ex4:hover { background-color: #cc9000; }
+
+
+        /* Styles pour l'aide interactive (dans le bloc question) */
+        .help-buttons {
+            margin-top: 15px; 
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding-top: 10px;
+            border-top: 1px solid #e0e0e0;
+        }
+        .help-buttons button {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: background-color 0.2s;
+        }
+        .btn-indication {
+            background-color: #fffbe6;
+            color: #ff9900;
+            border-color: #ff9900;
+        }
+        .btn-solution {
+            background-color: #e6fffb;
+            color: #008080;
+            border-color: #008080;
+        }
+        .help-content {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none; 
+            line-height: 1.5;
+            font-size: 0.9em;
+        }
+        .help-indication {
+            background-color: #fffcf5;
+            border-left: 3px solid #ff9900;
+        }
+        .help-solution {
+            background-color: #f5faff;
+            border-left: 3px solid #008080;
+        }
+        .help-content strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .ex4-counter {
+            font-size: 0.9em;
+            font-style: italic;
+            color: #666;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="session-title">Séance $S_3$ (50 min) : PGCD - Première Approche</h1>
+    <p class="theme-principal"><strong>Thème Principal :</strong> Le Plus Grand Commun Diviseur (PGCD) dans $\mathbb{Z}$</p>
+
+    <h2>I. Cours : Définition et Propriétés du PGCD</h2>
+
+    <div class="statement-block definition">
+        <span class="statement-title">Définition [Plus Grand Commun Diviseur (PGCD)]</span>
+        <p>Soient $a$ et $b$ deux entiers relatifs non tous deux nuls. Le <strong>Plus Grand Commun Diviseur</strong> de $a$ et $b$, noté $\text{PGCD}(a, b)$, est le plus grand élément de l'ensemble des diviseurs communs positifs de $a$ et $b$.</p>
+        <p>On note :</p>
+        \[\text{PGCD}(a, b) = \max(\{d \in \mathbb{N}^* \mid d|a \text{ et } d|b\})\]
+    </div>
+
+    <div class="statement-block propriete">
+        <span class="statement-title">Propriété [Propriétés Élémentaires]</span>
+        <ol class="roman">
+            <li>Le PGCD est toujours un entier <strong>positif</strong> ou nul (si $a=b=0$). Par convention, $\text{PGCD}(0, 0) = 0$.</li>
+            <li>Pour tout $a \in \mathbb{Z}$, $\text{PGCD}(a, 0) = |a|$.</li>
+            <li>$\text{PGCD}(a, b) = \text{PGCD}(|a|, |b|)$. Les signes des entiers n'affectent pas la valeur du PGCD.</li>
+            <li>Si $a$ divise $b$, alors $\text{PGCD}(a, b) = |a|$. (Ex : $\text{PGCD}(3, 6) = 3$).</li>
+            <li>$\text{PGCD}(a, 1) = 1$ pour tout $a \in \mathbb{Z}$.</li>
+        </ol>
+    </div>
+
+    <p><strong>Méthode de détermination :</strong> Pour calculer $\text{PGCD}(a, b)$, on peut lister les diviseurs positifs de $|a|$, puis les diviseurs positifs de $|b|$, identifier les diviseurs communs, et prendre le plus grand. La décomposition en facteurs premiers est également très utile.</p>
+    
+    <hr>
+
+    <h2>II. Exercices $S_3$</h2>
+
+    <p class="exercice-title"><strong>Exercice 1 : PGCD de deux entiers positifs (Dynamique)</strong></p>
+    <div class="question-box ex1-box">
+        <div class="dynamic-question-container">
+            <p><strong>Question :</strong> Déterminer le PGCD des entiers $a$ et $b$ en listant leurs diviseurs positifs :</p>
+            <p class="pgcd-numbers" style="color: #cc0000;">
+                $a=$ <span id="numA">18</span>, $b=$ <span id="numB">30</span>
+            </p>
+        </div>
+        
+        <button onclick="generateNewPair()" class="btn-update" id="btn-update-ex1"> Actualiser les Entiers Positifs</button>
+
+        <div class="help-buttons">
+            <button class="btn-indication" onclick="toggleHelp('ex1', 'ind1')">Indication (Méthode)</button>
+            <button class="btn-solution" onclick="generateDynamicSolutionEx1(); toggleHelp('ex1', 'sol2');">Solution (Dynamique)</button>
+        </div>
+
+        <div id="help-ex1-ind1" class="help-content help-indication">
+            <strong>Méthode par Diviseurs :</strong> 
+            1. Lister l'ensemble $\mathcal{D}_+(a)$ des diviseurs positifs de $a$.
+            2. Lister l'ensemble $\mathcal{D}_+(b)$ des diviseurs positifs de $b$.
+            3. Trouver l'ensemble des diviseurs communs : $\mathcal{D}_c = \mathcal{D}_+(a) \cap \mathcal{D}_+(b)$.
+            4. Le PGCD est le plus grand élément de $\mathcal{D}_c$.
+        </div>
+        <div id="help-ex1-sol2" class="help-content help-solution">
+             Cliquez sur "Solution (Dynamique)" pour afficher la correction étape par étape des nombres actuels.
+        </div>
+    </div>
+
+    <p class="exercice-title"><strong>Exercice 2 : PGCD avec des entiers négatifs (Dynamique)</strong></p>
+    <div class="question-box ex2-box">
+        <div class="dynamic-question-container">
+            <p><strong>Question :</strong> Déterminer le PGCD des entiers $a'$ et $b'$ en utilisant la propriété des valeurs absolues :</p>
+            <p class="pgcd-numbers ex2">
+                $a'=$ <span id="numA_neg">-24</span>, $b'=$ <span id="numB_neg">60</span>
+            </p>
+        </div>
+
+        <button onclick="generateNewPairNeg()" class="btn-update" id="btn-update-ex2"> Actualiser les Entiers (avec Négatif)</button>
+        
+        <div class="help-buttons">
+            <button class="btn-indication" onclick="toggleHelp('ex2', 'ind1')">Indication (Propriété)</button>
+            <button class="btn-solution" onclick="generateDynamicSolutionEx2(); toggleHelp('ex2', 'sol1');">Solution (Dynamique)</button>
+        </div>
+
+        <div id="help-ex2-ind1" class="help-content help-indication">
+            <strong>Propriété à utiliser :</strong> $\text{PGCD}(a, b) = \text{PGCD}(|a|, |b|)$. Calculez le PGCD des valeurs absolues pour simplifier, puis utilisez la méthode de la liste des diviseurs.
+        </div>
+        <div id="help-ex2-sol1" class="help-content help-solution">
+             Cliquez sur "Solution (Dynamique)" pour afficher la correction étape par étape des nombres actuels.
+        </div>
+    </div>
+    
+    <p class="exercice-title"><strong>Exercice 3 : Application des Propriétés Élémentaires (Dynamique)</strong></p>
+    <div class="question-box ex3-box">
+        <p><strong>Question :</strong> Donner directement la valeur des PGCD suivants en citant la propriété utilisée :</p>
+        
+        <div id="ex3-questions">
+            </div>
+
+        <button onclick="generateEx3Questions()" class="btn-update" id="btn-update-ex3"> Nouvelles Applications </button>
+
+        <div class="help-buttons">
+            <button class="btn-solution" onclick="generateEx3Solution(); toggleHelp('ex3', 'sol_all');">Toutes les Corrections</button>
+        </div>
+
+        <div id="help-ex3-sol_all" class="help-content help-solution">
+             Cliquez sur "Toutes les Corrections" pour afficher les réponses.
+        </div>
+    </div>
+    
+    <p class="exercice-title"><strong>Exercice 4 : Vers l'Arithmétique Avancée (Types Dynamiques)</strong></p>
+    <div class="question-box ex4-box">
+        <div class="dynamic-question-container">
+            <p><strong>Problème actuel : </strong><span id="ex4-counter" class="ex4-counter">(1/10) - Type: PGCD Basique</span></p>
+            <p id="dynamicEx4Question" class="pgcd-numbers ex4">Déterminer le PGCD des entiers 28 et 40.</p>
+        </div>
+
+        <button onclick="generateNewEx4Problem()" class="btn-update" id="btn-update-ex4"> Problème Suivant </button>
+
+        <div class="help-buttons">
+            <button class="btn-indication" onclick="toggleHelp('ex4', 'ind')">Indication</button>
+            <button class="btn-solution" onclick="updateEx4SolutionContent(); toggleHelp('ex4', 'sol');">Solution Complète</button>
+        </div>
+
+        <div id="help-ex4-ind" class="help-content help-indication">
+            <strong>Indication :</strong> Utilisez la méthode des diviseurs ou la décomposition en facteurs premiers.
+        </div>
+        <div id="help-ex4-sol" class="help-content help-solution">
+            Cliquez sur "Solution Complète" pour voir les étapes de résolution de la question 1.
+        </div>
+    </div>
+    
+    <hr>
+
+    <script>
+        /** GLOBAL VARIABLES AND UTILITIES **/
+        
+        // Liste des générateurs de problèmes (7 types distincts)
+        const problemGenerators = [
+            { type: "PGCD Basique (Nombres)", generate: generateBasicPGCDProblem },
+            { type: "PGCD Factorisé (Exposants)", generate: generateFactorizedPGCDProblem },
+            { type: "PGCD Algébrique (Base)", generate: generateAlgebraicBaseProblem },
+            { type: "PGCD par Multiplication", generate: generateMultiplicationPGCDProblem },
+            { type: "PGCD de Puissances", generate: generatePowerPGCDProblem },
+            { type: "PGCD Algébrique (Avancé)", generate: generateAlgebraicAdvancedProblem },
+            { type: "Équation PGCD", generate: generateEquationPGCDProblem }
+        ];
+
+        let currentEx4ProblemData = null; // Stocke les données du problème actuel
+        let currentEx4CycleCount = 0;    // Compteur global pour l'affichage (1/N)
+        const maxEx4Cycles = 10;         // Nombre maximum de problèmes à afficher (pour le compteur)
+        
+        let currentEx3ProblemSet = []; // Stocke les problèmes de l'Exercice 3
+
+        /**
+         * Fonction utilitaire pour obtenir un entier aléatoire entre min et max (inclus).
+         */
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        /**
+         * Fonction utilitaire pour le PGCD (Algorithme d'Euclide).
+         */
+        function gcd(a, b) {
+            a = Math.abs(a);
+            b = Math.abs(b);
+            while (b) {
+                [a, b] = [b, a % b];
+            }
+            return a;
+        }
+
+        /**
+         * Fonction utilitaire pour générer deux nombres premiers entre eux.
+         */
+        function generateCoprimePair(min, max) {
+            let k1, k2;
+            do {
+                k1 = randomInt(min, max);
+                k2 = randomInt(min, max);
+            } while (gcd(k1, k2) !== 1 || k1 === k2);
+            return [k1, k2];
+        }
+
+        /**
+         * Fonction utilitaire pour obtenir la liste des diviseurs positifs de |n|.
+         */
+        function getDivisors(n) {
+            n = Math.abs(n);
+            const divisors = [];
+            for (let i = 1; i * i <= n; i++) {
+                if (n % i === 0) {
+                    divisors.push(i);
+                    if (i * i !== n) {
+                        divisors.push(n / i);
+                    }
+                }
+            }
+            return divisors.sort((a, b) => a - b);
+        }
+
+        /** GÉNÉRATEURS DYNAMIQUES POUR L'EXERCICE 3 **/
+
+        // Prop 1: PGCD(a, 0) = |a|
+        function genProp1() {
+            const a = randomInt(15, 60);
+            return {
+                question: `$\\text{PGCD}(${a}, 0)$`,
+                answer: `${a}\\quad`,
+                property: `\\text{Propriété} : \\text{PGCD}(a, 0) = |a|`
+            };
+        }
+
+        // Prop 2: PGCD(a, a) = |a| (ou avec des signes différents)
+        function genProp2() {
+            const a_abs = randomInt(10, 50);
+            let a1 = a_abs;
+            let a2 = a_abs;
+
+            // Variation du signe : (a, a), (a, -a), (-a, a), (-a, -a)
+            if (Math.random() < 0.5) {
+                 a1 = -a_abs;
+            }
+            if (Math.random() < 0.5) {
+                 a2 = -a_abs;
+            }
+            
+            // Éviter PGCD(-10, -10) et PGCD(10, 10) à chaque fois, forcer la variation ou PGCD(a, a)
+            if (a1 === a2) {
+                 a2 = (a1 > 0) ? -a1 : a1; // Sauf cas spéciaux, forcer un négatif
+            }
+
+
+            return {
+                question: `$\\text{PGCD}(${a1}, ${a2})$`,
+                answer: `${a_abs}\\quad`,
+                property: `\\text{Propriété} : \\text{PGCD}(a, b) = \\text{PGCD}(|a|, |b|) \\text{ et } \\text{PGCD}(a, a)=|a|`
+            };
+        }
+
+        // Prop 3: PGCD(a, 1) = 1
+        function genProp3() {
+            const a = randomInt(5, 99) * (Math.random() > 0.5 ? 1 : -1);
+            return {
+                question: `$\\text{PGCD}(${a}, 1)$`,
+                answer: `1\\quad`,
+                property: `\\text{Propriété} : \\text{PGCD}(a, 1) = 1`
+            };
+        }
+
+        // Prop 4: PGCD(a, b) = |a| if a | b
+        function genProp4() {
+            const a = randomInt(5, 20);
+            const k = randomInt(2, 5);
+            const b = a * k;
+            
+            // Assurer que les arguments peuvent être négatifs, mais que le PGCD reste positif
+            const a_final = (Math.random() > 0.7) ? -a : a;
+            const b_final = (Math.random() > 0.7) ? -b : b;
+            
+            // Mettre l'ordre au hasard
+            let num1, num2;
+            if (Math.random() > 0.5) {
+                num1 = a_final; num2 = b_final; // PGCD(a, k*a)
+            } else {
+                num1 = b_final; num2 = a_final; // PGCD(k*a, a)
+            }
+
+            return {
+                question: `$\\text{PGCD}(${num1}, ${num2})$`,
+                answer: `${a}\\quad`,
+                property: `\\text{Propriété} : \\text{ Si } a|b, \\text{ alors } \\text{PGCD}(a, b) = |a|`
+            };
+        }
+
+        const ex3Generators = [genProp1, genProp2, genProp3, genProp4];
+
+        function generateEx3Questions() {
+            currentEx3ProblemSet = [];
+            const questionContainer = document.getElementById('ex3-questions');
+            let html = '<ol>';
+
+            // Mélanger les 4 générateurs pour varier l'ordre des questions
+            const shuffledGenerators = [...ex3Generators].sort(() => Math.random() - 0.5);
+
+            shuffledGenerators.forEach((gen) => {
+                const problem = gen();
+                currentEx3ProblemSet.push(problem);
+                html += `<li>${problem.question}</li>`;
+            });
+
+            html += '</ol>';
+            questionContainer.innerHTML = html;
+            
+            // Réinitialiser le message de la solution
+            document.getElementById('help-ex3-sol_all').innerHTML = 'Cliquez sur "Toutes les Corrections" pour afficher les réponses.';
+            document.getElementById('help-ex3-sol_all').style.display = 'none';
+
+            // Typeset les nouvelles questions
+            if (window.MathJax) {
+                MathJax.typeset([questionContainer]);
+            }
+        }
+
+        function generateEx3Solution() {
+            if (currentEx3ProblemSet.length === 0) return; 
+
+            let solutionHTML = '<strong>Réponses Complètes :</strong><ol>';
+
+            currentEx3ProblemSet.forEach((problem) => {
+                // Utilisation de la notation inline $...$ pour les expressions PGCD
+                solutionHTML += `
+                    <li>
+                        ${problem.question} $= ${problem.answer}$ 
+                        ($${problem.property}$)
+                    </li>
+                `;
+            });
+
+            solutionHTML += '</ol>';
+            
+            const helpElement = document.getElementById('help-ex3-sol_all');
+            helpElement.innerHTML = solutionHTML;
+
+            // Typeset la nouvelle solution
+            if (window.MathJax) {
+                MathJax.typeset([helpElement]);
+            }
+        }
+
+        /** GÉNÉRATEURS DYNAMIQUES POUR L'EXERCICE 4 **/
+        
+        function generateBasicPGCDProblem() {
+            // PGCD entre 2 et 15
+            const g = randomInt(2, 15); 
+            const [k1, k2] = generateCoprimePair(2, 10);
+            
+            let a = g * k1;
+            let b = g * k2;
+
+            // Assurer que les nombres ne sont pas trop petits
+            if (a < 30) a *= 2;
+            if (b < 30) b *= 2;
+            
+            // Recalculer le PGCD après les éventuelles multiplications
+            const result = gcd(a, b); 
+
+            return {
+                type: "PGCD Basique (Nombres)",
+                question: `Calculer le $\\text{PGCD}(${a}, ${b})$.`,
+                indication: "Utilisez la méthode des diviseurs ou la décomposition en facteurs premiers (pour des nombres plus grands, l'algorithme d'Euclide serait préférable).",
+                solutionSteps: [
+                    `$a=${a}$. Diviseurs de ${a} : $\\{${getDivisors(a).join(', ')}\\}$`,
+                    `$b=${b}$. Diviseurs de $${b} : \\{${getDivisors(b).join(', ')}\\}$`,
+                    `Le plus grand diviseur commun est ${result}.`,
+                    `$$\\text{PGCD}(${a}, ${b}) = ${result}$$`
+                ],
+                result: result
+            };
+        }
+        function generateFactorizedPGCDProblem() {
+            const primes = [2, 3, 5, 7];
+            let A_factors = {};
+            let B_factors = {};
+            let pgcd_factors_str = [];
+            let A = 1;
+            let B = 1;
+            let G = 1;
+
+            // Utiliser au moins 3 facteurs
+            for (let i = 0; i < 3; i++) {
+                const p = primes[i];
+                const e_a = randomInt(1, 4);
+                const e_b = randomInt(1, 4);
+                
+                A_factors[p] = e_a;
+                B_factors[p] = e_b;
+
+                const e_g = Math.min(e_a, e_b);
+                G *= Math.pow(p, e_g);
+                pgcd_factors_str.push(`${p}^{\\min(${e_a}, ${e_b})}`);
+
+                A *= Math.pow(p, e_a);
+                B *= Math.pow(p, e_b);
+            }
+
+            // Ajouter un facteur non commun à A (facultatif)
+            if (Math.random() > 0.5) {
+                const p = primes[3]; // Utiliser 7
+                A_factors[p] = randomInt(1, 2);
+            }
+            
+            // Formatter les facteurs
+            const formatFactors = (factors) => {
+                return Object.entries(factors).map(([p, e]) => `${p}^{${e}}`).join(' \\times ');
+            };
+
+            const A_str = formatFactors(A_factors);
+            const B_str = formatFactors(B_factors);
+            const G_str = pgcd_factors_str.join(' \\times ').replace(/\{\}/g, '');
+
+            return {
+                type: "PGCD Factorisé (Exposants)",
+                question: `Déterminer $\\text{PGCD}(A, B)$ si $A=${A_str}$ et $B=${B_str}$.`,
+                indication: "Appliquez la règle des facteurs premiers communs affectés du plus petit exposant.",
+                solutionSteps: [
+                    "Facteurs premiers communs avec l'exposant minimal :",
+                    `$$G = ${G_str} = ${G}$$`,
+                    `$$\\text{PGCD}(A, B) = ${G}$$`
+                ],
+                result: G
+            };
+        }
+        function generateAlgebraicBaseProblem() {
+            const k = randomInt(0, 5); // Décalage
+            const a = randomInt(1, 3); // Coefficient de n
+            
+            // Ex: PGCD(2n+1, 2n+2)
+            const term1 = `${a}n + ${k + 1}`;
+            const term2 = `${a}n + ${k + 2}`;
+            const diff = `${term2} - ${term1} = 1`; // Étape de la différence
+
+            return {
+                type: "PGCD Algébrique (Base)",
+                question: `Démontrer que pour tout entier naturel $n$, $\\text{PGCD}(${term1}, ${term2}) = 1$.`,
+                indication: "Soit $d$ le PGCD. $d$ divise toute combinaison linéaire, y compris la différence des deux expressions.",
+                solutionSteps: [
+                    `Soit $d = \\text{PGCD}(${term1}, ${term2})$. Alors $d$ divise leur différence :`,
+                    `$$\\text{PGCD}(${term1}, ${term2}) = \\text{PGCD}(${term1}, ${diff})$$`,
+                    "Puisque $d$ divise 1 et que $d$ est positif, $d$ ne peut être que 1.",
+                    `$$\\text{PGCD}(${term1}, ${term2}) = 1$$`
+                ],
+                result: 1,
+                term1,
+                term2
+            };
+        }
+        function generateMultiplicationPGCDProblem() {
+            const g = randomInt(3, 15); // PGCD(a, b)
+            const k = randomInt(2, 6);  // Le multiplicateur
+            const result = k * g;
+
+            return {
+                type: "PGCD par Multiplication",
+                question: `Sachant que $\\text{PGCD}(a, b) = ${g}$, que vaut $\\text{PGCD}(${k}a, ${k}b)$ ?`,
+                indication: "Utilisez la propriété fondamentale : $\\text{PGCD}(ka, kb) = |k| \\times \text{PGCD}(a, b)$.",
+                solutionSteps: [
+                    `Appliquons la propriété $\\text{PGCD}(ka, kb) = |k| \\times \\text{PGCD}(a, b)$ avec \\(k = ${k}\\) et \\(\\text{PGCD}(a, b) = ${g} \\)`,
+                    `$$\\text{PGCD}(${k}a, ${k}b) = ${k} \\times ${g}$$`,
+                    `$$\\text{PGCD}(${k}a, ${k}b) = ${result}$$`
+                ],
+                result: result
+            };
+        }
+        function generatePowerPGCDProblem() {
+            const a = randomInt(2, 10);
+            const m = randomInt(5, 12);
+            const n = randomInt(3, 8);
+            const min_exp = Math.min(m, n);
+
+            const result = Math.pow(a, min_exp);
+
+            return {
+                type: "PGCD de Puissances",
+                question: `Déterminer $\\text{PGCD}(${a}^{${m}}, ${a}^{${n}})$.`,
+                indication: `Rappel : Pour $\\text{PGCD}(x^m, x^n)$, $\\text{PGCD}(x^m, x^n) = x^{\\min(m, n)}$.`,
+                solutionSteps: [
+                    "Puisque la base est la même, le PGCD est la puissance affectée du plus petit exposant.",
+                    `$$ \\text{PGCD}(${a}^{${m}}, ${a}^{${n}}) = ${a}^{\\min(${m}, ${n})} $$`,
+                    `$$ \\text{PGCD}(${a}^{${m}}, ${a}^{${n}}) = ${a}^{${min_exp}} = ${result} $$`
+                ],
+                result: result
+            };
+        }
+        function generateAlgebraicAdvancedProblem() {
+            let a, c, b, d;
+            
+            // Assurer |ad - bc| = 1
+            const cases = [
+                {a: 2, c: 3, b: 1, d: 2}, // ad-bc = 4-3 = 1
+                {a: 3, c: 4, b: 2, d: 3}, // ad-bc = 9-8 = 1
+                {a: 5, c: 2, b: 2, d: 1}, // ad-bc = 5-4 = 1
+                {a: 4, c: 3, b: 1, d: 1}, // ad-bc = 4-3 = 1
+            ];
+            const chosenCase = cases[randomInt(0, cases.length - 1)];
+            a = chosenCase.a; c = chosenCase.c; b = chosenCase.b; d = chosenCase.d;
+            
+            const term1 = `${a}n + ${b}`;
+            const term2 = `${c}n + ${d}`;
+            
+            // Calcul des coefficients pour l'identité de Bezout : u*A + v*B = ad-bc
+            let u = d; 
+            let v = -b; 
+            let resultValue = a * d - b * c; 
+            
+            // Si le résultat est -1, on inverse les signes
+            if (resultValue < 0) {
+                 u = -u; 
+                 v = -v; 
+                 resultValue = 1;
+            }
+
+            // Construction de l'expression complète
+            const expression = `${u} \\times (${term1}) ${v < 0 ? v : '+' + v} \\times (${term2})`;
+
+            // Expression détaillée pour la simplification avec les underbrace
+            const u_a = u * a;
+            const v_c = v * c;
+            const u_b = u * b;
+            const v_d = v * d;
+            const simplification_value = u_b + v_d; // Valeur constante (1)
+            
+            const expression_detailed = `
+                ${u} (${a}n + ${b}) + ${v} (${c}n + ${d}) \\\\
+                = \\underbrace{${u_a}n ${v_c < 0 ? v_c : '+' + v_c}n}_{= 0} + \\underbrace{${u_b} ${v_d > 0 ? '+' + v_d : v_d}}_{= ${simplification_value}}
+            `;
+
+
+            return {
+                type: "PGCD Algébrique (Avancé)",
+                question: `Montrer que pour tout entier naturel $n$, $\\text{PGCD}(${term1}, ${term2}) = 1$.`,
+                indication: "Trouvez une combinaison linéaire $u(an+b) + v(cn+d)$ qui donne une constante simple (l'identité de Bezout).",
+                solutionSteps: [
+                    `Soit $d$ le PGCD. $d$ divise toute combinaison linéaire des deux termes. On calcule la combinaison linéaire $u \\cdot A + v \\cdot B$ où $u=${u}$ et $v=${v}$ :`,
+                    `$$\\text{PGCD}(${term1}, ${term2}) = \\text{PGCD}(${term1}, ${expression})$$`,
+                    `Le calcul de la combinaison linéaire donne (en regroupant les termes en $n$ et les termes constants) :`,
+                    `$$ ${expression_detailed} $$`,
+                    `$$ = ${simplification_value} $$`,
+                    "Puisque $d$ divise $\\pm 1$, on a $d=1$ (car $d$ est positif par définition).",
+                    `$$\\text{PGCD}(${term1}, ${term2}) = 1$$`
+                ],
+                result: 1
+            };
+        }
+        function generateEquationPGCDProblem() {
+            const C_candidates = [12, 18, 20, 24, 30];
+            const C = C_candidates[randomInt(0, C_candidates.length - 1)];
+            
+            let g, k_C;
+            do {
+                g = randomInt(2, C / 2);
+                k_C = C / g;
+            } while (C % g !== 0 || g === C); 
+
+            return {
+                type: "Équation PGCD",
+                question: `Trouver les entiers naturels $n$ tels que $\\text{PGCD}(n, ${C}) = ${g}$.`,
+                indication: `Si $\\text{PGCD}(n, C)=g$, alors $n$ doit être de la forme $g \\times k$, où $k$ est premier avec $C/g$.`,
+                solutionSteps: [
+                    ` La condition implique que $n$ est un multiple de $ ${g}$. Soit $n = ${g}k$.`,
+                    " En remplaçant dans l'équation :",
+                    `$$\\text{PGCD}(${g}k, ${C}) = \\text{PGCD}(${g}k, ${g} \\times ${k_C}) = ${g} \\times \\text{PGCD}(k, ${k_C}) = ${g}$$`,
+                    ` On en déduit la condition : $\\text{PGCD}(k, ${k_C}) = 1$.`,
+                    // Nouvelle étape formelle remplaçant la description
+                    `La condition est donc que $k$ soit premier avec $${k_C}$. L'ensemble des solutions est :`,
+                    `$$\\lbrace n \\in \\mathbb{N} \\mid n = ${g}k \\text{ avec } \\text{PGCD}(k, ${k_C}) = 1 \\rbrace$$`
+                ],
+                result: `n = ${g}k \\text{ avec } \\text{PGCD}(k, ${k_C}) = 1` 
+            };
+        }
+
+        /** FONCTIONS DE CONTRÔLE DE L'INTERFACE UTILISATEUR **/
+        
+        function generateNewEx4Problem() {
+            const generatorIndex = currentEx4CycleCount % problemGenerators.length;
+            const generator = problemGenerators[generatorIndex];
+            
+            currentEx4ProblemData = generator.generate();
+
+            const questionContainer = document.getElementById('dynamicEx4Question');
+            const questionCounter = document.getElementById('ex4-counter');
+            const helpInd = document.getElementById('help-ex4-ind');
+            const helpSol = document.getElementById('help-ex4-sol');
+            
+            helpInd.style.display = 'none';
+            helpSol.style.display = 'none';
+            
+            currentEx4CycleCount++;
+            questionContainer.innerHTML = currentEx4ProblemData.question;
+            questionCounter.textContent = `(${currentEx4CycleCount}/${maxEx4Cycles}) - Type: ${currentEx4ProblemData.type}`;
+
+            helpInd.innerHTML = `<strong>Indication :</strong> ${currentEx4ProblemData.indication}`;
+
+            if (window.MathJax) {
+                MathJax.typeset([questionContainer, helpInd]);
+            }
+        }
+        
+        /**
+         * Fonction pour mettre à jour et afficher la solution complète de l'Exercice 4.
+         */
+        function updateEx4SolutionContent() {
+            if (!currentEx4ProblemData) return;
+            
+            const problem = currentEx4ProblemData;
+            const solutionElement = document.getElementById('help-ex4-sol');
+            
+            const solutionSteps = problem.solutionSteps;
+            
+            let solutionHTML = `
+                <strong>Solution complète (Type : ${problem.type}) :</strong>
+                <ol>
+            `;
+            
+            solutionSteps.forEach(step => {
+                solutionHTML += `<li>${step}</li>`;
+            });
+
+            solutionHTML += `</ol>`;
+            solutionElement.innerHTML = solutionHTML;
+            
+            if (window.MathJax) {
+                // Utiliser MathJax.typeset sur l'élément solution pour rendre le LaTeX
+                MathJax.typeset([solutionElement]);
+            }
+        }
+        
+        function toggleHelp(exId, helpLevel) {
+            const id = `help-${exId}-${helpLevel}`;
+            const helpElement = document.getElementById(id);
+
+            const allHelpContents = document.querySelectorAll('.help-content');
+            allHelpContents.forEach(el => {
+                if (el.id.startsWith(`help-${exId}-`) && el.id !== id && el.style.display !== 'none') {
+                    el.style.display = 'none';
+                }
+            });
+
+            if (helpElement) {
+                if (helpElement.style.display === 'block') {
+                    helpElement.style.display = 'none';
+                } else {
+                    helpElement.style.display = 'block';
+                    if (window.MathJax) {
+                        MathJax.typeset([helpElement]);
+                    }
+                }
+            }
+        }
+        
+        function generateDynamicSolutionEx1() {
+            const a = parseInt(document.getElementById('numA').textContent);
+            const b = parseInt(document.getElementById('numB').textContent);
+
+            const divisorsA = getDivisors(a);
+            const divisorsB = getDivisors(b);
+            
+            const commonDivisors = divisorsA.filter(d => divisorsB.includes(d));
+            const pgcd = commonDivisors.length > 0 ? Math.max(...commonDivisors) : 1;
+
+            const content = `
+                <strong>Solution (Nombres actuels : $a=${a}, b=${b}$) :</strong> 
+                <ul>
+                    <li>Diviseurs positifs de $a=${a}$ ($\\mathcal{D}_+(${a})$) : $\\{${divisorsA.join(', ')}\\}$</li>
+                    <li>Diviseurs positifs de $b=${b}$ ($\\mathcal{D}_+(${b})$) : $\\{${divisorsB.join(', ')}\\}$</li>
+                    <li>Diviseurs communs ($\\mathcal{D}_c$) : $\\{${commonDivisors.join(', ')}\\}$</li>
+                </ul>
+                $$\\text{PGCD}(${a}, ${b}) = ${pgcd}$$
+            `;
+
+            const helpElement = document.getElementById('help-ex1-sol2');
+            helpElement.innerHTML = content;
+             if (window.MathJax) {
+                MathJax.typeset([helpElement]);
+            }
+        }
+
+        function generateDynamicSolutionEx2() {
+            const a_prime = parseInt(document.getElementById('numA_neg').textContent);
+            const b_prime = parseInt(document.getElementById('numB_neg').textContent);
+            
+            const a = Math.abs(a_prime);
+            const b = Math.abs(b_prime);
+            
+            const divisorsA = getDivisors(a);
+            const divisorsB = getDivisors(b);
+            
+            const commonDivisors = divisorsA.filter(d => divisorsB.includes(d));
+            const pgcd = commonDivisors.length > 0 ? Math.max(...commonDivisors) : 1;
+
+            const content = `
+                <strong>Solution (Nombres actuels : $a'=${a_prime}, b'=${b_prime}$) :</strong> 
+                <p>1. Utilisation de la propriété : $\\text{PGCD}(a', b') = \\text{PGCD}(|a'|, |b'|)$</p>
+                $$\\text{PGCD}(${a_prime}, ${b_prime}) = \\text{PGCD}(${a}, ${b})$$
+                <p>2. Détermination par les diviseurs de $|a'|=${a}$ et $|b'|=${b}$ :</p>
+                <ul>
+                    <li>Diviseurs positifs de $${a}$ : $\\{${divisorsA.join(', ')}\\}$</li>
+                    <li>Diviseurs positifs de $${b}$ : $\\{${divisorsB.join(', ')}\\}$</li>
+                    <li>Diviseurs communs : $\\{${commonDivisors.join(', ')}\\}$</li>
+                </ul>
+                $$\\text{PGCD}(${a_prime}, ${b_prime}) = ${pgcd}$$
+            `;
+
+            const helpElement = document.getElementById('help-ex2-sol1');
+            helpElement.innerHTML = content;
+             if (window.MathJax) {
+                MathJax.typeset([helpElement]);
+            }
+        }
+        
+        function generateNewPair() {
+            const min = 15;
+            const max = 80;
+            let a, b;
+            
+            do {
+                a = randomInt(min, max);
+                b = randomInt(min, max);
+            } while (a === b || gcd(a, b) <= 1 || a < 18 && b < 18); 
+
+            document.getElementById('numA').textContent = a;
+            document.getElementById('numB').textContent = b;
+            
+            document.getElementById('help-ex1-sol2').innerHTML = 'Cliquez sur "Solution (Dynamique)" pour afficher la correction étape par étape des nombres actuels.';
+            if (window.MathJax) {MathJax.typeset([document.getElementById('help-ex1-sol2')]);}
+        }
+
+        function generateNewPairNeg() {
+            const min_abs = 20;
+            const max_abs = 100;
+            let a_abs, b_abs;
+            
+            do {
+                a_abs = randomInt(min_abs, max_abs);
+                b_abs = randomInt(min_abs, max_abs);
+            } while (a_abs === b_abs || gcd(a_abs, b_abs) <= 1);
+
+            let a_neg = (Math.random() > 0.5) ? -a_abs : a_abs;
+            let b_neg = (Math.random() > 0.5) ? -b_abs : b_abs;
+            
+            if (a_neg > 0 && b_neg > 0) {
+                 a_neg = -a_neg; // Garantir au moins un négatif
+            }
+
+            document.getElementById('numA_neg').textContent = a_neg;
+            document.getElementById('numB_neg').textContent = b_neg;
+
+            document.getElementById('help-ex2-sol1').innerHTML = 'Cliquez sur "Solution (Dynamique)" pour afficher la correction étape par étape des nombres actuels.';
+            if (window.MathJax) {MathJax.typeset([document.getElementById('help-ex2-sol1')]);}
+        }
+
+        // Initialisation : génère une paire de nombres au chargement de la page
+        document.addEventListener('DOMContentLoaded', () => {
+             // Ex 1 initialisation
+            if (document.getElementById('numA')) {
+                document.getElementById('numA').textContent = 18;
+                document.getElementById('numB').textContent = 30;
+            }
+            // Ex 2 initialisation
+            if (document.getElementById('numA_neg')) {
+                document.getElementById('numA_neg').textContent = -24;
+                document.getElementById('numB_neg').textContent = 60;
+            }
+            // Ex 3 initialisation (NOUVEAU)
+            if (document.getElementById('ex3-questions')) {
+                 generateEx3Questions();
+            }
+            // Ex 4 initialisation: Lance le premier problème dynamique
+            if (document.getElementById('dynamicEx4Question')) {
+                generateNewEx4Problem();
+            }
+        });
+    </script>
+</body>
+</html>
