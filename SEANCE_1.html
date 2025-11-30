@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S1 : Divisibilité et Propriétés (Version Finale Corrigée)</title>
+    
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <script>
+        // Configuration MathJax pour les délimiteurs LaTeX
+        // Les formules en ligne sont délimitées par $...$ ou \(...\)
+        // Les formules en bloc sont délimitées par $$...$$ ou \[...\]
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+
+    <style>
+        /* CHARTE GRAPHIQUE FONDAMENTALE (S1) */
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.6;
+            margin: 0 auto;
+            max-width: 900px;
+            padding: 20px;
+            color: #333;
+        }
+        h1, h2 {
+            font-family: Arial, sans-serif;
+            color: #0056b3;
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        h1.session-title {
+            text-align: center;
+            font-size: 1.8em;
+            border-color: #0080ff;
+        }
+        h2 {
+            font-size: 1.4em;
+            color: #0080ff;
+            border-color: #e0e0e0;
+        }
+        .theme-principal {
+            text-align: center;
+            font-style: italic;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        /* Styles des blocs de Cours */
+        .statement-block {
+            margin: 1.5em 0;
+            padding: 15px;
+            border-left: 5px solid;
+            background-color: #f9f9f9;
+        }
+        .definition { border-color: #00aaff; }
+        .theoreme { border-color: #00cc66; }
+        .propriete { border-color: #ff9900; }
+        .statement-title {
+            font-weight: bold;
+            font-style: italic;
+            font-size: 1.1em;
+            margin-bottom: 0.5em;
+            display: block;
+        }
+        ol.roman { list-style-type: none; counter-reset: item; }
+        ol.roman > li { text-indent: -1.5em; margin-left: 1.5em; }
+        ol.roman > li:before {
+            content: "(" counter(item, lower-roman) ") ";
+            counter-increment: item;
+            font-weight: bold;
+        }
+        .exercice-title {
+            font-size: 1.1em;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+        }
+        /* CHARTE GRAPHIQUE DES EXERCICES (Styles S2 appliqués) */
+        .dynamic-division-container { 
+            background-color: #f8f8ff; 
+            padding: 15px;
+            border: 1px solid #7952b3; 
+            margin-bottom: 15px;
+        }
+        .dynamic-remainder-container { 
+            background-color: #f0f0ff; 
+            padding: 15px;
+            border: 1px solid #4a00ff; 
+            margin-bottom: 15px;
+        }
+        /* Conteneur Ex 4 personnalisé */
+        #container-ex4 {
+            background-color: #ffe0e0; 
+            border-color: #ff4d4d;
+        }
+        .ex4-difficulty {
+            font-weight: bold;
+            font-style: italic;
+            color: #d9534f;
+            margin-bottom: 5px;
+        }
+        /* Styles des Boutons */
+        .help-buttons {
+            margin-top: 10px;
+            margin-bottom: 10px; 
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px; 
+        }
+        .help-buttons button { 
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.2s;
+            margin-right: 5px;
+        }
+        .btn-generation { 
+            background-color: #007bff; 
+            color: white; 
+            border: none;
+        }
+        .btn-indication { 
+            background-color: #e0f0ff;
+            color: #0056b3;
+            border-color: #0056b3;
+        }
+        .btn-solution { 
+            background-color: #e9fbe9; 
+            color: #28a745; 
+            border-color: #28a745;
+        }
+        /* Contenu d'Aide */
+        .help-content {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none; 
+            line-height: 1.5;
+            font-size: 0.9em;
+        }
+        .help-indication {
+            background-color: #f5faff;
+            border-left: 3px solid #0056b3;
+        }
+        .help-solution {
+            background-color: #fffff0;
+            border-left: 3px solid #999900;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="session-title">Séance $S_1$ (50 min) : Divisibilité et Propriétés</h1>
+    <p class="theme-principal"><strong>Thème Principal :</strong> Les fondations de l'Arithmétique dans $\mathbb{Z}$</p>
+
+    <h2>I. Cours : Divisibilité dans $\mathbb{Z}$</h2>
+    <div class="statement-block definition">
+        <span class="statement-title">Définition [Divisibilité]</span>
+        <p>Soient $a$ et $b$ deux entiers relatifs ($a, b \in \mathbb{Z}$). On dit que $a$ <strong>divise</strong> $b$ s'il existe un entier relatif $k \in \mathbb{Z}$ tel que :</p>
+        \[b = k \times a\]
+        <p>On note $a | b$ (lire : « $a$ divise $b$ ») ou $b$ est un <strong>multiple</strong> de $a$.</p>
+    </div>
+    <div class="statement-block theoreme">
+        <span class="statement-title">Théorème [Propriété de Combinaison Linéaire]</span>
+        <p>Soient $a, b, c$ trois entiers relatifs. Si $c$ divise $a$ <strong>et</strong> si $c$ divise $b$, alors pour tout couple d'entiers $(\lambda, \mu) \in \mathbb{Z}^2$, $c$ divise la <strong>combinaison linéaire</strong> $\lambda a + \mu b$.</p>
+        \[c|a \text{ et } c|b \implies \forall (\lambda, \mu) \in \mathbb{Z}^2, c | (\lambda a + \mu b)\]
+    </div>
+    <div class="statement-block theoreme" id="theoreme-consecutif">
+        <span class="statement-title">Théorème [Divisibilité du Produit Consécutif]</span>
+        <p>Rappelez-vous que le produit de $k$ entiers consécutifs est toujours divisible par $k!$.</p>
+        \[\forall n \in \mathbb{N}, \forall k \in \mathbb{N}^*, k! \mid n(n+1)\cdots(n+k-1)\]
+        
+        <div class="help-buttons">
+            <button class="btn-demonstration" onclick="generateConsecutiveProductDemonstration(this, 'analyse')" data-type="analyse" style="background-color:#cc00cc;">Démonstration (Analyse $k=3$)</button>
+            <button class="btn-demonstration" onclick="generateConsecutiveProductDemonstration(this, 'recurrence')" data-type="recurrence" style="background-color:#ff8c00;">Démonstration (Récurrence Générale)</button>
+            <button class="btn-demonstration" onclick="generateConsecutiveProductDemonstration(this, 'binomial')" data-type="binomial" style="background-color:#008080;">Démonstration (Nombres Binomiaux)</button>
+        </div>
+        <div id="help-content-demonstration_k3" class="help-content help-solution">
+            <p style="font-style:italic;">Cliquez sur l'un des boutons pour voir la démonstration.</p>
+        </div>
+    </div>
+    <hr>
+
+    <h2>II. Exercices $S_1$</h2>
+
+    <h3 class="exercice-title">Exercice 1 : Recherche de diviseurs</h3>
+    <div id="container-ex1-q1" class="dynamic-division-container">
+        <p><strong>Question 1/2 :</strong> Donner l'ensemble $\mathcal{D}_{pos}(N)$ des diviseurs positifs de : <strong id="dynamicNumberCompact">N</strong>.</p>
+        <div class="help-buttons">
+            <button onclick="generateNewNumber()" class="btn-generation">Générer un nombre</button>
+            <button onclick="toggleHelp(this, 'ind1_ex1_q1')" class="btn-indication">Indication</button>
+            <button onclick="toggleHelp(this, 'sol1_ex1_q1')" class="btn-solution">Solution</button>
+        </div>
+        <div id="dynamic-content-ex1-q1" style="display:none;">
+            <div id="help-content-ind1_ex1_q1" class="help-content help-indication">
+                <p><strong>Indication :</strong> Commencez par calculer $\lfloor\sqrt{N}\rfloor$ et testez tous les entiers positifs jusqu'à cette valeur.</p>
+            </div>
+            <div id="help-content-sol1_ex1_q1" class="help-content help-solution"></div>
+        </div>
+        <p id="placeholder-ex1-q1">Cliquer sur le bouton <strong>Générer un nombre</strong> pour commencer.</p>
+    </div>
+
+    <div id="container-ex1-q2" class="dynamic-division-container">
+        <p><strong>Question 2/2 :</strong> Donner l'ensemble $\mathcal{D}(N)$ de tous les diviseurs (positifs et négatifs) de : <strong id="dynamicNumberCompact2">N</strong>.</p>
+        <div class="help-buttons">
+            <button onclick="generateNewNumber2()" class="btn-generation">Générer un nombre</button>
+            <button onclick="toggleHelp(this, 'ind2_ex1_q2')" class="btn-indication">Indication</button>
+            <button onclick="toggleHelp(this, 'sol2_ex1_q2')" class="btn-solution">Solution</button>
+        </div>
+        <div id="dynamic-content-ex1-q2" style="display:none;">
+            <div id="help-content-ind2_ex1_q2" class="help-content help-indication">
+                <p><strong>Indication :</strong> $\mathcal{D}(N) = \mathcal{D}_{pos}(|N|) \cup \{ -d \mid d \in \mathcal{D}_{pos}(|N|) \}$.</p>
+            </div>
+            <div id="help-content-sol2_ex1_q2" class="help-content help-solution"></div>
+        </div>
+        <p id="placeholder-ex1-q2">Cliquer sur le bouton <strong>Générer un nombre</strong> pour commencer.</p>
+    </div>
+
+    <hr>
+
+    <h3 class="exercice-title">Exercice 2 : Preuve par définition et factorisation</h3>
+    <div id="container-ex2-q1" class="dynamic-remainder-container">
+        <div class="dynamic-question-container">
+            <p id="dynamicProofQuestion" style="margin: 0; padding: 0;"><strong>Question :</strong> Prouver que, pour tout $n \in \mathbb{Z}$, <strong>[Question générée]</strong>.</p>
+        </div>
+        <div class="help-buttons">
+            <button onclick="generateNewProof()" class="btn-generation">Générer une preuve</button>
+            <button onclick="toggleHelp(this, 'ind1_ex2_q1')" class="btn-indication">Indication</button>
+            <button onclick="toggleHelp(this, 'sol1_ex2_q1')" class="btn-solution">Solution</button>
+        </div>
+        <div id="dynamic-content-ex2-q1" style="display:none;">
+            <div id="help-content-ind1_ex2_q1" class="help-content help-indication">
+                <p><strong>Indication :</strong> Essayez de factoriser l'expression à l'aide d'identités remarquables ou d'une décomposition astucieuse ($n^3+5n = n^3-n+6n$).</p>
+            </div>
+            <div id="help-content-sol1_ex2_q1" class="help-content help-solution"></div>
+        </div>
+        <p id="placeholder-ex2-q1">Cliquer sur le bouton <strong>Générer une preuve</strong> pour commencer.</p>
+    </div>
+
+    <div id="container-ex2-q2" class="dynamic-remainder-container">
+        <div class="dynamic-question-container">
+            <p id="dynamicDivisibilityQuestion" style="margin: 0; padding: 0;"><strong>Question :</strong> Prouver que, pour tout $n \in \mathbb{N}$, <strong>[Question générée]</strong>.</p>
+        </div>
+        <div class="help-buttons">
+            <button onclick="generateNewDivisibility()" class="btn-generation">Générer un exercice</button>
+            <button onclick="toggleHelp(this, 'ind2_ex2_q2')" class="btn-indication">Indication</button>
+            <button onclick="toggleHelp(this, 'sol2_ex2_q2')" class="btn-solution">Solution</button>
+        </div>
+        <div id="dynamic-content-ex2-q2" style="display:none;">
+            <div id="help-content-ind2_ex2_q2" class="help-content help-indication">
+                <p><strong>Indication :</strong> Pensez à l'identité $n^2 - 1 = (n-1)(n+1)$. Un produit de $k$ entiers consécutifs est toujours divisible par $k!$.</p>
+            </div>
+            <div id="help-content-sol2_ex2_q2" class="help-content help-solution"></div>
+        </div>
+        <p id="placeholder-ex2-q2">Cliquer sur le bouton <strong>Générer un exercice</strong> pour commencer.</p>
+    </div>
+
+    <hr>
+
+    <h3 class="exercice-title">Exercice 3 : Combinaison Linéaire</h3>
+    <div id="container-ex3" class="dynamic-remainder-container" style="border-color: #ff4d4d;">
+        <div class="dynamic-question-container">
+            <p id="dynamicLinearCombinationQuestion" style="margin: 0; padding: 0;"><strong>Question :</strong> <strong>[Question générée]</strong></p>
+        </div>
+        <div class="help-buttons">
+            <button onclick="generateNewLinearCombination()" class="btn-generation">Générer un exercice</button>
+            <button onclick="toggleHelp(this, 'ind1_ex3')" class="btn-indication">Indication</button>
+            <button onclick="toggleHelp(this, 'sol2_ex3')" class="btn-solution">Solution</button>
+        </div>
+        <div id="dynamic-content-ex3" style="display:none;">
+            <div id="help-content-ind1_ex3" class="help-content help-indication">
+                <p><strong>Indication :</strong> Le théorème dit que si $d$ divise $a$ et $d$ divise $b$, alors $d$ divise $\lambda a + \mu b$ pour n'importe quel coefficient entier $\lambda$ et $\mu$. Vous n'avez pas besoin de calculer l'expression finale, juste de citer la propriété.</p>
+            </div>
+            <div id="help-content-sol2_ex3" class="help-content help-solution"></div>
+        </div>
+        <p id="placeholder-ex3">Cliquer sur le bouton <strong>Générer un exercice</strong> pour commencer.</p>
+    </div>
+
+    <hr>
+
+    <h3 class="exercice-title">Exercice 4 : Problème de Synthèse (15 Niveaux de Difficulté)</h3>
+    <div id="container-ex4" class="dynamic-remainder-container">
+        <p id="ex4-difficulty-level" class="ex4-difficulty">Difficulté : Niveau 1 (Élémentaire)</p>
+        <div class="dynamic-question-container">
+            <p id="dynamicSynthesisProblem" style="margin: 0; padding: 0;"><strong>[Question générée]</strong></p>
+        </div>
+        
+        <div class="help-buttons">
+            <button onclick="generateNewSynthesisProblemV2()" class="btn-generation">Générer un nouvel exercice (Aléatoire)</button>
+            <button onclick="toggleHelp(this, 'ind1_ex4')" class="btn-indication">Indication</button>
+            <button onclick="toggleHelp(this, 'sol2_ex4')" class="btn-solution">Solution</button>
+        </div>
+
+        <div id="dynamic-content-ex4" style="display:none;">
+            <div id="help-content-ind1_ex4" class="help-content help-indication">
+                <p id="ex4-hint-content"><strong>Indication :</strong> Utilisez la factorisation, le théorème de la combinaison linéaire ou la décomposition selon le type de problème.</p>
+            </div>
+            <div id="help-content-sol2_ex4" class="help-content help-solution">
+                <p id="ex4-solution-content"></p>
+            </div>
+        </div>
+        <p id="placeholder-ex4">Cliquer sur le bouton <strong>Générer un exercice</strong> pour commencer.</p>
+    </div>
+    <hr>
+    
+    <script>
+        // --- Fonctions de base et d'utilité ---
+
+        function closeAllHelp(container) {
+            const allHelpContents = container.querySelectorAll('.help-content');
+            allHelpContents.forEach(el => {
+                el.style.display = 'none';
+            });
+            container.querySelectorAll('.help-buttons button').forEach(btn => {
+                if (btn.classList.contains('btn-indication') && btn.textContent !== 'Indication') {
+                    btn.textContent = 'Indication';
+                } else if (btn.classList.contains('btn-solution') && btn.textContent !== 'Solution') {
+                    btn.textContent = 'Solution';
+                }
+            });
+        }
+
+        function toggleHelp(triggerButton, helpSuffix) {
+            const id = `help-content-${helpSuffix}`;
+            const container = triggerButton.closest('div[id^="container-ex"]'); 
+            if (!container) return;
+            const helpElement = container.querySelector(`#${id}`);
+
+            const isVisible = helpElement.style.display === 'block';
+
+            container.querySelectorAll('.help-content').forEach(el => {
+                el.style.display = 'none';
+            });
+            container.querySelectorAll('.help-buttons button').forEach(btn => {
+                if (btn.classList.contains('btn-indication') || btn.classList.contains('btn-solution')) {
+                    const originalText = btn.classList.contains('btn-indication') ? 'Indication' : 'Solution';
+                    btn.textContent = originalText;
+                }
+            });
+
+            if (!isVisible) {
+                helpElement.style.display = 'block';
+                triggerButton.textContent = 'Masquer l\'aide';
+                if (window.MathJax) {
+                    // Re-typeset seulement l'élément généré pour une performance optimale
+                    MathJax.typeset([helpElement]);
+                }
+            }
+        }
+
+        function getDivisors(N) {
+            N = Math.abs(N);
+            let divisors = [];
+            const R = Math.floor(Math.sqrt(N));
+            for (let d = 1; d <= R; d++) {
+                if (N % d === 0) {
+                    divisors.push(d);
+                    if (d * d !== N) {
+                        divisors.push(N / d);
+                    }
+                }
+            }
+            divisors.sort((a, b) => a - b);
+            return divisors;
+        }
+
+        function formatSolutionText(text) {
+            // Remplace un point suivi d'un espace, d'une tabulation, d'un retour chariot ou de la fin de chaîne par .<br> et le caractère capturé.
+            return text.replace(/\.([ \t\r\n]|$)/g, '.<br>$1');
+        }
+
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // --- FONCTION DE DÉMONSTRATION DU THÉORÈME (inchangée) ---
+        function generateConsecutiveProductDemonstration(triggerButton, type) { 
+            const id = `help-content-demonstration_k3`;
+            const helpElement = document.getElementById(id);
+            if (!helpElement) return;
+
+            const isVisible = helpElement.style.display === 'block';
+
+            const container = triggerButton.closest('.statement-block');
+            if (container) {
+                const allHelpContents = container.querySelectorAll('.help-content');
+                allHelpContents.forEach(el => {
+                    if (el.id !== id && el.style.display !== 'none') {
+                        el.style.display = 'none';
+                    }
+                });
+            }
+
+            if (isVisible) {
+                helpElement.style.display = 'none';
+            } else {
+                let solText = '';
+                
+                if (type === 'analyse') {
+                    solText = `
+                        <strong>Démonstration par Analyse du cas $k=3$ (Divisibilité par $3! = 6$)</strong>
+                        <p>Nous devons montrer que pour tout $n \\in \\mathbb{N}$, l'expression $P(n) = n(n+1)(n+2)$ est divisible par 6.</p>
+                        <ol style="padding-left: 20px;">
+                            <li><strong>Divisibilité par 2 :</strong> $P(n)$ contient le produit de <strong>deux entiers consécutifs</strong>, soit $n(n+1)$. Ce produit est toujours pair (divisible par 2).</li>
+                            <li><strong>Divisibilité par 3 :</strong> $P(n)$ contient le produit de <strong>trois entiers consécutifs</strong>, $n, n+1, n+2$. Dans toute suite de trois entiers consécutifs, il y a exactement un multiple de 3. Donc $P(n)$ est toujours divisible par 3.</li>
+                            <li><strong>Conclusion :</strong> Puisque $P(n)$ est divisible par 2 et par 3, et que 2 et 3 sont premiers entre eux, $P(n)$ est divisible par leur produit $2 \\times 3 = 6$.
+                            <br>Ainsi, $3! \\mid n(n+1)(n+2)$.</li>
+                        </ol>
+                    `;
+                } else if (type === 'recurrence') {
+                    solText = `
+                        <strong>Démonstration par Récurrence (Généralisation via l'identité de Pascal)</strong>
+                        <p>La preuve la plus rigoureuse par récurrence s'effectue en montrant que le coefficient binomial $\\mathbf{\\binom{N}{k} = \\frac{N(N-1)\\cdots(N-k+1)}{k!}}$ est un entier, ce qui est équivalent à prouver que $k!$ divise le produit de $k$ entiers consécutifs.</p>
+                        <p>Posons $N=n+k-1$. Nous prouvons par récurrence sur $\\mathbf{N}$ que $\\binom{N}{k} \\in \\mathbb{N}$ pour tout $k \\le N$.</p>
+                        
+                        <ol style="padding-left: 20px;">
+                            <li><strong>Initialisation :</strong> Pour $N=1$. $\\binom{1}{0}=1$ et $\\binom{1}{1}=1$. La propriété est vérifiée.</li>
+                            <li><strong>Hérédité (Hypothèse de Récurrence - HR) :</strong> Supposons que pour un certain $N \\in \\mathbb{N}^*$, $\\binom{N}{k}$ est un entier pour tout $k \\in \\{0, 1, \\dots, N\\}$.</li>
+                            <li><strong>Preuve pour $N+1$ :</strong> Nous devons montrer que $\\binom{N+1}{k}$ est un entier pour tout $k \\in \\{0, 1, \\dots, N+1\\}$.
+                                <p>Pour $k=0$ et $k=N+1$, $\\binom{N+1}{0}=1$ et $\\binom{N+1}{N+1}=1$, qui sont des entiers.</p>
+                                <p>Pour $k \\in \\{1, \\dots, N\\}$, on utilise l'<strong>Identité de Pascal</strong> :
+                                \\[\\binom{N+1}{k} = \\binom{N}{k} + \\binom{N}{k-1}\\]
+                                Par (HR), $\\binom{N}{k}$ et $\\binom{N}{k-1}$ sont des entiers.
+                                <br>Puisque la somme de deux entiers est un entier, $\\binom{N+1}{k}$ est un entier.
+                                <br>La propriété est héréditaire.</p>
+                            </li>
+                            <li><strong>Conclusion :</strong> Par le principe de récurrence, $\\binom{N}{k}$ est un entier. Puisque le produit de $k$ entiers consécutifs $n(n+1)\\cdots(n+k-1)$ est égal à $\\mathbf{k! \\times \\binom{n+k-1}{k}}$, cela prouve qu'il est divisible par $\\mathbf{k!}$.
+                            </li>
+                        </ol>
+                    `;
+                } else if (type === 'binomial') {
+                    solText = `
+                        <strong>Démonstration par les Nombres Binomiaux (Cas général)</strong>
+                        <p>Le produit de $k$ entiers consécutifs à partir de $n$ est $P = n(n+1)\\cdots(n+k-1)$.</p>
+                        <p>On utilise la définition du <b>coefficient binomial</b> :
+                        \\[\\binom{N}{k} = \\frac{N(N-1)\\cdots(N-k+1)}{k!}\\]
+                        </p>
+                        <p>Considérons le nombre binomial $\\mathbf{\\binom{n+k-1}{k}}$ :
+                        \\[\\binom{n+k-1}{k} = \\frac{(n+k-1)(n+k-2)\\cdots(n+k-1-k+1)}{k!}\\]
+                        \\[\\binom{n+k-1}{k} = \\frac{(n+k-1)(n+k-2)\\cdots(n)}{k!} = \\frac{n(n+1)\\cdots(n+k-1)}{k!}\\]
+                        </p>
+                        <p>On peut alors exprimer le produit $P$ en fonction du coefficient binomial :
+                        \\[P = n(n+1)\\cdots(n+k-1) = k! \\times \\binom{n+k-1}{k}\\]
+                        </p>
+                        <p>Puisque $\\binom{n+k-1}{k}$ est, par définition (combinaison), le nombre de façons de choisir $k$ éléments parmi $n+k-1$, c'est toujours un <strong>entier naturel</strong> ($\in \\mathbb{N}$).</p>
+                        <p>Par conséquent, $P$ est un multiple de $k!$, ce qui prouve que $k! \\mid n(n+1)\\cdots(n+k-1)$.</p>
+                    `;
+                } else {
+                    solText = `<p>Type de démonstration inconnu.</p>`;
+                }
+
+                helpElement.innerHTML = solText;
+                helpElement.style.display = 'block';
+                if (window.MathJax) {
+                    MathJax.typeset([helpElement]);
+                }
+            }
+        }
+        
+        // --- FONCTIONS DE GÉNÉRATION EXERCICE 1 (Diviseurs) ---
+
+        function generateNewNumber() {
+            const container = document.getElementById('container-ex1-q1');
+            closeAllHelp(container); 
+
+            const min = 10;
+            const max = 50;
+            const newNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+            
+            const divisors = getDivisors(newNumber);
+            const R = Math.floor(Math.sqrt(newNumber));
+            
+            const divisorPairs = divisors.map(d => {
+                if (d <= R) {
+                    if (d * d === newNumber) {
+                        return `\\(d=${d} \\text{ (racine carrée)}\\)`;
+                    } else {
+                        return `\\(d=${d}, \\frac{N}{d}=${newNumber/d}\\)`;
+                    }
+                }
+                return null;
+            }).filter(p => p !== null).join(', ');
+
+            let solText = `
+                <strong>Solution niveau 1 (Méthode) :</strong> Calculer $R = \\lfloor\\sqrt{N}\\rfloor$. Tester la division par $d \\in \\{1, 2, \\dots, R\\}$. Lister $d$ et $N/d$.
+                <br><em>Cas $N=${newNumber}$ :</em> $\\sqrt{N} \\approx ${R}$. Diviseurs à tester : $\\{1, 2, \\dots, ${R}\\}$.
+                <br>Paires de diviseurs trouvées : ${divisorPairs}.
+                <br>Diviseurs positifs : $\\mathcal{D}_{pos}(${newNumber})=\\{${divisors.join(', ')}\\}$.
+            `;
+            
+            solText = formatSolutionText(solText);
+
+            document.getElementById('dynamicNumberCompact').textContent = newNumber;
+            document.getElementById('help-content-sol1_ex1_q1').innerHTML = solText;
+            
+            document.getElementById('dynamic-content-ex1-q1').style.display = 'block';
+            document.getElementById('placeholder-ex1-q1').style.display = 'none';
+
+            if (window.MathJax) MathJax.typeset([document.getElementById('help-content-sol1_ex1_q1')]);
+        }
+
+        function generateNewNumber2() {
+            const container = document.getElementById('container-ex1-q2');
+            closeAllHelp(container); 
+
+            const min = -50;
+            const max = -10;
+            const newNumber = -(Math.floor(Math.random() * (Math.abs(max) - Math.abs(min) + 1)) + Math.abs(min));
+            
+            const positiveN = Math.abs(newNumber);
+            const posDivisors = getDivisors(positiveN);
+            
+            const negDivisors = posDivisors.map(d => `-${d}`).reverse();
+            const allDivisors = [...negDivisors, ...posDivisors];
+
+            let solText = `
+                <strong>Solution :</strong> Déterminez $\\mathcal{D}_{pos}(|N|)$, puis ajoutez l'opposé de chaque élément pour former $\\mathcal{D}(N)$.
+                <br><em>Cas $N=${newNumber}$ :</em> $|N|=${positiveN}$.
+                <br>Les diviseurs positifs sont : $\\mathcal{D}_{pos}(${positiveN})=\\{${posDivisors.join(', ')}\\}$.
+                <br>L'ensemble de tous les diviseurs est $\\mathcal{D}(${newNumber}) = \\{${allDivisors.join(', ')}\\}$.
+            `;
+            
+            solText = formatSolutionText(solText);
+
+            document.getElementById('dynamicNumberCompact2').textContent = newNumber;
+            document.getElementById('help-content-sol2_ex1_q2').innerHTML = solText;
+            
+            document.getElementById('dynamic-content-ex1-q2').style.display = 'block';
+            document.getElementById('placeholder-ex1-q2').style.display = 'none';
+
+            if (window.MathJax) MathJax.typeset([document.getElementById('help-content-sol2_ex1_q2')]);
+        }
+
+        // --- FONCTIONS DE GÉNÉRATION EXERCICE 2 (Preuve par définition/factorisation) ---
+
+        function generateNewProof() {
+            const container = document.getElementById('container-ex2-q1');
+            closeAllHelp(container); 
+
+            const dynamicProofQuestion = document.getElementById('dynamicProofQuestion');
+            const solElement = document.getElementById('help-content-sol1_ex2_q1');
+            if (!dynamicProofQuestion || !solElement) return;
+
+            const constant_a = Math.floor(Math.random() * 3) + 2; 
+
+            const proofExamples = [
+                {
+                    generator: (a) => ({ 
+                        question: `$(n+${a})$ divise $n^2 - ${a*a}$`, 
+                        proof: `L'expression à diviser est $n^2-${a*a}$. <br>Par l'identité remarquable $a^2-b^2$, on a $n^2-${a*a} = (n-${a})(n+${a})$. <br>Posons $k=n-${a}$. <br>Comme $k \\in \\mathbb{Z}$, on a $n^2-${a*a} = k \\times (n+${a})$. <br>Ce qui prouve que $(n+${a})$ divise $n^2 - ${a*a}$.`
+                    }),
+                    type: 'a^2-b^2'
+                },
+                {
+                    generator: (a) => ({ 
+                        question: `$(n+${a})$ divise $n^2 + ${2*a}n + ${a*a}$`, 
+                        proof: `Par l'identité remarquable $(a+b)^2$, on a $n^2 + ${2*a}n + ${a*a} = (n+${a})^2 = (n+${a}) \\times (n+${a})$. <br>Posons $k=n+${a}$. Comme $k \\in \\mathbb{Z}$, on a l'égalité, ce qui prouve que $(n+${a})$ divise $n^2 + ${2*a}n + ${a*a}$.`
+                    }),
+                    type: '(a+b)^2'
+                },
+                {
+                    generator: () => ({ 
+                        question: `$(n+1)$ divise $n^3 + 1$`, 
+                        proof: `L'identité remarquable $a^3+b^3 = (a+b)(a^2-ab+b^2)$ donne $n^3+1 = (n+1)(n^2-n+1)$. Posons $k=n^2-n+1$. Comme $k \\in \\mathbb{Z}$, on a l'égalité, ce qui prouve que $(n+1)$ divise $n^3 + 1$.`
+                    }),
+                    type: 'a^3+b^3'
+                },
+                { 
+                    generator: () => ({ 
+                        question: `l'entier $\\mathbf{6}$ divise $\\mathbf{n^3 + 5n}$`, 
+                        proof: `On réécrit l'expression par décomposition : $n^3 + 5n = n^3 - n + 6n$. <br>On factorise : $n^3 + 5n = n(n^2 - 1) + 6n = (n-1)n(n+1) + 6n$. <br>L'expression $(n-1)n(n+1)$ est un produit de <b>3 entiers consécutifs</b>, donc toujours divisible par $3! = 6$. De plus $6n$ est divisible par 6. <br>Par le Théorème de Combinaison Linéaire, $n^3 + 5n$ est divisible par 6.`, 
+                        level: 'Très Avancée (Algèbre Consécutif)' 
+                    }), 
+                    type: 'n^3+5n-6' 
+                },
+            ];
+            
+            const randomIndex = Math.floor(Math.random() * proofExamples.length);
+            const selectedExample = proofExamples[randomIndex];
+            const result = selectedExample.generator(constant_a);
+
+            dynamicProofQuestion.innerHTML = `<strong>Question :</strong> Prouver que, pour tout $n \\in \\mathbb{Z}$, ${result.question}.`;
+            solElement.innerHTML = `
+                <strong>Démonstration Exacte :</strong>
+                <p>${result.proof}</p>
+            `;
+
+            document.getElementById('dynamic-content-ex2-q1').style.display = 'block';
+            document.getElementById('placeholder-ex2-q1').style.display = 'none';
+
+            if (window.MathJax) MathJax.typeset([dynamicProofQuestion, solElement]);
+        }
+
+        function generateNewDivisibility() {
+            const container = document.getElementById('container-ex2-q2');
+            closeAllHelp(container); 
+
+            const dynamicDivisibilityQuestion = document.getElementById('dynamicDivisibilityQuestion');
+            const solElement = document.getElementById('help-content-sol2_ex2_q2');
+            if (!dynamicDivisibilityQuestion || !solElement) return;
+
+            const examples = [
+                {
+                    question: `l'entier $\\mathbf{6}$ divise $\\mathbf{n(n^2 - 1)}$`,
+                    proof: `On factorise l'expression : $n(n^2 - 1) = n(n-1)(n+1)$. <br>On réordonne : $P(n) = (n-1)n(n+1)$. <br>C'est le <b>produit de trois entiers consécutifs</b>. <br>Un tel produit est toujours divisible par $3! = 6$.`
+                },
+                {
+                    question: `l'entier $\\mathbf{24}$ divise $\\mathbf{n^2(n^2 - 1)}$ si $\\mathbf{n}$ est impair`,
+                    proof: `On factorise $P(n) = n^2(n-1)(n+1)$.<br>1. <strong>Divisibilité par 8 :</strong> Si $n$ est impair, $n-1$ et $n+1$ sont deux nombres pairs consécutifs. On pose $n-1 = 2k$ et $n+1 = 2k+2$. Alors $P(n) = n^2 (2k)(2k+2) = 4 n^2 k(k+1)$. Puisque $k(k+1)$ est un produit de deux entiers consécutifs, il est divisible par 2. On pose $k(k+1)=2m$. Donc $P(n) = 4 n^2 (2m) = 8m n^2$. Donc $8 \\mid P(n)$.<br>2. <strong>Divisibilité par 3 :</strong> $n-1, n, n+1$ sont trois entiers consécutifs. Donc $3 \\mid n(n-1)(n+1)$, ce qui implique $3 \\mid n^2(n^2-1)$.<br>3. <strong>Conclusion :</strong> Puisque $P(n)$ est divisible par 8 et par 3, et que 8 et 3 sont premiers entre eux, $P(n)$ est divisible par leur produit $8 \\times 3 = 24$.`
+                }
+            ];
+            
+            const selectedExample = examples[Math.floor(Math.random() * examples.length)];
+
+            dynamicDivisibilityQuestion.innerHTML = `<strong>Question :</strong> Prouver que, pour tout $n \\in \\mathbb{N}$ (et $n$ impair si besoin), ${selectedExample.question}.`;
+            solElement.innerHTML = `
+                <strong>Démonstration Exacte :</strong>
+                <p>${selectedExample.proof}</p>
+            `;
+
+            document.getElementById('dynamic-content-ex2-q2').style.display = 'block';
+            document.getElementById('placeholder-ex2-q2').style.display = 'none';
+
+            if (window.MathJax) MathJax.typeset([dynamicDivisibilityQuestion, solElement]);
+        }
+
+        // --- FONCTION DE GÉNÉRATION EXERCICE 3 (Combinaison Linéaire) ---
+
+        function generateNewLinearCombination() {
+            const container = document.getElementById('container-ex3');
+            closeAllHelp(container); 
+
+            const dynamicLinearCombinationQuestion = document.getElementById('dynamicLinearCombinationQuestion');
+            const solElement = document.getElementById('help-content-sol2_ex3');
+            if (!dynamicLinearCombinationQuestion || !solElement) return;
+
+            const n = Math.floor(Math.random() * 2) + 1;
+            const m = Math.floor(Math.random() * 2) + 1;
+            const lambda = Math.floor(Math.random() * 2) + 2;
+            const mu = Math.floor(Math.random() * 2) + 2;
+            const div = Math.floor(Math.random() * 3) + 2;
+
+            const k1 = n + div + m; 
+            const k2 = n * div + m; 
+            const a = div * k1;
+            const b = div * k2;
+            
+            const P = `${lambda} \\times ${a} + ${mu} \\times ${b}`;
+
+            const question = `Sachant que $\\mathbf{${div} \\mid ${a}}$ et $\\mathbf{${div} \\mid ${b}}$, prouver que $\\mathbf{${div}}$ divise $\\mathbf{${P}}$.`;
+
+            let proof = `
+                Selon le <b>Théorème de Combinaison Linéaire</b>, si $d$ divise $a$ et $d$ divise $b$, alors $d$ divise $\\lambda a + \\mu b$ pour tout $\\lambda, \\mu \\in \\mathbb{Z}$.
+                <br>Ici, $d=${div}$, $a=${a}$, $b=${b}$, $\\lambda=${lambda}$, $\\mu=${mu}$.
+                <br>Puisque $${div}|${a}$ (car $${a}=${div} \\times ${k1}$) et $${div}|${b}$ (car $${b}=${div} \\times ${k2}$), alors $${div}$ divise $\\lambda a + \\mu b$.
+                <br>
+                <br><strong>Vérification par calcul :</strong>
+                <br>$\\lambda a + \\mu b = ${lambda}(${a}) + ${mu}(${b})$
+                <br>$\\lambda a + \\mu b = ${lambda*a} + ${mu*b} = ${lambda*a + mu*b}$.
+                <br>Or $${lambda*a + mu*b} = ${div} \\times ${ (lambda*a + mu*b) / div }$.
+                <br>L'expression est bien divisible par $${div}$.
+            `;
+            proof = formatSolutionText(proof);
+
+            dynamicLinearCombinationQuestion.innerHTML = `<strong>Question :</strong> ${question}`;
+            solElement.innerHTML = `
+                <strong>Preuve Exacte (Combinaison Linéaire) :</strong>
+                <p>${proof}</p>
+            `;
+
+            document.getElementById('dynamic-content-ex3').style.display = 'block';
+            document.getElementById('placeholder-ex3').style.display = 'none';
+
+            if (window.MathJax) MathJax.typeset([dynamicLinearCombinationQuestion, solElement]);
+        }
+        
+        // --- FONCTION DE GÉNÉRATION EXERCICE 4 (Synthèse) ---
+        
+        let lastGeneratedIndex = -1; 
+
+        const synthesisProblems = [
+            // Niveau 1 : Très Facile (Combinaison Linéaire simple)
+            { 
+                level: 1, difficulty: 'Très Facile (Combinaison Linéaire I)',
+                q: (n) => ({
+                    q_text: `Soient $A=n+3$ et $B=n+1$ avec $n \\in \\mathbb{Z}$. Prouver que $\\mathbf{2}$ divise $P = A-B$.`,
+                    hint: `Simplifiez d'abord $P = A-B$ pour trouver une expression indépendante de $n$.`,
+                    sol: `On calcule $P = A-B = (n+3) - (n+1) = 2$. Puisque $2 = 2 \\times 1$, $P$ est évidemment divisible par 2.
+                           <br>Ce résultat est vrai pour tout $n \\in \\mathbb{Z}$.`
+                })
+            },
+            // Niveau 2 : Facile (Divisibilité par factorisation)
+            {
+                level: 2, difficulty: 'Facile (Factorisation Évidente)',
+                q: (n) => ({
+                    q_text: `Soient $A=n^2$ et $B=n$. Prouver que $\\mathbf{n-1}$ divise $P = A-B$.`,
+                    hint: `Factorisez $P = n^2 - n$.`,
+                    sol: `On calcule $P = A-B = n^2 - n$.
+                           <br>On factorise : $P = n(n-1)$.
+                           <br>Puisque $P$ s'écrit sous la forme $k \\times (n-1)$ avec $k=n \\in \\mathbb{Z}$, $P$ est divisible par $n-1$.`
+                })
+            },
+            // Niveau 3 : Facile (Combinaison linéaire simple)
+            {
+                level: 3, difficulty: 'Facile (Combinaison Linéaire II)',
+                q: (n) => {
+                    const d = getRandomInt(2, 3);
+                    const k = getRandomInt(2, 4);
+                    const a = d * n;
+                    const b = d * k;
+                    const c = getRandomInt(1, 2);
+                    return {
+                        q_text: `Soient $A=${a}$ et $B=${b}$ ($n \\in \\mathbb{Z}$). Prouver que $\\mathbf{${d}}$ divise $P = ${c}A + B$.`,
+                        hint: `Appliquez directement le Théorème de Combinaison Linéaire.`,
+                        sol: `Puisque $\\mathbf{${d}}$ divise $A$ (car $A=${d}n$) et $\\mathbf{${d}}$ divise $B$ (car $B=${d}\\times ${k}$), alors, par le Théorème de Combinaison Linéaire, $\\mathbf{${d}}$ divise toute combinaison $\\lambda A + \\mu B$, donc ${c}A+B$.
+                               <br>Vérification : $P = ${c}A + B = ${c}(${d}n) + ${d*k} = ${c*d}n + ${d*k} = ${d}(${c}n + ${k})$.`
+                    }
+                }
+            },
+            // Niveau 4 : Moyen (Produit de 2 consécutifs)
+            {
+                level: 4, difficulty: 'Moyen (Produit Consécutif Simple)',
+                q: (n) => ({
+                    q_text: `Prouver que, pour tout $n \\in \\mathbb{N}$, $\\mathbf{2}$ divise $P = n^2 + 5n + 6$.`,
+                    hint: `Factorisez le trinôme : $n^2 + 5n + 6 = (n+2)(n+3)$.`,
+                    sol: `On factorise $P = n^2 + 5n + 6 = (n+2)(n+3)$.
+                           <br>Puisque $n+2$ et $n+3$ sont deux entiers consécutifs, leur produit est toujours divisible par $\\mathbf{2}$.`
+                })
+            },
+            // Niveau 5 : Moyen (Factorisation et Combinaison Linéaire)
+            {
+                level: 5, difficulty: 'Moyen (Factorisation / Combi. Lin.)',
+                q: (n) => {
+                    const c = getRandomInt(2, 4);
+                    return {
+                        q_text: `Prouver que $\\mathbf{n-1}$ divise $P = n^3 - ${c}n^2 + ${c}n - 1$.`,
+                        hint: `Essayez de grouper et factoriser par $(n-1)$, ou remarquez que $P(1) = 0$.`,
+                        sol: `On factorise $P$ par groupement :
+                               <br>$P = (n^3 - 1) - (${c}n^2 - ${c}n)$
+                               <br>$P = (n-1)(n^2+n+1) - ${c}n(n-1)$
+                               <br>$P = (n-1)[(n^2+n+1) - ${c}n] = (n-1)(n^2 + (1-${c})n + 1)$.
+                               <br>Puisque $P$ s'écrit sous la forme $k \\times (n-1)$, avec $k \\in \\mathbb{Z}$, $P$ est divisible par $n-1$.`
+                    }
+                }
+            },
+            // Niveau 6 : Moyen (Carré d'un impair)
+            {
+                level: 6, difficulty: 'Moyen (Cas Impair)',
+                q: (n) => ({
+                    q_text: `Soit $n$ un entier impair. Prouver que $\\mathbf{8}$ divise $P = n^2 - 1$.`,
+                    hint: `Factorisez $P = (n-1)(n+1)$. Si $n$ est impair, que peut-on dire de $n-1$ et $n+1$?`,
+                    sol: `On factorise $P = (n-1)(n+1)$.
+                           <br>Si $n$ est impair, alors $n-1$ et $n+1$ sont deux entiers pairs consécutifs.
+                           <br>On peut écrire $n-1 = 2k$ et $n+1 = 2k+2 = 2(k+1)$, où $k \\in \\mathbb{Z}$.
+                           <br>$P = (2k)(2(k+1)) = 4k(k+1)$.
+                           <br>Puisque $k$ et $k+1$ sont consécutifs, $k(k+1)$ est pair, donc divisible par $\\mathbf{2}$.
+                           <br>On pose $k(k+1) = 2m$ ($m \\in \\mathbb{Z}$), et $P = 4(2m) = \\mathbf{8m}$. Donc $\\mathbf{8}$ divise $P$.`
+                })
+            },
+            // Niveau 7 : Moyen+ (Factorisation a^n-b^n I) - CORRIGÉ
+            {
+                level: 7, difficulty: 'Moyen+ (Factorisation \\(a^n-b^n\\) I)',
+                q: (n) => {
+                    const base = 4; // base-1 = 3
+                    const div = 3;
+                    return {
+                        q_text: `Prouver que $\\mathbf{${div}}$ divise $P = ${base}^n - 1$ pour tout $n \\in \\mathbb{N}^*$.`,
+                        hint: `Utilisez la formule de factorisation $a^n - b^n = (a-b)(a^{n-1} + a^{n-2}b + \\cdots + b^{n-1})$. Ici $a=${base}$ et $b=1$.`,
+                        sol: `Nous utilisons l'identité de factorisation $a^n - b^n$.
+                               <br>Pour $P = 4^n - 1$, on a $a=4$ et $b=1$:
+                               <br>$P = 4^n - 1^n = (4-1)(4^{n-1} + 4^{n-2}(1) + \\cdots + 1^{n-1})$
+                               <br>$P = \\mathbf{3} \\times (4^{n-1} + 4^{n-2} + \\cdots + 1)$.
+                               <br>Puisque la somme entre parenthèses est un entier, $P$ est un multiple de $\\mathbf{3}$.`
+                    }
+                }
+            },
+            // Niveau 8 : Avancé (Produit de 3 consécutifs + Combinaison Linéaire)
+            {
+                level: 8, difficulty: 'Avancé (Produit Consécutif III)',
+                q: (n) => ({
+                    q_text: `Prouver que $\\mathbf{6}$ divise $P = n(n^2+5)$ pour tout $n \\in \\mathbb{Z}$.`,
+                    hint: `Décomposez $n^2+5 = n^2-1 + 6$ et factorisez $P$.`,
+                    sol: `On décompose l'expression :
+                           <br>$P = n(n^2+5) = n(n^2-1 + 6)$
+                           <br>$P = n(n^2-1) + 6n$
+                           <br>$P = n(n-1)(n+1) + 6n$.
+                           <br>L'expression $n(n-1)(n+1)$ est le produit de $\\mathbf{3}$ entiers consécutifs, elle est donc divisible par $3! = \\mathbf{6}$.
+                           <br>De plus, $6n$ est divisible par $\\mathbf{6}$.
+                           <br>Par le Théorème de Combinaison Linéaire (ici, une somme), $\\mathbf{6}$ divise $P$.`
+                })
+            },
+            // Niveau 9 : Avancé (Divisibilité d'un polynôme)
+            {
+                level: 9, difficulty: 'Avancé (Polynôme)',
+                q: (n) => {
+                    const a = getRandomInt(2, 4);
+                    const b = getRandomInt(1, 3);
+                    return {
+                        q_text: `Prouver que $\\mathbf{n-1}$ divise $P = n^{a+b} - n^{a} - n^{b} + 1$.`,
+                        hint: `Factorisez par groupement : $P = n^a(n^b-1) - (n^b-1)$.`,
+                        sol: `On factorise par groupement :
+                               <br>$P = n^{a}(n^{b}-1) - (n^{b}-1)$
+                               <br>$P = (n^{a}-1)(n^{b}-1)$.
+                               <br>On sait que pour tout $k \\in \\mathbb{N}^*$, $\\mathbf{n-1}$ divise $n^k-1$.
+                               <br>Ainsi, $n-1$ divise $n^{a}-1$, donc $n-1$ divise le produit $P$.`
+                    }
+                }
+            },
+            // Niveau 10 : Avancé+ (Divisibilité par 12)
+            {
+                level: 10, difficulty: 'Avancé+ (Divisibilité par 12)',
+                q: (n) => ({
+                    q_text: `Prouver que $\\mathbf{12}$ divise $P = n(n^2-1)$ si $n$ est impair.`,
+                    hint: `Factorisez $P = (n-1)n(n+1)$. Si $n$ est impair, utilisez la divisibilité par $\\mathbf{4}$ et $\\mathbf{3}$ (produit de consécutifs).`,
+                    sol: `On factorise $P = (n-1)n(n+1)$.
+                           <br>1. <strong>Divisibilité par 4 :</strong> Si $n$ est impair, $n-1$ et $n+1$ sont deux entiers pairs consécutifs. Leur produit $Q=(n-1)(n+1)$ est le produit de deux nombres pairs consécutifs, il est donc divisible par $\\mathbf{8}$. Puisque $8\\mid Q$, $4 \\mid Q$. Le produit $P=nQ$ est donc divisible par $\\mathbf{4}$.
+                           <br>2. <strong>Divisibilité par 3 :</strong> $(n-1)n(n+1)$ est le produit de 3 entiers consécutifs, il est donc divisible par $\\mathbf{3}$.
+                           <br>3. <strong>Conclusion :</strong> Puisque $P$ est divisible par $\\mathbf{4}$ et par $\\mathbf{3}$, et que $\\text{pgcd}(3, 4)=1$, $P$ est divisible par leur produit $4 \\times 3 = \\mathbf{12}$.`
+                })
+            },
+            // Niveau 11 : Avancé++ (Factorisation a^n-b^n II) - CORRIGÉ
+            {
+                level: 11, difficulty: 'Avancé++ (Factorisation \\(a^n-b^n\\) II)',
+                q: (n) => ({
+                    q_text: `Prouver que $\\mathbf{7}$ divise $P = 8^n - 1$ pour tout $n \\in \\mathbb{N}^*$.`,
+                    hint: `Factorisez $P$ en utilisant la formule $a^n - b^n$. Quelle est la valeur de $a-b$?`,
+                    sol: `Nous utilisons la formule de factorisation $a^n - b^n$.
+                           <br>Pour $P = 8^n - 1^n$, on a $a=8$ et $b=1$:
+                           <br>$P = (8-1)(8^{n-1} + 8^{n-2} + \\cdots + 1)$
+                           <br>$P = \\mathbf{7} \\times (8^{n-1} + 8^{n-2} + \\cdots + 1)$.
+                           <br>Puisque le terme $(8^{n-1} + \\cdots + 1)$ est un entier, $P$ est un multiple de $\\mathbf{7}$.`
+                })
+            },
+            // Niveau 12 : Expert (Divisibilité par 30)
+            { 
+                level: 12, difficulty: 'Expert (Divisibilité par 30)',
+                q: (n) => ({
+                    q_text: `Prouver que $\\mathbf{30}$ divise $P = n^5 - n$ pour tout $n \\in \\mathbb{Z}$.`,
+                    hint: `Factorisez $P = (n-1)n(n+1)(n^2+1)$. Prouvez la divisibilité par $\\mathbf{2, 3}$ et $\\mathbf{5}$ séparément. Pour 5, considérez les cas $n=5k, 5k\\pm 1, 5k\\pm 2$.`,
+                    sol: `On factorise $P = n^5 - n = n(n^4-1) = n(n^2-1)(n^2+1) = \\mathbf{(n-1)n(n+1)(n^2+1)}$.
+                           <br>Pour prouver $\\mathbf{30 \\mid P}$, il faut montrer que $P$ est divisible par $2, 3$ et $5$.
+                           <br>1. <strong>Divisibilité par $6$ :</strong> L'expression $\\mathbf{(n-1)n(n+1)}$ est le produit de 3 entiers consécutifs, elle est donc divisible par $3! = 6$. Donc $2 \\mid P$ et $3 \\mid P$.
+                           <br>2. <strong>Divisibilité par $5$ :</strong> On examine les cas pour $n$ par rapport à 5 :
+                           <br>  - Si $n$ est un multiple de 5, alors $\\mathbf{5 \\mid n}$, donc $5 \\mid P$.
+                           <br>  - Si $n$ est de la forme $5k+1$ ou $5k-1$, alors $n-1$ ou $n+1$ est un multiple de 5. Dans ce cas, $\\mathbf{5 \\mid (n-1)(n+1)}$, et $5 \\mid P$.
+                           <br>  - Si $n$ est de la forme $5k+2$ ou $5k-2$ :
+                           <br>    On considère le facteur $n^2+1$: $n^2+1 = (5k\\pm 2)^2 + 1 = 25k^2 \\pm 20k + 4 + 1 = 25k^2 \\pm 20k + 5 = \\mathbf{5}(5k^2 \\pm 4k + 1)$.
+                           <br>    Dans ce cas, $\\mathbf{5 \\mid (n^2+1)}$, donc $5 \\mid P$.
+                           <br>3. <strong>Conclusion :</strong> $P$ est divisible par 2, 3 et 5, il est donc divisible par leur produit $\\mathbf{30}$.`
+                })
+            },
+            // Niveau 13 : Expert (Entiers a et b aléatoires) - CORRIGÉ
+            { 
+                level: 13, difficulty: 'Expert (Entiers \\(a\\) et \\(b\\) aléatoires)',
+                q: (n) => {
+                    const a = getRandomInt(1, 3);
+                    const b = getRandomInt(4, 6);
+                    return {
+                        q_text: `Prouver que $\\mathbf{6}$ divise $P = a(a^2-1)$ et $\\mathbf{6}$ divise $Q = b(b^2-1)$ pour $a, b \\in \\mathbb{Z}$. En déduire que $\\mathbf{6}$ divise $P+Q$.`,
+                        hint: `Utilisez le produit de trois entiers consécutifs pour $P$ et $Q$. La combinaison linéaire s'applique à la somme.`,
+                        sol: `1. <strong>$6 \\mid P$ :</strong> $P = a(a^2-1) = (a-1)a(a+1)$. C'est le produit de 3 entiers consécutifs, donc $6 \\mid P$.
+                               <br>2. <strong>$6 \\mid Q$ :</strong> Par la même raison, $Q = b(b^2-1) = (b-1)b(b+1)$ est le produit de 3 entiers consécutifs, donc $6 \\mid Q$.
+                               <br>3. <strong>$6 \\mid P+Q$ :</strong> Par le Théorème de Combinaison Linéaire (avec $\\lambda=1, \\mu=1$), si $\\mathbf{6}$ divise $P$ et $\\mathbf{6}$ divise $Q$, alors $\\mathbf{6}$ divise leur somme $P+Q$.`
+                    }
+                }
+            },
+            // Niveau 14 : Expert (Divisibilité de sommes)
+            {
+                level: 14, difficulty: 'Expert (Divisibilité par 5, analyse de cas)',
+                q: (n) => ({
+                    q_text: `Prouver que $\\mathbf{5}$ divise $P = n^4 - 1$ si $n$ n'est pas un multiple de 5.`,
+                    hint: `Factorisez $P = (n-1)(n+1)(n^2+1)$. Considérez les cas de $n$ par rapport à 5 ($n=5k\\pm 1$ ou $n=5k\\pm 2$).`,
+                    sol: `Nous factorisons $P = n^4 - 1 = (n^2-1)(n^2+1) = \\mathbf{(n-1)(n+1)(n^2+1)}$.
+                           <br>Puisque $n$ n'est pas un multiple de 5, $n$ peut être de la forme $5k\\pm 1$ ou $5k\\pm 2$ (où $k \\in \\mathbb{Z}$).
+                           <br>1. <strong>Cas $n = 5k \\pm 1$ :</strong>
+                           <br>  - Si $n=5k+1$, alors $\\mathbf{n-1} = 5k$, qui est divisible par 5.
+                           <br>  - Si $n=5k-1$, alors $\\mathbf{n+1} = 5k$, qui est divisible par 5.
+                           <br>  Dans ce cas, $\\mathbf{5 \\mid P}$.
+                           <br>2. <strong>Cas $n = 5k \\pm 2$ :</strong>
+                           <br>  On considère le facteur $\\mathbf{n^2+1}$.
+                           <br>  $n^2+1 = (5k\\pm 2)^2 + 1 = 25k^2 \\pm 20k + 4 + 1 = 25k^2 \\pm 20k + 5 = \\mathbf{5}(5k^2 \\pm 4k + 1)$.
+                           <br>  Dans ce cas, $\\mathbf{5 \\mid (n^2+1)}$, donc $5 \\mid P$.
+                           <br>Puisque $\\mathbf{5}$ divise $P$ dans tous les cas où $5 \\nmid n$, la propriété est prouvée.`
+                })
+            },
+            {
+                level: 15, difficulty: 'Expert (Récurrence/Induction)',
+                q: (n) => ({
+                    q_text: `Prouver par récurrence que $\\mathbf{3}$ divise $P(n) = 4^n - 1$ pour tout $n \\in \\mathbb{N}$.`,
+                    hint: `Initialisation : $n=0$ ou $n=1$. Hérédité : Exprimez $4^{k+1}-1$ en fonction de $4^k-1$. ($4^{k+1}-1 = 4(4^k-1) + 3$).`,
+                    sol: `1. <strong>Initialisation ($n=0$) :</strong> $P(0) = 4^0 - 1 = 1 - 1 = 0$. Puisque $3 \\mid 0$, l'initialisation est vérifiée.
+                           <br>2. <strong>Hérédité :</strong> Supposons que $3 \\mid 4^k - 1$ pour un certain $k \\in \\mathbb{N}$ (Hypothèse de Récurrence : $4^k - 1 = 3m, m \\in \\mathbb{Z}$).
+                           <br>On considère $P(k+1) = 4^{k+1} - 1$.
+                           <br>$4^{k+1} - 1 = 4 \\cdot 4^k - 1$
+                           <br>$4^{k+1} - 1 = 4 \\cdot (3m + 1) - 1$ (par HR)
+                           <br>$4^{k+1} - 1 = 12m + 4 - 1 = 12m + 3 = 3(4m + 1)$.
+                           <br>Puisque $4m+1 \\in \\mathbb{Z}$, $\\mathbf{3}$ divise $P(k+1)$. L'hérédité est vérifiée.
+                           <br>3. <strong>Conclusion :</strong> Par le principe de récurrence, $\\mathbf{3}$ divise $4^n - 1$ pour tout $n \\in \\mathbb{N}$.`
+                })
+            }
+        ];
+        
+        function generateNewSynthesisProblemV2() {
+            const container = document.getElementById('container-ex4');
+            closeAllHelp(container); 
+
+            const dynamicSynthesisProblem = document.getElementById('dynamicSynthesisProblem');
+            const difficultyLevel = document.getElementById('ex4-difficulty-level');
+            const hintContent = document.getElementById('ex4-hint-content');
+            const solContent = document.getElementById('ex4-solution-content');
+
+            if (!dynamicSynthesisProblem || !difficultyLevel) return;
+
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * synthesisProblems.length);
+            } while (randomIndex === lastGeneratedIndex && synthesisProblems.length > 1);
+            lastGeneratedIndex = randomIndex;
+
+            const problem = synthesisProblems[randomIndex];
+            const n_val = getRandomInt(2, 4); 
+            const generatedProblem = problem.q(n_val);
+            
+            // Le texte de la difficulté est maintenant bien formaté avec \\( et \\)
+            difficultyLevel.innerHTML = `Difficulté : Niveau ${problem.level} (${problem.difficulty})`;
+            dynamicSynthesisProblem.innerHTML = generatedProblem.q_text;
+
+            hintContent.innerHTML = `<strong>Indication :</strong> ${generatedProblem.hint}`;
+            solContent.innerHTML = `<strong>Solution Détaillée (Niveau ${problem.level}) :</strong><br>${generatedProblem.sol}`;
+            
+            document.getElementById('dynamic-content-ex4').style.display = 'block';
+            document.getElementById('placeholder-ex4').style.display = 'none';
+
+            if (window.MathJax) {
+                // Re-typeset les éléments dynamiques (question, indice, solution)
+                MathJax.typeset([dynamicSynthesisProblem, hintContent, solContent, difficultyLevel]);
+            }
+        }
+
+        // --- Initialisation de tous les exercices au chargement de la page ---
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof generateNewNumber === 'function') generateNewNumber();
+            if (typeof generateNewNumber2 === 'function') generateNewNumber2();
+            if (typeof generateNewProof === 'function') generateNewProof();
+            if (typeof generateNewDivisibility === 'function') generateNewDivisibility();
+            if (typeof generateNewLinearCombination === 'function') generateNewLinearCombination();
+            
+            // Initialisation de l'Exercice 4 avec la version dynamique V2
+            if (typeof generateNewSynthesisProblemV2 === 'function') generateNewSynthesisProblemV2();
+            
+            // Re-typeset initial pour les formules LaTeX statiques (cours)
+            if (window.MathJax) {
+                MathJax.typeset();
+            }
+        });
+	function toggleDisclaimer() {
+            const disclaimer = document.getElementById('disclaimer-content');
+            const button = document.getElementById('show-auteur-btn');
+            if (disclaimer.style.display === 'block') {
+                disclaimer.style.display = 'none';
+                button.textContent = 'Auteur et Droits d\'Auteur';
+                button.style.backgroundColor = '#333';
+            } else {
+                disclaimer.style.display = 'block';
+                button.textContent = 'Masquer les Droits d\'Auteur';
+                button.style.backgroundColor = '#dc3545';
+            }
+        }
+
+    </script>
+<div style="text-align: center; margin-top: 50px;">
+        <button id="show-auteur-btn" onclick="toggleDisclaimer()" 
+            style="padding: 10px 20px; font-size: 1em; cursor: pointer; border: none; border-radius: 5px; background-color: #333; color: white;">
+            Auteur et Droits d'Auteur
+        </button>
+    </div>
+
+    <div id="disclaimer-content" style="margin-top: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 5px; background-color: #fff; display: none;">
+        <h3>Droits d'Auteur et Source</h3>
+            <p><strong>Auteur du problème :</strong> Yann Merdy</p>
+            <p><strong>Droits d'Auteur et Utilisation :</strong></p>
+            <p>Ce contenu, y compris l'énoncé, les solutions et le code interactif, est protégé par les droits d'auteur. <strong>Toute utilisation à des fins commerciales, y compris la revente, la distribution ou l'intégration dans des produits commerciaux, est strictement interdite sans autorisation écrite explicite de l'auteur.</strong></p>
+            <p>L'utilisation est limitée à des fins éducatives et personnelles non commerciales.</p>
+        
+    </div>
+
+</body>
+</html>

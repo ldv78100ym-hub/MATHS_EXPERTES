@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S2 : Division Euclidienne — Exercices Dynamiques V13 (Final)</title>
+
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <script>
+        // Configuration MathJax pour les délimiteurs LaTeX
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+
+    <style>
+        /* CHARTE GRAPHIQUE FONDAMENTALE (Copie de SEANCE_1.html) */
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.6;
+            margin: 0 auto;
+            max-width: 900px;
+            padding: 20px;
+            color: #333;
+        }
+        h1, h2, h3 {
+            font-family: Arial, sans-serif;
+            color: #0056b3;
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        h1.session-title {
+            text-align: center;
+            font-size: 1.8em;
+            border-color: #0080ff;
+        }
+        h2 {
+            font-size: 1.4em;
+            color: #0080ff;
+            border-color: #e0e0e0;
+        }
+        h3 {
+            font-size: 1.2em;
+            color: #cc0000;
+            border-color: #e0e0e0;
+        }
+        .theme-principal {
+            text-align: center;
+            font-style: italic;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        /* Styles des blocs de Cours */
+        .statement-block {
+            margin: 1.5em 0;
+            padding: 15px;
+            border-left: 5px solid;
+            background-color: #f9f9f9;
+        }
+        .theoreme { border-color: #00cc66; }
+        .statement-title {
+            font-weight: bold;
+            font-style: italic;
+            font-size: 1.1em;
+            margin-bottom: 0.5em;
+            display: block;
+        }
+        .exercice-title {
+            font-size: 1.1em;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+        }
+        /* CHARTE GRAPHIQUE DES EXERCICES */
+        .dynamic-division-container { 
+            background-color: #f8f8ff; 
+            padding: 15px;
+            border: 1px solid #7952b3; 
+            margin-bottom: 15px;
+        }
+        .dynamic-remainder-container { 
+            background-color: #f0f0ff; 
+            padding: 15px;
+            border: 1px solid #4a00ff; 
+            margin-bottom: 15px;
+        }
+        .dynamic-advanced-container { 
+            background-color: #fff0f0; 
+            padding: 15px;
+            border: 1px solid #cc0000; 
+            margin-bottom: 15px;
+        }
+        /* Styles des Boutons */
+        .help-buttons {
+            margin-top: 10px;
+            margin-bottom: 10px; 
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px; 
+        }
+        .help-buttons button { 
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.2s;
+            margin-right: 5px;
+        }
+        .btn-generation { 
+            background-color: #007bff; 
+            color: white; 
+            border: none;
+        }
+        .btn-indication { 
+            background-color: #e0f0ff;
+            color: #0056b3;
+            border-color: #0056b3;
+        }
+        .btn-solution { 
+            background-color: #e9fbe9; 
+            color: #28a745; 
+            border-color: #28a745;
+        }
+        .btn-advanced {
+            background-color: #cc0000;
+            color: white;
+            border: none;
+        }
+        /* Contenu d'Aide */
+        .help-content {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none; 
+            line-height: 1.5;
+            font-size: 0.9em;
+        }
+        .help-indication {
+            background-color: #f5faff;
+            border-left: 3px solid #0056b3;
+        }
+        .help-solution {
+            background-color: #fffff0;
+            border-left: 3px solid #999900;
+        }
+        .help-solution ol li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="session-title">Séance $S_2$ : Division Euclidienne</h1>
+    <p class="theme-principal"><b>Thème Principal :</b> Division Euclidienne dans $\mathbb{Z}$ et Interprétation du Reste (Programme S2)</p>
+
+    <h2>I. Cours : Division Euclidienne</h2>
+    <div class="statement-block theoreme">
+        <span class="statement-title">Théorème [Théorème de la Division Euclidienne]</span>
+        <p>Soient $a$ un entier relatif ($a \in \mathbb{Z}$) et $b$ un entier naturel non nul ($b \in \mathbb{N}^*$).
+            Il existe un unique couple d'entiers relatifs $(q, r) \in \mathbb{Z}^2$, appelé <b>quotient</b> et <b>reste</b>, tel que :
+        </p>
+        \[a = bq + r \quad \text{avec } 0 \le r < b\]
+    </div>
+
+    <hr>
+
+    <h2>II. Exercices Dynamiques $S_2$ (Niveau Fondamental)</h2>
+
+    <h3 class="exercice-title">Exercice 1 : Calcul de Divisions Euclidiennes (Cas $a > 0$)</h3>
+    <div id="container-ex1" class="dynamic-division-container">
+        <p><strong>Question :</strong> Déterminer le quotient $q$ et le reste $r$ de la division euclidienne de $a$ par $b$.
+        </p>
+        <div class="dynamic-question-container">
+            <p id="ex1_question_latex">$$a = \mathbf{\color{#007bff}A} \quad ; \quad b = \mathbf{\color{#d9534f}B}$$</p>
+        </div>
+        
+        <div class="help-buttons">
+            <button onclick="generateNewDivision(false)" class="btn-generation">Générer $a>0$</button>
+            <button onclick="toggleHelp(this, 'ind1_ex1')" class="btn-indication">Indication</button>
+            <button onclick="toggleHelp(this, 'sol1_ex1')" class="btn-solution">Solution</button>
+        </div>
+        <div id="dynamic-content-ex1" style="display:none;">
+            <div id="help-content-ind1_ex1" class="help-content help-indication">
+                <p><strong>Indication :</strong> Le quotient $q$ est $\lfloor a/b \rfloor$. Le reste $r$ est calculé par $r = a - bq$. Assurez-vous que $0 \le r < b$.</p>
+            </div>
+            <div id="help-content-sol1_ex1" class="help-content help-solution"></div>
+        </div>
+        <p id="placeholder-ex1">Cliquer sur le bouton <strong>Générer $a>0$</strong> pour commencer.</p>
+    </div>
+    
+    <h3 class="exercice-title">Exercice 2 : Cas Délicat (Dividende $a < 0$)</h3>
+    <div id="container-ex2" class="dynamic-remainder-container">
+        <p><strong>Question :</strong> Déterminer le quotient $q$ et le reste $r$ de la division euclidienne de $a$ par $b$.
+        </p>
+        <div class="dynamic-question-container">
+            <p id="ex2_question_latex">$$a = \mathbf{\color{#007bff}A_{\text{neg}}} \quad ; \quad b = \mathbf{\color{#d9534f}B_{\text{pos}}}$$</p>
+        </div>
+        
+        <div class="help-buttons">
+            <button onclick="generateNewDivision(true)" class="btn-generation">Générer $a<0$</button>
+            <button onclick="toggleHelp(this, 'ind1_ex2')" class="btn-indication">Indication</button>
+            <button onclick="toggleHelp(this, 'sol1_ex2')" class="btn-solution">Solution</button>
+        </div>
+        <div id="dynamic-content-ex2" style="display:none;">
+            <div id="help-content-ind1_ex2" class="help-content help-indication">
+                <p><strong>Indication :</strong> Pour $a < 0$, le quotient $q$ est l'entier juste inférieur ou égal à $a/b$. Le reste $r$ doit rester positif ou nul ($\mathbf{0 \le r < b}$).</p>
+            </div>
+            <div id="help-content-sol1_ex2" class="help-content help-solution"></div>
+        </div>
+        <p id="placeholder-ex2">Cliquer sur le bouton <strong>Générer $a<0$</strong> pour commencer.</p>
+    </div>
+
+    <h3 class="exercice-title">Exercice 3 : Propriété du Reste et Formes d'un Entier</h3>
+    <div id="container-ex3" class="dynamic-division-container" style="border-color: #ff4d4d;">
+        <div class="dynamic-question-container">
+            <p id="dynamicRemainderQuestion" style="margin: 0; padding: 0;"><strong>Question :</strong> <strong>[Question générée]</strong></p>
+        </div>
+        <div class="help-buttons">
+            <button onclick="generateNewRemainderProperty()" class="btn-generation">Générer un exercice</button>
+            <button onclick="toggleHelp(this, 'ind1_ex3')" class="btn-indication">Indication</button>
+            <button onclick="toggleHelp(this, 'sol2_ex3')" class="btn-solution">Solution</button>
+        </div>
+        <div id="dynamic-content-ex3" style="display:none;">
+            <div id="help-content-ind1_ex3" class="help-content help-indication">
+                <p id="ex3-hint-content"><strong>Indication :</strong> Si le reste d'une division par $b$ est $r$, alors le nombre est de la forme $a = bq + r$. Pour la liste des restes, rappelez-vous que $0 \le r < b$.</p>
+            </div>
+            <div id="help-content-sol2_ex3" class="help-content help-solution"></div>
+        </div>
+        <p id="placeholder-ex3">Cliquer sur le bouton <strong>Générer un exercice</strong> pour commencer.</p>
+    </div>
+
+    <hr>
+
+    <h2 style="border-bottom: 2px solid #cc0000; color: #cc0000;">III. Applications et Problèmes (Difficile à Très Difficile)</h2>
+    
+    <h3 class="exercice-title">Exercices Avancés (Types 4 à 13)</h3>
+    <div id="container-ex4" class="dynamic-advanced-container">
+        <div class="dynamic-question-container">
+            <p id="dynamicAdvancedQuestion" style="margin: 0; padding: 0;"><strong>Question (Type X) :</strong> <strong>[Problème généré]</strong></p>
+        </div>
+        <div class="help-buttons">
+            <button onclick="generateNewAdvancedProblem()" class="btn-advanced">Générer Problème Avancé</button>
+            <button onclick="toggleHelp(this, 'ind1_ex4')" class="btn-indication">Indication</button>
+            <button onclick="toggleHelp(this, 'sol2_ex4')" class="btn-solution">Solution</button>
+        </div>
+        <div id="dynamic-content-ex4" style="display:none;">
+            <div id="help-content-ind1_ex4" class="help-content help-indication">
+                <p id="ex4-hint-content"><strong>Indication :</strong> [Indication du Problème Avancé]</p>
+            </div>
+            <div id="help-content-sol2_ex4" class="help-content help-solution"></div>
+        </div>
+        <p id="placeholder-ex4">Cliquer sur le bouton <strong>Générer Problème Avancé</strong> pour commencer.</p>
+    </div>
+
+    <hr>
+    
+    <script>
+        // --- Fonctions de base et d'utilité ---
+
+        function closeAllHelp(container) {
+            const allHelpContents = container.querySelectorAll('.help-content');
+            allHelpContents.forEach(el => {
+                el.style.display = 'none';
+            });
+            container.querySelectorAll('.help-buttons button').forEach(btn => {
+                if (btn.classList.contains('btn-indication') && btn.textContent !== 'Indication') {
+                    btn.textContent = 'Indication';
+                } else if (btn.classList.contains('btn-solution') && btn.textContent !== 'Solution') {
+                    btn.textContent = 'Solution';
+                }
+            });
+        }
+
+        function toggleHelp(triggerButton, helpSuffix) {
+            const id = `help-content-${helpSuffix}`;
+            const container = triggerButton.closest('div[id^="container-ex"]'); 
+            if (!container) return;
+            const helpElement = container.querySelector(`#${id}`);
+
+            const isVisible = helpElement.style.display === 'block';
+
+            container.querySelectorAll('.help-content').forEach(el => {
+                el.style.display = 'none';
+            });
+            container.querySelectorAll('.help-buttons button').forEach(btn => {
+                if (btn.classList.contains('btn-indication') || btn.classList.contains('btn-solution')) {
+                    const originalText = btn.classList.contains('btn-indication') ? 'Indication' : 'Solution';
+                    btn.textContent = originalText;
+                }
+            });
+
+            if (!isVisible) {
+                helpElement.style.display = 'block';
+                triggerButton.textContent = 'Masquer l\'aide';
+                if (window.MathJax) {
+                    MathJax.typeset([helpElement]);
+                }
+            }
+        }
+        
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function getDivisors(n) {
+            n = Math.abs(n);
+            const divisors = [];
+            for (let i = 1; i * i <= n; i++) {
+                if (n % i === 0) {
+                    divisors.push(i);
+                    if (i * i !== n) {
+                        divisors.push(n / i);
+                    }
+                }
+            }
+            return divisors.sort((a, b) => a - b);
+        }
+
+        // --- FONCTIONS DE GÉNÉRATION EXERCICES S2 (Niveau Fondamental) ---
+
+        /**
+         * Génère un nouvel exercice de division euclidienne (Ex 1 et 2).
+         * @param {boolean} isNegative Si vrai, a est négatif. Sinon, a est positif.
+         */
+        function generateNewDivision(isNegative) {
+            let container, placeholder, solContainer, questionElementID;
+            
+            if (isNegative) {
+                container = document.getElementById('container-ex2');
+                placeholder = document.getElementById('placeholder-ex2');
+                solContainer = document.getElementById('help-content-sol1_ex2');
+                questionElementID = 'ex2_question_latex'; 
+            } else {
+                container = document.getElementById('container-ex1');
+                placeholder = document.getElementById('placeholder-ex1');
+                solContainer = document.getElementById('help-content-sol1_ex1');
+                questionElementID = 'ex1_question_latex'; 
+            }
+            
+            if (!container) return;
+
+            closeAllHelp(container);
+            
+            const pQuestion = document.getElementById(questionElementID);
+            if (!pQuestion) return;
+
+            // Génération des nombres
+            const b = getRandomInt(4, 15); // Diviseur b > 0
+            let a;
+            
+            if (isNegative) {
+                a = getRandomInt(-100, -b - 1); 
+            } else {
+                a = getRandomInt(20, 150);
+            }
+
+            // Calcul de la division euclidienne a = bq + r, 0 <= r < b
+            const q = Math.floor(a / b);
+            const r = a - b * q; 
+
+            // Mise à jour de la question
+            const a_string = a.toString();
+            const b_string = b.toString();
+            
+            pQuestion.innerHTML = `$$a = \\mathbf{\\color{#007bff}${a_string}} \\quad ; \\quad b = \\mathbf{\\color{#d9534f}${b_string}}$$`;
+
+            // Génération de la solution
+            let solText = `
+                <strong>Solution :</strong> Nous cherchons $q \\in \\mathbb{Z}$ et $r \\in \\mathbb{N}$ tels que $a = bq + r$ et $0 \\le r < b$.
+                <ol style="padding-left: 20px;">
+                    <li><strong>Calcul du quotient $q$ :</strong> $q = \\lfloor a/b \\rfloor = \\lfloor \\frac{${a}}{${b}} \\rfloor$.
+                        <p>$\\frac{${a}}{${b}} \\approx ${ (a/b).toFixed(4) }$.</p>
+                        <p>Donc $\\mathbf{q = ${q}}$.</p>
+                    </li>
+                    <li><strong>Calcul du reste $r$ :</strong> $r = a - bq$.
+                        <p>$r = ${a} - ${b} \\times (${q}) = ${a} - (${b * q}) = ${r}$.</p>
+                    </li>
+                    <li><strong>Vérification :</strong>
+                        <p>L'égalité est : $\\mathbf{${a} = ${b} \\times (${q}) + ${r}}$</p>
+                        <p>La condition sur le reste est : $\\mathbf{0 \\le ${r} < ${b}}$. Elle est vérifiée.</p>
+                    </li>
+                    <li><strong>Conclusion :</strong> Le quotient est $\\mathbf{q = ${q}}$ et le reste est $\\mathbf{r = ${r}}$.</li>
+                </ol>
+            `;
+            
+            solContainer.innerHTML = solText;
+            document.getElementById(`dynamic-content-ex${isNegative ? 2 : 1}`).style.display = 'block';
+            placeholder.style.display = 'none';
+
+            if (window.MathJax) {
+                MathJax.typeset([pQuestion, solContainer]);
+            }
+        }
+
+        /**
+         * Génère un nouvel exercice sur les propriétés du reste (Ex 3).
+         */
+        function generateNewRemainderProperty() {
+            const container = document.getElementById('container-ex3');
+            const placeholder = document.getElementById('placeholder-ex3');
+            const questionContainer = document.getElementById('dynamicRemainderQuestion');
+            const solContainer = document.getElementById('help-content-sol2_ex3');
+
+            closeAllHelp(container);
+
+            const b = getRandomInt(5, 12);
+            const r1 = getRandomInt(0, b - 1);
+
+            const type = getRandomInt(1, 3);
+            let questionText = "";
+            let solText = "";
+
+            if (type === 1) {
+                // Type 1: Lister les restes possibles
+                questionText = `Donner l'ensemble $\\mathcal{R}$ de tous les restes possibles dans la division euclidienne par $\\mathbf{${b}}$.`;
+                const remainders = Array.from({length: b}, (_, i) => i);
+                solText = `
+                    <strong>Solution :</strong> Le reste $\\mathbf{r}$ doit satisfaire $\\mathbf{0 \\le r < b}$.
+                    <p>Pour $b=${b}$, l'ensemble des restes possibles est :</p>
+                    <p>$$\\mathcal{R} = \\left\\{ 0, 1, 2, \\dots, ${b-1} \\right\\}$$</p>
+                    <p>Soit $\\mathbf{\\mathcal{R} = \\{${remainders.join(', ')}\\}}$</p>
+                `;
+            } else if (type === 2) {
+                // Type 2: Déterminer la forme d'un entier
+                questionText = `Soit $N$ un entier. Donner toutes les formes possibles de $N$ dans la division euclidienne par $\\mathbf{${b}}$.`;
+                const forms = Array.from({length: b}, (_, i) => `\\(N = ${b}q + ${i}\\)`);
+                solText = `
+                    <strong>Solution :</strong> Un entier $\\mathbf{N}$ divisé par $\\mathbf{${b}}$ a un reste $\\mathbf{r}$ tel que $\\mathbf{0 \\le r < ${b}}$ (le reste doit être positif ou nul et strictement inférieur au diviseur).
+                    <p>L'entier $\\mathbf{N}$ est donc de la forme $\\mathbf{N = ${b}q + r}$ où $\\mathbf{r \\in \\{0, 1, \\dots, ${b-1}\\}}$.</p>
+                    <p>Les $\\mathbf{${b}}$ formes possibles de $\\mathbf{N}$ sont : ${forms.join(' $\\text{ ou }$ ')}</p>
+                `;
+            } else {
+                // Type 3: Trouver le dividende à partir d'informations sur q et r
+                const q_val = getRandomInt(5, 15);
+                const a = b * q_val + r1;
+                questionText = `Un entier $a$ est tel que son quotient dans la division euclidienne par $\\mathbf{${b}}$ est $\\mathbf{q=${q_val}}$ et son reste est $\\mathbf{r=${r1}}$. Quel est l'entier $a$ ?`;
+                solText = `
+                    <strong>Solution :</strong> Par définition de la division euclidienne, $\\mathbf{a = bq + r}$.
+                    <p>Avec $b=${b}$, $q=${q_val}$ et $r=${r1}$, on a :</p>
+                    \\[a = ${b} \\times ${q_val} + ${r1}\\]
+                    \\[a = ${b * q_val} + ${r1}\\]
+                    <p>L'entier est $\\mathbf{a = ${a}}$</p>
+                `;
+            }
+
+            questionContainer.innerHTML = `<strong>Question :</strong> ${questionText}`;
+            solContainer.innerHTML = solText;
+
+            document.getElementById('dynamic-content-ex3').style.display = 'block';
+            placeholder.style.display = 'none';
+            if (window.MathJax) {
+                MathJax.typeset([questionContainer, solContainer]);
+            }
+        }
+
+        // --- FONCTION DE GÉNÉRATION EXERCICES AVANCÉS (Types 4 à 13) ---
+
+        /**
+         * Génère un nouvel exercice avancé.
+         */
+        function generateNewAdvancedProblem() {
+            const container = document.getElementById('container-ex4');
+            const placeholder = document.getElementById('placeholder-ex4');
+            const questionContainer = document.getElementById('dynamicAdvancedQuestion');
+            const hintContainer = document.getElementById('ex4-hint-content');
+            const solContainer = document.getElementById('help-content-sol2_ex4');
+
+            closeAllHelp(container);
+
+            const type = getRandomInt(4, 13);
+            let questionText = "";
+            let hintText = "";
+            let solText = "";
+
+            switch (type) {
+                case 4: { // Range of a (Given b, q)
+                    const b_val = getRandomInt(5, 12);
+                    const q_val = getRandomInt(10, 30);
+                    const a_min = b_val * q_val;
+                    const a_max = b_val * (q_val + 1) - 1;
+                    
+                    questionText = `Déterminer le plus petit entier $\\mathbf{a_{\\min}}$ et le plus grand entier $\\mathbf{a_{\\max}}$ tels que la division euclidienne de $a$ par $\\mathbf{${b_val}}$ ait pour quotient $\\mathbf{q} = \\mathbf{${q_val}}$.`;
+                    hintText = `Le théorème de la division euclidienne implique que $a$ doit vérifier l'encadrement : $\\mathbf{b q \\le a < b (q+1)}$.`;
+                    solText = `
+                        <strong>Solution (Type 4 : Intervalle du Dividende) :</strong>
+                        <p>Nous cherchons $a$ tel que $\\mathbf{${b_val} \\times ${q_val} \\le a < ${b_val} \\times (${q_val} + 1)}$.</p>
+                        <ol>
+                            <li>Le plus petit entier $a_{\\min}$ est obtenu pour le reste $r=0$: $\\mathbf{a_{\\min} = ${b_val} \\times ${q_val} = ${a_min}}$.</li>
+                            <li>Le plus grand entier $a_{\\max}$ est obtenu pour le reste $r = b-1 = ${b_val - 1}$: $\\mathbf{a_{\\max} = ${b_val} \\times ${q_val} + (${b_val - 1}) = ${a_max}}$.</li>
+                        </ol>
+                        <p>L'ensemble des entiers $a$ est l'intervalle $\\mathbf{[${a_min}, ${a_max}]}$.</p>
+                    `;
+                    break;
+                }
+                case 5: { // Find all possible divisors b (Given a, q, r)
+                    const a_val = getRandomInt(100, 200);
+                    const q_val = getRandomInt(5, 10);
+                    const r_val = getRandomInt(1, 4); // petit reste pour avoir plus de solutions
+                    
+                    questionText = `Déterminer l'ensemble de tous les entiers $\\mathbf{b \\in \\mathbb{N}^*}$ tels que la division euclidienne de $\\mathbf{a=${a_val}}$ par $\\mathbf{b}$ ait pour quotient $\\mathbf{q} = \\mathbf{${q_val}}$ et pour reste $\\mathbf{r} = \\mathbf{${r_val}}$.`;
+                    hintText = `L'équation est $\\mathbf{${a_val} = b \\times ${q_val} + ${r_val}}$. Le diviseur $b$ doit être un diviseur de $\\mathbf{a-r}$ et doit vérifier la condition sur le reste : $\\mathbf{b > r}$.`;
+                    
+                    const ar = a_val - r_val;
+                    const divisors = getDivisors(ar);
+                    const solutions = divisors.filter(d => d > r_val && d > 0);
+                    
+                    solText = `
+                        <strong>Solution (Type 5 : Trouver Diviseur $b$) :</strong>
+                        <ol>
+                            <li>Nous avons $\\mathbf{a = bq + r}$, soit $\\mathbf{${a_val} = b \\times ${q_val} + ${r_val}}$, ce qui donne $\\mathbf{b \\times ${q_val} = ${ar}}$.</li>
+                            <li>Le diviseur $b$ doit être un diviseur de $\\mathbf{${ar}}$ et satisfaire la condition $\\mathbf{b > r}$, donc $\\mathbf{b > ${r_val}}$.</li>
+                            <li>Les diviseurs de ${ar}$ sont : ${divisors.join(', ')}.</li>
+                            <li>L'ensemble des diviseurs $b$ qui vérifient $\\mathbf{b > ${r_val}}$ est : $\\mathbf{\\{${solutions.join(', ')}\\}}$.</li>
+                        </ol>
+                    `;
+                    break;
+                }
+                case 6: { // Remainder of a Sum (No Congruence)
+                    const b_val = getRandomInt(7, 12);
+                    const r1_val = getRandomInt(2, b_val - 2);
+                    const r2_val = getRandomInt(3, b_val - 1);
+                    
+                    questionText = `Si la division de $\\mathbf{a_1}$ par $\\mathbf{${b_val}}$ donne $\\mathbf{r_1} = \\mathbf{${r1_val}}$ et celle de $\\mathbf{a_2}$ par $\\mathbf{${b_val}}$ donne $\\mathbf{r_2} = \\mathbf{${r2_val}}$, quel est le reste de la division euclidienne de $\\mathbf{a_1 + a_2}$ par $\\mathbf{${b_val}}$ ?`;
+                    hintText = `Le reste de la somme $\\mathbf{a_1 + a_2}$ est le reste de la division de $\\mathbf{r_1 + r_2}$ par $b$. Si $\\mathbf{r_1 + r_2 \\ge b}$, le nouveau reste est $\\mathbf{r_1 + r_2 - b}$.`;
+                    
+                    const r_sum = r1_val + r2_val;
+                    const final_r = r_sum >= b_val ? r_sum - b_val : r_sum;
+                    
+                    solText = `
+                        <strong>Solution (Type 6 : Reste d'une Somme) :</strong>
+                        <ol>
+                            <li>Nous avons $a_1 = ${b_val}q_1 + ${r1_val}$ et $a_2 = ${b_val}q_2 + ${r2_val}$.</li>
+                            <li>Donc $\\mathbf{a_1 + a_2 = ${b_val}(q_1 + q_2) + (${r1_val} + ${r2_val})}$.</li>
+                            <li>Le reste provisoire est $\\mathbf{r'} = \\mathbf{${r1_val} + ${r2_val} = ${r_sum}}$.</li>
+                            <li>Puisque $\\mathbf{r'} = \\mathbf{${r_sum}}$ est ${r_sum >= b_val ? `supérieur ou égal à ${b_val}` : `inférieur à ${b_val}`}, nous devons effectuer une nouvelle division.
+                                ${r_sum >= b_val ? `<p>Le nouveau reste est $\\mathbf{r = ${r_sum} - ${b_val} = ${final_r}}$.</p>` : `<p>Le reste est $\\mathbf{r = ${final_r}}$.</p>`}
+                            </li>
+                            <li>Le reste final de la division de $\\mathbf{a_1 + a_2}$ par $\\mathbf{${b_val}}$ est $\\mathbf{${final_r}}$.</li>
+                        </ol>
+                    `;
+                    break;
+                }
+                case 7: { // Uniqueness violation Check
+                    const b_val = getRandomInt(5, 12);
+                    const r_valid = getRandomInt(0, b_val - 1);
+                    const q_val = getRandomInt(10, 20);
+                    const a_val = b_val * q_val + r_valid;
+                    
+                    // Créer une mauvaise division
+                    const r_invalid = r_valid + getRandomInt(1, 3);
+                    const q_invalid = q_val - 1;
+                    
+                    questionText = `Soient $\\mathbf{a=${a_val}}$ et $\\mathbf{b=${b_val}}$. Est-ce que l'égalité $\\mathbf{${a_val} = ${b_val} \\times ${q_invalid} + ${r_invalid}}$ est la division euclidienne de $\\mathbf{a}$ par $\\mathbf{b}$ ? Justifier.`;
+                    hintText = `Vérifiez si l'égalité est correcte ($\mathbf{a = bq' + r'}$) et surtout si la condition sur le reste est respectée ($\mathbf{0 \\le r' < b}$).`;
+                    
+                    solText = `
+                        <strong>Solution (Type 7 : Validation d'une Division Euclidienne) :</strong>
+                        <ol>
+                            <li><strong>Vérification de l'égalité :</strong> $\\mathbf{${b_val} \\times ${q_invalid} + ${r_invalid} = ${b_val * q_invalid} + ${r_invalid} = ${a_val}}$. L'égalité est vraie.</li>
+                            <li><strong>Vérification de la condition sur le reste :</strong> Le reste proposé est $\\mathbf{r'} = \\mathbf{${r_invalid}}$. La condition est $\\mathbf{0 \\le r' < b}$, soit $\\mathbf{0 \\le ${r_invalid} < ${b_val}}$.</li>
+                            <li>Puisque $\\mathbf{${r_invalid} \\ge ${b_val}}$ (car $r'$ est trop grand), la condition sur le reste n'est pas vérifiée.</li>
+                            <li><strong>Conclusion :</strong> Non, ce n'est pas la division euclidienne de $\\mathbf{${a_val}}$ par $\\mathbf{${b_val}}$ car le reste $\\mathbf{r'} = \\mathbf{${r_invalid}}$ est supérieur ou égal au diviseur $\\mathbf{b} = \\mathbf{${b_val}}$.</li>
+                        </ol>
+                    `;
+                    break;
+                }
+                case 8: { // Division with Negative a (Reverse)
+                    const b_val = getRandomInt(5, 10);
+                    const q_pos = getRandomInt(10, 20);
+                    const r_pos = getRandomInt(1, b_val - 1);
+                    const a_pos = b_val * q_pos + r_pos;
+                    const a_neg = -a_pos;
+
+                    // Division euclidienne de a_neg: -a_pos = b*q_neg + r_neg
+                    const q_neg = -q_pos - 1;
+                    const r_neg = b_val - r_pos;
+                    
+                    questionText = `On sait que la division euclidienne de $\\mathbf{a} = \\mathbf{${a_pos}}$ par $\\mathbf{b} = \\mathbf{${b_val}}$ est $\\mathbf{${a_pos} = ${b_val} \\times ${q_pos} + ${r_pos}}$. En déduire le quotient $\\mathbf{q'}$ et le reste $\\mathbf{r'}$ de la division euclidienne de $\\mathbf{-a}$ par $\\mathbf{b}$.`;
+                    hintText = `Multipliez l'égalité par $-1$ : $\\mathbf{-a = ${b_val}(-q_{\\text{pos}}) - r_{\\text{pos}}}$. Vous devez ensuite ajuster l'écriture pour que le reste $\\mathbf{r'}$ soit positif et plus petit que $\\mathbf{b}$. Pensez à ajouter et soustraire $\\mathbf{b}$.`;
+                    
+                    solText = `
+                        <strong>Solution (Type 8 : Division de l'Opposé) :</strong>
+                        <ol>
+                            <li>Nous avons $\\mathbf{a} = \\mathbf{${b_val}q_{\\text{pos}} + ${r_pos}}$. Multiplions par $-1$: $\\mathbf{-a} = \\mathbf{${b_val}(-q_{\\text{pos}}) - ${r_pos}}$.</li>
+                            <li>Comme le reste doit être positif, nous ajustons en ajoutant et soustrayant $\\mathbf{b} = \\mathbf{${b_val}}$:
+                                $$\\mathbf{-a = ${b_val}(-q_{\\text{pos}}) - ${b_val} + ${b_val} - ${r_pos}}$$
+                            </li>
+                            <li>On factorise $\\mathbf{-q_{\\text{pos}} - 1}$:
+                                $$\\mathbf{-a = ${b_val}(-q_{\\text{pos}} - 1) + (${b_val} - ${r_pos})}$$
+                            </li>
+                            <li>Le quotient est $\\mathbf{q'} = \\mathbf{-${q_pos} - 1 = ${q_neg}}$.</li>
+                            <li>Le reste est $\\mathbf{r'} = \\mathbf{${b_val} - ${r_pos} = ${r_neg}}$. On vérifie que $\\mathbf{0 \\le ${r_neg} < ${b_val}}$.</li>
+                            <li>L'égalité finale est : $\\mathbf{${a_neg} = ${b_val} \\times (${q_neg}) + ${r_neg}}$.</li>
+                        </ol>
+                    `;
+                    break;
+                }
+                case 9: { // Simplified CRT (Find a from two remainders)
+                    const b1 = getRandomInt(5, 9);
+                    const r1 = getRandomInt(1, b1 - 1);
+                    let b2, r2;
+                    do {
+                        b2 = getRandomInt(4, 7);
+                    } while (b1 === b2 || getDivisors(b1).includes(b2) || getDivisors(b2).includes(b1)); // Ensure b1 and b2 are somewhat coprime
+                    r2 = getRandomInt(1, b2 - 1);
+
+                    // Recherche du plus petit a > 0
+                    let a_val = r1;
+                    let found = false;
+                    const max_iter = 100;
+                    let iter = 0;
+                    while (!found && iter < max_iter) {
+                        if (a_val % b2 === r2) {
+                            found = true;
+                        } else {
+                            a_val += b1;
+                        }
+                        iter++;
+                    }
+                    
+                    questionText = `Trouver le plus petit entier $\\mathbf{a > 0}$ tel que la division euclidienne de $\\mathbf{a}$ par $\\mathbf{b_1} = \\mathbf{${b1}}$ ait pour reste $\\mathbf{r_1} = \\mathbf{${r1}}$ et la division de $\\mathbf{a}$ par $\\mathbf{b_2} = \\mathbf{${b2}}$ ait pour reste $\\mathbf{r_2} = \\mathbf{${r2}}$.`;
+                    hintText = `Le nombre $a$ est de la forme $\\mathbf{a = ${b1}q + ${r1}}$. Testez les valeurs de $q=0, 1, 2, \\dots$ jusqu'à ce que le résultat $\\mathbf{a}$ satisfasse la deuxième condition : $\\mathbf{a = ${b2}q' + ${r2}}$.`;
+                    
+                    solText = `
+                        <strong>Solution (Type 9 : Système de Divisions) :</strong>
+                        <ol>
+                            <li>La première condition donne $\\mathbf{a = ${b1}q + ${r1}}$. Nous testons les premières valeurs de $a$ :
+                                <ul>
+                                    <li>$q=0: a = ${r1}$. Reste par ${b2}$ : ${r1 % b2}. (Rejeté car ${r1 % b2} \\ne ${r2}$)</li>
+                                    <li>$q=1: a = ${b1 + r1}$. Reste par ${b2}$ : ${(b1 + r1) % b2}. (Rejeté)</li>
+                                    <li>$q=2: a = ${b1 * 2 + r1}$. Reste par ${b2}$ : ${(b1 * 2 + r1) % b2}. (Rejeté)</li>
+                                    <li>...</li>
+                                </ul>
+                            </li>
+                            <li>L'entier $\\mathbf{a}$ doit vérifier $\\mathbf{a = ${b1}q + ${r1}}$ ET $\\mathbf{a = ${b2}q' + ${r2}}$.</li>
+                            <li>Après vérification, le plus petit entier positif est $\\mathbf{a = ${a_val}}$.</li>
+                            <li>Vérification : $\\mathbf{${a_val} = ${b1} \\times ${Math.floor((a_val - r1) / b1)} + ${r1}}$ et $\\mathbf{${a_val} = ${b2} \\times ${Math.floor((a_val - r2) / b2)} + ${r2}}$.</li>
+                        </ol>
+                    `;
+                    break;
+                }
+                case 10: { // Quotient when a is multiplied by k (CORRIGÉ V13 - Fix Solution Rendering)
+                    const b_val = getRandomInt(6, 12);
+                    const q_val = getRandomInt(10, 15);
+                    const r_val = getRandomInt(1, 2); // r small to keep k small
+                    const a_val = b_val * q_val + r_val;
+                    const k_val = getRandomInt(2, 4);
+
+                    const ka = k_val * a_val;
+                    const new_q = Math.floor(ka / b_val);
+                    const new_r = ka % b_val;
+
+                    // CORRECTION V12: Ajout des délimiteurs $...$ autour de chaque expression LaTeX.
+                    questionText = `On a $\\mathbf{a} = \\mathbf{${a_val}}$ par $\\mathbf{b} = \\mathbf{${b_val}}$ qui donne $\\mathbf{q} = \\mathbf{${q_val}}$ et $\\mathbf{r} = \\mathbf{${r_val}}$. Déterminer le quotient $\\mathbf{q'}$ et le reste $\\mathbf{r'}$ de la division euclidienne de $\\mathbf{k a}$ par $\\mathbf{b}$ pour $\\mathbf{k} = \\mathbf{${k_val}}$.`;
+                    hintText = `Développez l'expression $\\mathbf{k \\cdot a = k(bq+r)}$. Ensuite, déterminez le reste de $\\mathbf{k r}$ par $b$. Si $\\mathbf{k r = bq_{\\text{r}} + r'}$, alors $\\mathbf{k a = b(kq + q_{\\text{r}}) + r'}$.`;
+                    
+                    const k_r = k_val * r_val;
+                    const q_r = Math.floor(k_r / b_val);
+                    
+                    solText = `
+                        <strong>Solution (Type 10 : Division de $\\mathbf{ka}$) :</strong>
+                        <ol>
+                            <li>L'égalité de départ est $\\mathbf{a} = ${b_val}q + ${r_val}$. Multiplions par $\\mathbf{k} = \\mathbf{${k_val}}$ :
+                                $$\\mathbf{ka} = ${b_val}(${k_val}q) + ${k_val}r = ${b_val}(${k_val}q) + ${k_r}$$
+                            </li>
+                            <li>Nous devons diviser le terme $\\mathbf{${k_r}}$ par $\\mathbf{b} = \\mathbf{${b_val}}$ :
+                                $$\\mathbf{${k_r}} = ${b_val} \\times ${q_r} + ${new_r}$$
+                            </li>
+                            <li>Substituons cette nouvelle division dans l'expression de $\\mathbf{ka}$ :
+                                $$\\mathbf{ka} = ${b_val}(${k_val}q) + (${b_val} \\times ${q_r} + ${new_r})$$
+                                $$\\mathbf{ka} = ${b_val}(${k_val}q + ${q_r}) + ${new_r}$$
+                            </li>
+                            <li>Le nouveau quotient est $\\mathbf{q'} = \\mathbf{${k_val}q + ${q_r}} = \\mathbf{${k_val * q_val + q_r}} = \\mathbf{${new_q}}$.</li>
+                            <li>Le nouveau reste est $\\mathbf{r'} = \\mathbf{${new_r}}$.</li>
+                        </ol>
+                    `;
+                    break;
+                }
+                case 11: { // Division with r=q
+                    const a_val = getRandomInt(100, 200);
+                    
+                    questionText = `La division euclidienne de $\\mathbf{a} = \\mathbf{${a_val}}$ par $\\mathbf{b}$ donne un quotient $\\mathbf{q}$ et un reste $\\mathbf{r}$ tels que $\\mathbf{q = r}$. Déterminer toutes les paires possibles $\\mathbf{(b, q)}$ pour cette division.`;
+                    hintText = `L'égalité devient $\\mathbf{a = bq + q}$, ce qui donne $\\mathbf{a = q(b+1)}$. Le diviseur $\\mathbf{b}$ doit vérifier $\\mathbf{b > r}$, donc $\\mathbf{b > q}$. Trouvez tous les diviseurs $\\mathbf{q}$ de $\\mathbf{a}$ puis vérifiez la condition $\\mathbf{b = (a/q) - 1 > q}$.`;
+                    
+                    const divisors = getDivisors(a_val);
+                    const solutions = [];
+
+                    divisors.forEach(q_val => {
+                        // q_val est le quotient q (et le reste r)
+                        const bp1 = a_val / q_val;
+                        const b_val = bp1 - 1;
+                        if (b_val > q_val && b_val > 0) {
+                            solutions.push(`(b=${b_val}, q=${q_val})`);
+                        }
+                    });
+
+                    solText = `
+                        <strong>Solution (Type 11 : Relation $q=r$) :</strong>
+                        <ol>
+                            <li>Nous cherchons $a, b, q, r$ tels que $\\mathbf{a=bq+r}$ et $\\mathbf{r=q}$ et $\\mathbf{0 \\le r < b}$.</li>
+                            <li>L'égalité devient $\\mathbf{${a_val} = bq + q = q(b+1)}$.</li>
+                            <li>De plus, la condition $\\mathbf{r < b}$ devient $\\mathbf{q < b}$, soit $\\mathbf{b > q}$.</li>
+                            <li>Nous devons donc chercher les $\\mathbf{q}$ qui sont des diviseurs de $\\mathbf{${a_val}}$. Pour chaque diviseur $\\mathbf{q}$, on pose $\\mathbf{b = \\frac{${a_val}}{q} - 1}$.</li>
+                            <li>Les diviseurs $\\mathbf{q}$ de $\\mathbf{${a_val}}$ qui vérifient la condition $\\mathbf{b > q}$ donnent les solutions :
+                                <p>$\\mathbf{\\{${solutions.join(' ; ')}\\}}$</p>
+                            </li>
+                        </ol>
+                    `;
+                    break;
+                }
+                case 12: { // Division with r=2q
+                    const a_val = getRandomInt(100, 250);
+                    
+                    questionText = `La division euclidienne de $\\mathbf{a} = \\mathbf{${a_val}}$ par $\\mathbf{b}$ donne un quotient $\\mathbf{q}$ et un reste $\\mathbf{r}$ tels que $\\mathbf{r = 2q}$. Déterminer toutes les paires possibles $\\mathbf{(b, q)}$ pour cette division.`;
+                    hintText = `L'égalité devient $\\mathbf{a = bq + 2q = q(b+2)}$. Le diviseur $\\mathbf{b}$ doit vérifier $\\mathbf{b > r}$, soit $\\mathbf{b > 2q}$. Trouvez tous les diviseurs $\\mathbf{q}$ de $\\mathbf{a}$ puis vérifiez la condition $\\mathbf{b = (a/q) - 2 > 2q}$.`;
+                    
+                    const divisors = getDivisors(a_val);
+                    const solutions = [];
+
+                    divisors.forEach(q_val => {
+                        // q_val est le quotient q
+                        const bp2 = a_val / q_val;
+                        const b_val = bp2 - 2;
+                        if (b_val > 2 * q_val && b_val > 0) { // b > 2q and b must be positive
+                            solutions.push(`(b=${b_val}, q=${q_val})`);
+                        }
+                    });
+
+                    solText = `
+                        <strong>Solution (Type 12 : Relation $r=2q$) :</strong>
+                        <ol>
+                            <li>L'égalité devient $\\mathbf{a = bq + 2q = q(b+2)}$. D'où $\\mathbf{b+2 = \\frac{a}{q}}$.</li>
+                            <li>La condition sur le reste $\\mathbf{r < b}$ devient $\\mathbf{2q < b}$, soit $\\mathbf{b > 2q}$.</li>
+                            <li>Nous cherchons les diviseurs $\\mathbf{q}$ de $\\mathbf{a} = \\mathbf{${a_val}}$ qui vérifient : $\\mathbf{b = \\frac{${a_val}}{q} - 2 > 2q}$.</li>
+                            <li>Les diviseurs $\\mathbf{q}$ de $\\mathbf{${a_val}}$ qui vérifient la condition $\\mathbf{b > 2q}$ donnent les solutions :
+                                <p>$\\mathbf{\\{${solutions.join(' ; ')}\\}}$</p>
+                            </li>
+                        </ol>
+                    `;
+                    break;
+                }
+                case 13: { // Smallest k to change q
+                    const b_val = getRandomInt(6, 12);
+                    const q_val = getRandomInt(10, 20);
+                    const r_val = getRandomInt(2, b_val - 2); // r > 0 for non-trivial case
+                    const a_val = b_val * q_val + r_val;
+                    
+                    const k_val = b_val - r_val;
+
+                    questionText = `On a la division $\\mathbf{a} = \\mathbf{${a_val}}$ par $\\mathbf{b} = \\mathbf{${b_val}}$ qui donne $\\mathbf{q} = \\mathbf{${q_val}}$ et $\\mathbf{r} = \\mathbf{${r_val}}$. Quel est le plus petit entier $\\mathbf{k > 0}$ que l'on doit ajouter à $\\mathbf{a}$ pour que le quotient de $\\mathbf{a+k}$ par $\\mathbf{b}$ soit $\\mathbf{q+1}$ ?`;
+                    hintText = `Pour que le quotient passe de $\\mathbf{q}$ à $\\mathbf{q+1}$, il faut que $\\mathbf{a+k}$ soit supérieur ou égal à $\\mathbf{b(q+1)}$. De plus, on a $\\mathbf{a = bq + r}$. On cherche donc $\\mathbf{a+k \\ge bq + b}$. Le plus petit $\\mathbf{k}$ est celui qui donne $\\mathbf{a+k = b(q+1) = bq + b}$.`;
+                    
+                    solText = `
+                        <strong>Solution (Type 13 : Changement de Quotient) :</strong>
+                        <ol>
+                            <li>L'entier $\\mathbf{a+k}$ doit vérifier $\\mathbf{a+k \\ge b(q+1)}$.</li>
+                            <li>Puisque $\\mathbf{a = bq + r}$, l'équation devient $\\mathbf{bq + r + k \\ge bq + b}$.</li>
+                            <li>Cela se simplifie en $\\mathbf{r + k \\ge b}$, soit $\\mathbf{k \\ge b - r}$.</li>
+                            <li>Le plus petit entier $\\mathbf{k}$ positif est donc $\\mathbf{k_{\\min} = b - r}$.</li>
+                            <li>Application : $\\mathbf{k_{\\min} = ${b_val} - ${r_val} = ${k_val}}$.</li>
+                            <li>Vérification : $\\mathbf{a+k_{\\min} = ${a_val + k_val}}$. Division de $\\mathbf{${a_val + k_val}}$ par $\\mathbf{${b_val}}$:
+                                $\\mathbf{${a_val + k_val} = ${b_val} \\times ${q_val + 1} + 0}$. Le quotient est bien $\\mathbf{${q_val + 1}}$.
+                            </li>
+                        </ol>
+                    `;
+                    break;
+                }
+                default:
+                    questionText = "Erreur de génération. Cliquer à nouveau.";
+                    hintText = "Erreur.";
+                    solText = "Erreur.";
+            }
+
+            // Mise à jour de l'affichage
+            questionContainer.innerHTML = `<strong>Question (Type ${type}) :</strong> ${questionText}`;
+            hintContainer.innerHTML = `<strong>Indication :</strong> ${hintText}`;
+            solContainer.innerHTML = solText;
+
+            document.getElementById('dynamic-content-ex4').style.display = 'block';
+            placeholder.style.display = 'none';
+
+            if (window.MathJax) {
+                MathJax.typeset([questionContainer, hintContainer, solContainer]);
+            }
+        }
+
+        // --- Initialisation au chargement de la page ---
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof generateNewDivision === 'function') {
+                generateNewDivision(false); 
+                generateNewDivision(true);  
+                generateNewRemainderProperty(); 
+            }
+            if (typeof generateNewAdvancedProblem === 'function') {
+                generateNewAdvancedProblem(); 
+            }
+            
+            if (window.MathJax) {
+                MathJax.typeset();
+            }
+        });
+	function toggleDisclaimer() {
+            const disclaimer = document.getElementById('disclaimer-content');
+            const button = document.getElementById('show-auteur-btn');
+            if (disclaimer.style.display === 'block') {
+                disclaimer.style.display = 'none';
+                button.textContent = 'Auteur et Droits d\'Auteur';
+                button.style.backgroundColor = '#333';
+            } else {
+                disclaimer.style.display = 'block';
+                button.textContent = 'Masquer les Droits d\'Auteur';
+                button.style.backgroundColor = '#dc3545';
+            }
+        }
+    </script>
+<div style="text-align: center; margin-top: 50px;">
+        <button id="show-auteur-btn" onclick="toggleDisclaimer()" 
+            style="padding: 10px 20px; font-size: 1em; cursor: pointer; border: none; border-radius: 5px; background-color: #333; color: white;">
+            Auteur et Droits d'Auteur
+        </button>
+    </div>
+
+    <div id="disclaimer-content" style="margin-top: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 5px; background-color: #fff; display: none;">
+        <h3>Droits d'Auteur et Source</h3>
+            <p><strong>Auteur du problème :</strong> Yann Merdy</p>
+            <p><strong>Droits d'Auteur et Utilisation :</strong></p>
+            <p>Ce contenu, y compris l'énoncé, les solutions et le code interactif, est protégé par les droits d'auteur. <strong>Toute utilisation à des fins commerciales, y compris la revente, la distribution ou l'intégration dans des produits commerciaux, est strictement interdite sans autorisation écrite explicite de l'auteur.</strong></p>
+            <p>L'utilisation est limitée à des fins éducatives et personnelles non commerciales.</p>
+        
+    </div>
+	
+   </body>
+</html>
