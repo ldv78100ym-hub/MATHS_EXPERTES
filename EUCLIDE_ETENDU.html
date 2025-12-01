@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorithme d'Euclide Étendu (Aléatoire)</title>
+    
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        header {
+            background-color: #3498db;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        main {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #2ecc71;
+            margin-top: 20px;
+        }
+        .math-block {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        .resultat {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #e74c3c;
+            background-color: #fcebeb;
+            padding: 10px;
+            border: 1px dashed #e74c3c;
+            border-radius: 4px;
+            text-align: center;
+        }
+        button {
+            background-color: white;
+            color: #3498db;
+            border: 2px solid white;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+            color: white;
+            border-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Méthode de l'Algorithme d'Euclide Étendu</h1>
+        <button onclick="genererNouveauCalcul()">🔄 Générer de nouvelles valeurs</button>
+    </header>
+
+    <main>
+        <p>
+            L'Algorithme d'Euclide Étendu (AEE) permet de trouver le \(\text{PGCD}(a,b)\) ainsi que les coefficients de Bézout \((u,v)\) tels que :
+            $$au + bv = \text{PGCD}(a,b)$$
+        </p>
+
+        <h2 id="titre-application">Application ...</h2>
+
+        <section>
+            <h3>1. Algorithme d'Euclide Standard (Descente)</h3>
+            <p>On cherche le PGCD par divisions euclidiennes successives :</p>
+            <div id="descente-euclide" class="math-block">
+                </div>
+            <p id="phrase-pgcd">Le dernier reste non nul est ...</p>
+        </section>
+
+        <section>
+            <h3>2. Remontée pour l'Identité de Bézout</h3>
+            <p>On isole le reste dans chaque équation pour préparer la remontée :</p>
+
+            <h4>A. Équations des restes (isolés) :</h4>
+            <div id="equations-restes" class="math-block">
+                </div>
+
+            <h4>B. Résultat de la substitution :</h4>
+            <p>En remontant les équations successives, on exprime le PGCD comme combinaison linéaire de \(a\) et \(b\).</p>
+            
+            <div class="resultat" id="resultat-final">
+                </div>
+        </section>
+    </main>
+
+    <script>
+        // Fonction pour générer un entier aléatoire entre min et max
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Fonction principale de calcul et d'affichage
+        function genererNouveauCalcul() {
+            // 1. Génération des nombres aléatoires
+            // On s'assure que b > a pour la cohérence de l'affichage initial
+            let val1 = getRandomInt(20, 100);
+            let val2 = getRandomInt(20, 200);
+            
+            let a = Math.min(val1, val2);
+            let b = Math.max(val1, val2);
+
+            // Mise à jour du titre
+            document.getElementById('titre-application').innerHTML = `Application avec \\(a=${a}\\) et \\(b=${b}\\)`;
+
+            // 2. Descente d'Euclide (Calcul + Stockage pour affichage)
+            let r0 = b, r1 = a;
+            let descenteHTML = "";
+            let equationsRestesHTML = "";
+            let steps = []; // Pour stocker les étapes r = r0 - q*r1
+
+            while (r1 > 0) {
+                let q = Math.floor(r0 / r1);
+                let r = r0 % r1;
+
+                // Affichage descente : 138 = 2 * 48 + 42
+                descenteHTML += `$$${r0} = ${q} \\times ${r1} + ${r}$$`;
+
+                if (r > 0) {
+                    // Stockage pour l'équation des restes : 42 = 138 - 2 * 48
+                    // On stocke sous forme d'objet pour traiter plus tard si besoin
+                    steps.push({ r: r, big: r0, q: q, small: r1 });
+                    
+                    // Affichage équation reste (inverse)
+                    equationsRestesHTML += `$$\\mathbf{${r}} = ${r0} - ${q} \\times ${r1}$$`;
+                }
+
+                r0 = r1;
+                r1 = r;
+            }
+
+            let pgcd = r0;
+
+            // Injection HTML Descente
+            document.getElementById('descente-euclide').innerHTML = descenteHTML;
+            document.getElementById('phrase-pgcd').innerHTML = `Le dernier reste non nul est \\(\\mathbf{${pgcd}}\\). Donc, \\(\\text{PGCD}(${a}, ${b}) = ${pgcd}\\).`;
+            
+            // Injection HTML Équations Restes (inversées pour l'affichage, du dernier au premier)
+            // On inverse l'ordre pour montrer du plus petit reste au plus grand (comme dans l'exemple original)
+            // L'exemple original montrait : 6=..., puis 42=... (ordre croissant des restes ?)
+            // Non, l'original montre : 6 (dernier reste) puis 42 (avant-dernier).
+            // Donc on inverse steps pour l'affichage
+            let equationsRestesDisplay = "";
+            for (let i = steps.length - 1; i >= 0; i--) {
+                let s = steps[i];
+                equationsRestesDisplay += `$$\\mathbf{${s.r}} = ${s.big} - ${s.q} \\times ${s.small}$$`;
+            }
+            document.getElementById('equations-restes').innerHTML = equationsRestesDisplay;
+
+            // 3. Calcul des Coefficients de Bézout (Algorithme Étendu réel)
+            // On réinitialise pour le calcul mathématique pur
+            let u0 = 1, u1 = 0; // Coeffs pour b (le plus grand)
+            let v0 = 0, v1 = 1; // Coeffs pour a (le plus petit)
+            
+            // Note: b * u + a * v = PGCD
+            // Algorithme itératif standard
+            let tempB = b;
+            let tempA = a;
+            
+            let s0 = 1, s1 = 0; // coeff de b
+            let t0 = 0, t1 = 1; // coeff de a
+            
+            let r_old = b, r_new = a;
+            let s_old = 1, s_new = 0;
+            let t_old = 0, t_new = 1;
+
+            while (r_new !== 0) {
+                let quotient = Math.floor(r_old / r_new);
+                
+                let temp_r = r_new;
+                r_new = r_old - quotient * r_new;
+                r_old = temp_r;
+
+                let temp_s = s_new;
+                s_new = s_old - quotient * s_new;
+                s_old = temp_s;
+
+                let temp_t = t_new;
+                t_new = t_old - quotient * t_new;
+                t_old = temp_t;
+            }
+            
+            // À la fin de la boucle, r_old est le PGCD
+            // s_old est le coeff de b
+            // t_old est le coeff de a
+            // Vérification : b*s_old + a*t_old = PGCD
+
+            let u = t_old; // Coeff devant a
+            let v = s_old; // Coeff devant b
+
+            // 4. Affichage Résultat
+            let resultHTML = `
+                L'identité de Bézout est vérifiée : \\(${a}u + ${b}v = ${pgcd}\\).<br>
+                Les coefficients sont : \\(\\mathbf{u = ${u}}\\) et \\(\\mathbf{v = ${v}}\\).<br>
+                <small style="color:gray;">(Vérification : \\(${a} \\times (${u}) + ${b} \\times (${v}) = ${a*u + b*v})\\)</small>
+            `;
+            document.getElementById('resultat-final').innerHTML = resultHTML;
+
+            // Demander à MathJax de retraiter la page pour afficher les nouvelles formules
+            if (window.MathJax) {
+                MathJax.typeset();
+            }
+        }
+
+        // Lancer au chargement de la page
+        window.onload = genererNouveauCalcul;
+    </script>
+
+</body>
+</html>
