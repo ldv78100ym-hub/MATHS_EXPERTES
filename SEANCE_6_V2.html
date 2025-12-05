@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S6 : Nombres Premiers et Décomposition</title>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <script>
+        // Configuration MathJax, standard pour toutes les séances
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']], // Délimiteurs inline $...$ et \(...\)
+                displayMath: [['$$', '$$'], ['\\[', '\\]']] // Délimiteurs display $$...$$ et \[...\]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+        // --- FONCTIONS UTILITAIRES GÉNÉRALES ---
+        /**
+         * Génère un nombre aléatoire (utilisé pour les exemples)
+         * @param {number} min - minimum inclusif
+         * @param {number} max - maximum inclusif
+         */
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        /**
+         * Fonction générique pour basculer l'affichage de l'aide/solution et de l'état du bouton
+         */
+        function toggleHelp(button, contentId, originalText) {
+            const content = document.getElementById(contentId);
+            const container = button.closest('.question-box');
+            
+            // Masquer tout contenu d'aide dans le même conteneur sauf celui qui est cliqué
+            container.querySelectorAll('.help-content').forEach(el => {
+                if (el.id !== contentId && el.style.display !== 'none') {
+                    el.style.display = 'none';
+                }
+            });
+            // Réinitialiser les boutons des autres aides (Indication / Solution)
+            container.querySelectorAll('.help-button-action').forEach(btn => {
+                if (btn !== button && btn.textContent !== btn.getAttribute('data-content-id').includes('sol') ? 'Solution' : 'Indication') {
+                    // C'est un peu plus complexe ici, car il y a des boutons "Voir l'exemple"
+                    let defaultText = '';
+                    let defaultColor = '';
+                    if (btn.classList.contains('btn-solution')) {
+                        defaultText = 'Solution (Complète)';
+                        defaultColor = '#33cc33';
+                    } else if (btn.classList.contains('btn-example')) {
+                        defaultText = 'Voir l\'Exemple & Solution';
+                        defaultColor = '#0066cc'; // Bleu pour les exemples
+                    } else { // Indication (si présente)
+                        defaultText = 'Indication';
+                        defaultColor = '#ffcc00';
+                    }
+                    btn.textContent = defaultText;
+                    btn.style.backgroundColor = defaultColor;
+                }
+            });
+
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+                button.textContent = originalText;
+                // Définir la couleur de retour à la normale
+                let defaultColor = button.classList.contains('btn-solution') ? '#33cc33' : (button.classList.contains('btn-example') ? '#0066cc' : '#ffcc00');
+                button.style.backgroundColor = defaultColor;
+            } else {
+                content.style.display = 'block';
+                button.textContent = `Masquer ${originalText.replace('(Complète)', '').trim()}`;
+                // Définir la couleur 'Masquer' (plus sombre ou rouge)
+                let pressedColor = button.classList.contains('btn-solution') ? '#cc0000' : (button.classList.contains('btn-example') ? '#004d99' : '#d1a400');
+                button.style.backgroundColor = pressedColor;
+            }
+        }
+        
+        /**
+         * Calcule le PGCD de deux nombres.
+         */
+        function gcd(a, b) {
+            a = Math.abs(a);
+            b = Math.abs(b);
+            while (b) {
+                [a, b] = [b, a % b];
+            }
+            return a;
+        }
+
+        /**
+         * Décomposition en facteurs premiers
+         */
+        function primeFactorization(n) {
+            n = Math.abs(n);
+            let factors = {};
+            let d = 2;
+            let temp = n;
+            
+            if (n === 0 || n === 1) return {};
+
+            while (d * d <= temp) {
+                while (temp % d === 0) {
+                    factors[d] = (factors[d] || 0) + 1;
+                    temp /= d;
+                }
+                d++;
+            }
+            if (temp > 1) {
+                factors[temp] = (factors[temp] || 0) + 1;
+            }
+            return factors;
+        }
+
+        /**
+         * Formate la décomposition en facteurs premiers en LaTeX
+         */
+        function formatFactorization(n, factors) {
+            let result = `${n} = `;
+            let parts = [];
+            for (const prime in factors) {
+                const power = factors[prime];
+                if (power === 1) {
+                    parts.push(`${prime}`);
+                } else {
+                    parts.push(`${prime}^{${power}}`);
+                }
+            }
+            return `$$${n} = ${parts.join(' \\times ')}$$`;
+        }
+
+        /**
+         * Calcule le nombre de diviseurs
+         */
+        function numberOfDivisors(factors) {
+            let count = 1;
+            for (const prime in factors) {
+                count *= (factors[prime] + 1);
+            }
+            return count;
+        }
+
+        /**
+         * Trouve le plus grand diviseur premier possible à tester (partie entière de la racine)
+         */
+        function maxTestPrime(n) {
+            return Math.floor(Math.sqrt(n));
+        }
+
+        // --- EXERCICE 1 : Test de Primalité (Dynamique) ---
+        function generateNewPrimaliteProblem() {
+            let n;
+            let factors;
+            
+            // Générer un nombre entre 100 et 1000
+            do {
+                n = getRandomInt(100, 1000);
+                factors = primeFactorization(n);
+            } while (n % 2 === 0 || n % 5 === 0); // Éviter les cas triviaux (multiples de 2 ou 5)
+
+            const isPrime = Object.keys(factors).length === 1 && factors[n] === 1;
+            const maxPrime = maxTestPrime(n);
+            
+            document.getElementById('ex1-number').textContent = n;
+            
+            let solContent = `
+                <h3>Correction Détaillée : Test de Primalité pour $N = ${n}$</h3>
+                <p><strong>1. Détermination de la borne :</strong></p>
+                <p>On calcule la partie entière de la racine carrée de $N$ :</p>
+                $$\\sqrt{${n}} \\approx ${Math.sqrt(n).toFixed(2)}$$
+                <p>La borne est donc : $\\mathbf{${maxPrime}}$. Nous devons tester les nombres premiers $p \\leq ${maxPrime}$.</p>
+                <p><strong>2. Test des diviseurs premiers :</strong></p>
+                <p>Les nombres premiers à tester sont : ${[2, 3, 5, 7, 11, 13, 17, 19, 23, 29].filter(p => p <= maxPrime).join(', ')}.</p>
+                
+                <div style="margin-left: 20px;">
+                ${[2, 3, 5, 7, 11, 13, 17, 19, 23, 29].filter(p => p <= maxPrime).map(p => {
+                    const isDivisor = n % p === 0;
+                    return `
+                        <p>$N \\div ${p} :$ ${isDivisor ? `Oui, $${n} = ${p} \\times ${n / p}$.` : `Non, $${n} \\bmod ${p} = ${n % p} \\neq 0$.`}</p>
+                    `;
+                }).join('')}
+                </div>
+                
+                ${isPrime ? `
+                    <p>Puisqu'aucun nombre premier inférieur ou égal à ${maxPrime} ne divise ${n}$, alors $\\mathbf{${n}}$ est un nombre premier.</p>
+                ` : `
+                    <p>Nous trouvons que ${Object.keys(factors)[0]} est un diviseur de ${n}. Il n'est donc pas premier.</p>
+                    <p>Sa décomposition est : ${formatFactorization(n, factors)}</p>
+                `}
+            `;
+            
+            document.getElementById('ex1-solution-content').innerHTML = solContent;
+            
+            // Masquer la solution et assurer le rendu MathJax
+            document.getElementById('help-ex1-sol1').style.display = 'none';
+            document.querySelector('#container-ex1 [data-content-id="help-ex1-sol1"]').textContent = 'Solution (Complète)';
+            document.querySelector('#container-ex1 [data-content-id="help-ex1-sol1"]').style.backgroundColor = '#33cc33';
+            
+            if (window.MathJax) {
+                MathJax.typeset([document.getElementById('ex1-number').parentNode, document.getElementById('ex1-solution-content')]);
+            }
+        }
+
+        // --- EXERCICE 2 : Décomposition en Facteurs Premiers (Dynamique) ---
+        function generateNewFactorizationProblem() {
+            // Créer un nombre N = p1^a * p2^b
+            const primes = [2, 3, 5, 7, 11, 13];
+            let n = 1;
+            let factors = {};
+
+            // Choisir 2 ou 3 facteurs premiers
+            const numFactors = getRandomInt(2, 3);
+            const selectedPrimes = [];
+            
+            while (selectedPrimes.length < numFactors) {
+                const p = primes[getRandomInt(0, primes.length - 1)];
+                if (!selectedPrimes.includes(p)) {
+                    selectedPrimes.push(p);
+                }
+            }
+
+            for (const p of selectedPrimes) {
+                const power = getRandomInt(1, 3);
+                n *= Math.pow(p, power);
+                factors[p] = power;
+            }
+            
+            document.getElementById('ex2-number').textContent = n;
+            
+            let solContent = `
+                <h3>Correction Détaillée : Décomposition de $N = ${n}$</h3>
+                <p>On divise successivement par les plus petits nombres premiers possibles : 2, 3, 5, 7, ...</p>
+                
+                <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+                    <tr>
+                        <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Nombre</th>
+                        <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Diviseur</th>
+                        <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Résultat</th>
+                    </tr>
+                    ${Object.keys(factors).map(p => {
+                        let rows = [];
+                        let tempN = n;
+                        for (let i = 0; i < factors[p]; i++) {
+                            const result = tempN / p;
+                            rows.push(`
+                                <tr>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">${i === 0 ? document.getElementById('ex2-number').textContent : tempN}</td>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">${p}</td>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">${result}</td>
+                                </tr>
+                            `);
+                            tempN = result;
+                        }
+                        n = tempN; // Mise à jour pour le prochain cycle
+                        return rows.join('');
+                    }).join('')}
+                    <tr>
+                        <td style="border: 1px solid #ccc; padding: 8px; font-weight: bold;">1</td>
+                        <td style="border: 1px solid #ccc; padding: 8px;"></td>
+                        <td style="border: 1px solid #ccc; padding: 8px;">Fin</td>
+                    </tr>
+                </table>
+
+                <p>La décomposition finale est :</p>
+                ${formatFactorization(document.getElementById('ex2-number').textContent, primeFactorization(document.getElementById('ex2-number').textContent))}
+            `;
+            
+            document.getElementById('ex2-solution-content').innerHTML = solContent;
+            
+            // Masquer la solution et assurer le rendu MathJax
+            document.getElementById('help-ex2-sol1').style.display = 'none';
+            document.querySelector('#container-ex2 [data-content-id="help-ex2-sol1"]').textContent = 'Solution (Complète)';
+            document.querySelector('#container-ex2 [data-content-id="help-ex2-sol1"]').style.backgroundColor = '#33cc33';
+
+            if (window.MathJax) {
+                MathJax.typeset([document.getElementById('ex2-number').parentNode, document.getElementById('ex2-solution-content')]);
+            }
+        }
+        
+        // --- EXERCICE 3 : Nombre de diviseurs (Dynamique) ---
+        function generateNewDivisorsProblem() {
+            let n = getRandomInt(100, 500);
+            const factors = primeFactorization(n);
+            const numDivisors = numberOfDivisors(factors);
+            
+            document.getElementById('ex3-number').textContent = n;
+            
+            let solContent = `
+                <h3>Correction Détaillée : Nombre de Diviseurs de $N = ${n}$</h3>
+                <p><strong>1. Décomposition en facteurs premiers :</strong></p>
+                <p>Nous décomposons ${n}$ en facteurs premiers :</p>
+                ${formatFactorization(n, factors)}
+                
+                <p><strong>2. Application de la formule :</strong></p>
+                <p>Si la décomposition est $N = p_1^{\\alpha_1} p_2^{\\alpha_2} \\cdots p_k^{\\alpha_k}$, le nombre de diviseurs $\\tau(N)$ est donné par :</p>
+                $$\\tau(N) = (\\alpha_1 + 1)(\\alpha_2 + 1) \\cdots (\\alpha_k + 1)$$
+                
+                <p>Pour $N = ${n}$, les exposants sont :</p>
+                <ul>
+                ${Object.keys(factors).map(p => `<li>Pour $p=${p}$, l'exposant est $\\alpha = ${factors[p]}$.</li>`).join('')}
+                </ul>
+                
+                <p>Le nombre de diviseurs est donc :</p>
+                $$\\tau(${n}) = ${Object.keys(factors).map(p => `(${factors[p]} + 1)`).join(' \\times ')} = \\mathbf{${numDivisors}}$$
+                
+                <p>Le nombre ${n} admet $\\mathbf{${numDivisors}}$ diviseurs.</p>
+            `;
+            
+            document.getElementById('ex3-solution-content').innerHTML = solContent;
+
+            // Masquer la solution et assurer le rendu MathJax
+            document.getElementById('help-ex3-sol1').style.display = 'none';
+            document.querySelector('#container-ex3 [data-content-id="help-ex3-sol1"]').textContent = 'Solution (Complète)';
+            document.querySelector('#container-ex3 [data-content-id="help-ex3-sol1"]').style.backgroundColor = '#33cc33';
+
+            if (window.MathJax) {
+                MathJax.typeset([document.getElementById('ex3-number').parentNode, document.getElementById('ex3-solution-content')]);
+            }
+        }
+        
+        // --- NOUVELLE FONCTION POUR DROITS D'AUTEUR ---
+        function toggleDisclaimer() {
+            const disclaimer = document.getElementById('disclaimer-content');
+            const button = document.getElementById('show-auteur-btn');
+            const isVisible = disclaimer.style.display === 'block';
+
+            if (isVisible) {
+                disclaimer.style.display = 'none';
+                button.textContent = 'Auteur et Droits d\'Auteur';
+                button.style.backgroundColor = '#333';
+            } else {
+                disclaimer.style.display = 'block';
+                button.textContent = 'Masquer les Droits d\'Auteur';
+                button.style.backgroundColor = '#dc3545';
+            }
+        }
+        // --- Fin NOUVELLE FONCTION ---
+
+
+        // --- Initialisation au chargement de la page ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialisation de l'Exercice 1 (Test de Primalité)
+            if (typeof generateNewPrimaliteProblem === 'function') {
+                generateNewPrimaliteProblem();
+            }
+            // Initialisation de l'Exercice 2 (Décomposition)
+            if (typeof generateNewFactorizationProblem === 'function') {
+                generateNewFactorizationProblem();
+            }
+            // Initialisation de l'Exercice 3 (Nombre de diviseurs)
+            if (typeof generateNewDivisorsProblem === 'function') {
+                generateNewDivisorsProblem();
+            }
+            // Re-typeset initial pour les formules LaTeX statiques et les nouveaux exercices
+            if (window.MathJax) {
+                MathJax.typeset();
+            }
+        });
+    </script>
+
+    <style>
+        /* CHARTE GRAPHIQUE FONDAMENTALE */
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.6;
+            margin: 0 auto;
+            max-width: 900px;
+            padding: 20px;
+            color: #333;
+            background-color: #f4f7f6; 
+        }
+        h1, h2, h3 {
+            font-family: Arial, sans-serif;
+            color: #004d99; /* Bleu foncé */
+            border-bottom: 2px solid #004d99;
+            padding-bottom: 5px;
+            margin-top: 25px;
+        }
+        h1 { font-size: 2em; text-align: center; border-bottom: 3px double #004d99; }
+        h2 { font-size: 1.5em; }
+        h3 { font-size: 1.2em; border-bottom: 1px solid #ccc; }
+
+        .section-box, .question-box {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+        }
+        .section-box {
+            background-color: #e6f7ff; /* Bleu très clair */
+            border-left: 5px solid #004d99;
+        }
+
+        .exercice-title {
+            color: #cc5200; /* Orange/Rouge */
+            border-bottom: 1px solid #cc5200;
+        }
+        
+        /* Styles pour les boutons d'aide/solution */
+        .help-buttons {
+            margin-top: 15px;
+            text-align: right;
+        }
+        .help-button-action, .btn-generation {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 0.9em;
+            transition: background-color 0.3s;
+        }
+        .btn-indication {
+            background-color: #ffcc00; /* Jaune */
+            color: #333;
+        }
+        .btn-solution {
+            background-color: #33cc33; /* Vert */
+            color: white;
+        }
+        .btn-generation {
+            background-color: #0066cc; /* Bleu clair */
+            color: white;
+        }
+        .btn-example {
+             background-color: #0066cc; /* Bleu clair */
+            color: white;
+        }
+        .help-content {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none; /* Caché par défaut */
+        }
+        .help-indication {
+            background-color: #fffacd; /* Jaune pâle */
+            border: 1px dashed #ffcc00;
+            font-style: italic;
+        }
+        .help-solution {
+            background-color: #e5ffe5; /* Vert très pâle */
+            border: 1px dashed #33cc33;
+            font-style: normal; /* Normal pour la correction détaillée */
+        }
+        .question-number {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #004d99;
+            text-align: left;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>S6 : Nombres Premiers et Décomposition 🧩</h1>
+
+    <div class="section-box">
+        <h2>I. Cours : Nombres Premiers et Théorème Fondamental</h2>
+        <p><strong>Définition :</strong> Un nombre premier est un entier naturel qui admet exactement deux diviseurs distincts positifs : 1 et lui-même.</p>
+        <p><strong>Théorème Fondamental de l'Arithmétique :</strong> Tout entier naturel $n \geq 2$ se décompose de manière unique (à l'ordre des facteurs près) en un produit de nombres premiers :</p>
+        $$n = p_1^{\alpha_1} p_2^{\alpha_2} \cdots p_k^{\alpha_k}$$
+        <p>où $p_1, p_2, \ldots, p_k$ sont des nombres premiers distincts et $\alpha_1, \alpha_2, \ldots, \alpha_k$ sont des entiers naturels non nuls.</p>
+        <h3>Critères :</h3>
+        <ul>
+            <li><strong>Test de Primalité :</strong> Pour savoir si $N$ est premier, il suffit de tester sa divisibilité par tous les nombres premiers $p$ tels que $p \leq \sqrt{N}$.</li>
+            <li><strong>Nombre de Diviseurs :</strong> Le nombre total de diviseurs d'un nombre $n$ est $\tau(n) = (\alpha_1 + 1)(\alpha_2 + 1) \cdots (\alpha_k + 1)$.</li>
+        </ul>
+    </div>
+
+    <h3 class="exercice-title">Exercice 1 : Test de Primalité</h3>
+    <div id="container-ex1" class="question-box">
+        <p class="question-number">Déterminer si $\mathbf{N = }$ <span id="ex1-number">Chargement...</span> est un nombre premier.</p>
+        
+        <div class="help-buttons">
+            <button onclick="toggleHelp(this, 'help-ex1-sol1', 'Solution (Complète)')" class="btn-solution help-button-action" data-content-id="help-ex1-sol1">Solution (Complète)</button>
+            <button onclick="generateNewPrimaliteProblem()" class="btn-generation">Générer un nouvel exercice</button>
+        </div>
+        
+        <div id="help-ex1-sol1" class="help-content help-solution">
+            <p id="ex1-solution-content">Solution détaillée (Calcul en cours...)</p>
+        </div>
+    </div>
+
+    <h3 class="exercice-title">Exercice 2 : Décomposition en Facteurs Premiers</h3>
+    <div id="container-ex2" class="question-box">
+        <p class="question-number">Décomposer le nombre $\mathbf{N = }$ <span id="ex2-number">Chargement...</span> en produit de facteurs premiers.</p>
+        
+        <div class="help-buttons">
+            <button onclick="toggleHelp(this, 'help-ex2-sol1', 'Solution (Complète)')" class="btn-solution help-button-action" data-content-id="help-ex2-sol1">Solution (Complète)</button>
+            <button onclick="generateNewFactorizationProblem()" class="btn-generation">Générer un nouvel exercice</button>
+        </div>
+        
+        <div id="help-ex2-sol1" class="help-content help-solution">
+            <p id="ex2-solution-content">Solution détaillée (Calcul en cours...)</p>
+        </div>
+    </div>
+    
+    <h3 class="exercice-title">Exercice 3 : Nombre de Diviseurs</h3>
+    <div id="container-ex3" class="question-box">
+        <p class="question-number">Déterminer le nombre de diviseurs de $\mathbf{N = }$ <span id="ex3-number">Chargement...</span></p>
+        
+        <div class="help-buttons">
+            <button onclick="toggleHelp(this, 'help-ex3-sol1', 'Solution (Complète)')" class="btn-solution help-button-action" data-content-id="help-ex3-sol1">Solution (Complète)</button>
+            <button onclick="generateNewDivisorsProblem()" class="btn-generation">Générer un nouvel exercice</button>
+        </div>
+        
+        <div id="help-ex3-sol1" class="help-content help-solution">
+            <p id="ex3-solution-content">Solution détaillée (Calcul en cours...)</p>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 50px;">
+        <button id="show-auteur-btn" onclick="toggleDisclaimer()" 
+            style="padding: 10px 20px; font-size: 1em; cursor: pointer; border: none; border-radius: 5px; background-color: #333; color: white;">
+            Auteur et Droits d'Auteur
+        </button>
+    </div>
+
+    <div id="disclaimer-content" style="margin-top: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 5px; background-color: #fff; display: none;">
+        <h3>Droits d'Auteur et Source</h3>
+            <p><strong>Auteur du problème :</strong> Yann Merdy</p>
+            <p><strong>Droits d'Auteur et Utilisation :</strong></p>
+            <p>Ce contenu, y compris l'énoncé, les solutions et le code interactif, est protégé par les droits d'auteur. <strong>Toute utilisation à des fins commerciales, y compris la revente, la distribution ou l'intégration dans des produits commerciaux, est...</strong></p>
+    </div>
+    </body>
+</html>+

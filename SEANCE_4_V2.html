@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S4 : Algorithme d'Euclide et Théorème de Bézout</title>
+    
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <script>
+        // Configuration MathJax pour les délimiteurs LaTeX
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']], 
+                displayMath: [['$$', '$$'], ['\\[', '\\]']] 
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+
+        // --- FONCTIONS UTILITAIRES MATHÉMATIQUES (PGCD, Bézout & Fibonacci) ---
+        
+        /**
+         * Calcule le PGCD de deux nombres.
+         */
+        function gcd(a, b) {
+            a = Math.abs(a);
+            b = Math.abs(b);
+            while (b) {
+                [a, b] = [b, a % b];
+            }
+            return a;
+        }
+        
+        /**
+         * Algorithme d'Euclide Étendu (données).
+         * Retourne {pgcd: d, u: u0, v: v0} tel que a*u0 + b*v0 = d.
+         */
+        function extendedEuclide(numA, numB) {
+            // Travaille avec les valeurs absolues pour la base de l'algorithme
+            const A = Math.abs(numA);
+            const B = Math.abs(numB);
+
+            let u_A = 1, v_A = 0;
+            let u_B = 0, v_B = 1;
+            
+            let R_prev = A;
+            let R_curr = B;
+            
+            let u_final = 0;
+            let v_final = 0;
+            let d_val = B; // Initialisation pour le cas B=0
+
+            while (R_curr !== 0) {
+                let Q = Math.floor(R_prev / R_curr);
+                let R_next = R_prev % R_curr;
+                
+                let U_next = u_A - Q * u_B;
+                let V_next = v_A - Q * v_B;
+                
+                d_val = R_curr; // Le PGCD est le dernier reste non nul
+                u_final = u_B; // Coefficients de Bézout associés
+                v_final = v_B;
+
+                R_prev = R_curr;
+                R_curr = R_next;
+                u_A = u_B;
+                v_A = v_B;
+                u_B = U_next;
+                v_B = V_next;
+            }
+            
+            // Ajustement pour les signes des nombres d'entrée
+            if (numA < 0) u_final = -u_final;
+            if (numB < 0) v_final = -v_final;
+            
+            // Cas où B=0
+            if (numB === 0) {
+                 return { pgcd: Math.abs(numA), u: (numA > 0 ? 1 : -1), v: 0 };
+            }
+
+            return { pgcd: d_val, u: u_final, v: v_final };
+        }
+        
+        /**
+         * Calcule le nième terme de la suite de Fibonacci (F0=0, F1=1).
+         * @param {number} n - L'indice du terme à calculer.
+         * @returns {number} Le nième terme de Fibonacci.
+         */
+        function fibonacci(n) {
+            if (n <= 0) return 0;
+            if (n === 1) return 1;
+            let a = 0, b = 1, temp;
+            for (let i = 2; i <= n; i++) {
+                temp = a + b;
+                a = b;
+                b = temp;
+            }
+            return b;
+        }
+
+
+        // --- SOLUTION DÉTAILLÉE POUR LES EXERCICES DE BASE (Réutilisation) ---
+
+        /**
+         * Génère l'intégralité de la solution de l'Algorithme d'Euclide sous forme HTML/LaTeX.
+         */
+        function getEuclideSolutionHTML(numA, numB) {
+            let a = Math.max(Math.abs(numA), Math.abs(numB));
+            let b = Math.min(Math.abs(numA), Math.abs(numB));
+            
+            if (b === 0) {
+                return `<p><strong>Solution :</strong> $\\text{PGCD}(${numA}, ${numB}) = ${a}$ car $\\text{PGCD}(a, 0) = |a|$ pour tout $a \\in \\mathbb{Z}^*$.</p>`;
+            }
+
+            let solutionSteps = [];
+            let currentA = a;
+            let currentB = b;
+            let r = 1; 
+            let step = 1;
+            let pgcd = b; 
+
+            solutionSteps.push(`<span class="statement-title" style="color:#007bff;">Démarche : Calcul de $\\text{PGCD}(${a}, ${b})$</span>`);
+            solutionSteps.push('<hr style="border: none; border-top: 1px dashed #ccc;">');
+
+            while (r !== 0) {
+                let q = Math.floor(currentA / currentB);
+                r = currentA % currentB;
+                
+                const equation = `$$\\text{Étape ${step}} : \\quad ${currentA} = ${currentB} \\times ${q} + ${r}$$`;
+
+                let comment = '';
+                if (r !== 0) {
+                    comment = `Le reste est $r=${r}$. D'après le <strong>Théorème [Propriété fondamentale du PGCD]</strong>, $\\text{PGCD}(${currentA}, ${currentB}) = \\text{PGCD}(${currentB}, ${r})$.`;
+                    pgcd = r; 
+                } else {
+                    comment = `Le reste est $r=0$. Le PGCD est le dernier reste non nul (qui est le diviseur $\\mathbf{${currentB}}$ de cette dernière étape).`;
+                    pgcd = currentB; // R_curr avant la dernière itération
+                }
+
+                solutionSteps.push(`
+                    <div style="margin-top: 15px;">
+                        ${equation}
+                        <p style="font-size: 0.9em; margin-top: -10px; padding-left: 10px; border-left: 3px solid #ff9900; background-color: #fffcf5; padding: 5px;">
+                            <strong>Explication :</strong> ${comment}
+                        </p>
+                    </div>
+                `);
+
+                currentA = currentB;
+                currentB = r;
+                step++;
+            }
+
+            // Correction: Si le reste est 0, le PGCD est le diviseur (currentA)
+            if (r === 0) {
+                 pgcd = currentA;
+            }
+
+            solutionSteps.push('<hr style="border: none; border-top: 1px dashed #ccc; margin-top: 20px;">');
+            solutionSteps.push(`<p style="font-size: 1.1em; font-weight: <strong>bold</strong>; color: #008080;">Conclusion Finale :</p>`);
+            solutionSteps.push(`<p>Ainsi, $\\mathbf{\\text{PGCD}(${numA}, ${numB}) = ${pgcd}}$.</p>`);
+
+            return solutionSteps.join('');
+        }
+        
+        /**
+         * Génère la solution détaillée de l'Algorithme d'Euclide Étendu (Bézout) en utilisant la méthode de la chaîne d'identités.
+         */
+        function getBezoutSolutionHTML(numA, numB) {
+            const a = numA;
+            const b = numB;
+            
+            if (b === 0) {
+                return `<p><strong>Solution :</strong> $\\text{PGCD}(${numA}, ${numB}) = ${Math.abs(numA)}$. L'identité de Bézout n'est pas toujours unique dans ce cas trivial.</p>`;
+            }
+
+            let solSteps = [];
+            
+            const A = Math.abs(a);
+            const B = Math.abs(b);
+            let R_prev = A;
+            let R_curr = B;
+            let temp_r;
+            let step = 1;
+            let d = 0; 
+            
+            // Stockage des divisions pour la remontée
+            let divisions = [];
+
+            while (R_curr !== 0) {
+                let q = Math.floor(R_prev / R_curr);
+                temp_r = R_prev % R_curr;
+                
+                if (temp_r !== 0) {
+                    divisions.push({ R_prev, R_curr, q, r: temp_r });
+                    d = temp_r; // Le PGCD final sera le dernier reste non nul
+                } else {
+                    d = R_curr; // Le PGCD est le diviseur si le reste est nul
+                }
+
+                R_prev = R_curr;
+                R_curr = temp_r;
+                step++;
+                
+                if (temp_r === 0) break; 
+            }
+            
+            // Affichage du PGCD exact dans l'en-tête
+            solSteps.push(`<span class="statement-title" style="color:#7952b3;">Démarche : Algorithme d'Euclide Étendu pour trouver ${a}u + ${b}v = ${d}</span>`);
+            solSteps.push('<hr style="border: none; border-top: 1px dashed #ccc;">');
+            
+            solSteps.push('<p><strong>Étape 1 : Algorithme d\'Euclide (Calcul du PGCD)</strong></p>');
+            divisions.forEach((div, index) => {
+                 solSteps.push(`
+                    <div style="margin-top: 10px; padding: 5px; border-left: 3px solid #007bff; background-color: #f5f8ff;">
+                        $$\\text{Éq. ${index+1}} : \\quad ${div.R_prev} = ${div.R_curr} \\times ${div.q} + ${div.r}$$
+                        <p style="font-size: 0.9em; margin-top: -10px; padding-left: 10px;">
+                            <strong>Isole le reste :</strong> $\\mathbf{${div.r} = ${div.R_prev} - ${div.R_curr} \\times ${div.q}}$
+                        </p>
+                    </div>
+                `);
+            });
+            solSteps.push(`<p>Le PGCD est le dernier reste non nul : $\\mathbf{d = ${d}}$.</p>`);
+            
+            // --- REMONTÉE DES DIVISIONS (Algorithme d'Euclide Étendu) ---
+            
+            /**
+             * Helper function to format the current combination linear.
+             * @param {Map} components - Map of {R_value: coefficient}.
+             * @param {number} A - The first initial number (absolute value).
+             * @param {number} B - The second initial number (absolute value).
+             * @param {number} d - The PGCD value.
+             * @param {number[]} excludedKeys - Array of keys (R values) to exclude from the expression.
+             * @returns {string} The LaTeX formatted linear combination string.
+             */
+            const getExpression = (components, A, B, d, excludedKeys = []) => {
+                let parts = [];
+                
+                // Sort keys to maintain a consistent display order (A and B last)
+                const sortedKeys = Array.from(components.keys()).sort((a, b) => {
+                    // A and B should be last
+                    if (a === A) return 1;
+                    if (b === A) return -1;
+                    if (a === B) return 1;
+                    if (b === B) return -1;
+                    return b - a; // Descending order for intermediate R values (larger R first)
+                });
+
+                for (const R of sortedKeys) {
+                    if (excludedKeys.includes(R)) continue; // Skip the excluded R
+
+                    let coeff = components.get(R);
+                    if (coeff === 0) continue;
+                    
+                    let sign = (coeff > 0) ? '+' : '-';
+                    let absCoeff = Math.abs(coeff);
+                    let coeffStr = (absCoeff === 1) ? '' : `${absCoeff}`;
+                    
+                    // Don't show '+' for the very first term
+                    if (parts.length === 0) {
+                        sign = (coeff > 0) ? '' : '-';
+                        if (absCoeff === 1) coeffStr = '';
+                    }
+
+                    // Construct the term: [+/-] [coeff] x [R]
+                    let term = '';
+                    if (R === A || R === B) {
+                        // For final A and B terms, use x (multiplication sign)
+                         if (absCoeff === 1) {
+                            term = `${sign} ${R}`;
+                        } else {
+                            term = `${sign} ${coeffStr} \\times ${R}`;
+                        }
+                    } else {
+                        // For intermediate R terms, use x (multiplication sign)
+                         if (absCoeff === 1) {
+                            term = `${sign} ${R}`;
+                        } else {
+                            term = `${sign} ${coeffStr} \\times ${R}`;
+                        }
+                    }
+                    
+                    parts.push(term.trim());
+                }
+                
+                let expression = parts.join(' ').trim();
+                if (expression.startsWith('+')) {
+                    expression = expression.substring(1).trim();
+                }
+                
+                // Return empty string if the expression is empty for explicit construction later
+                if (expression === '') return ''; 
+                
+                return expression;
+            };
+
+            solSteps.push('<p style="margin-top: 20px;"><strong>Étape 2 : Remontée des Identités de Bézout (Substitution Explicite)</strong></p>');
+            solSteps.push('<p>Nous exprimons le PGCD ($d$) comme une combinaison linéaire de $A$ et $B$ en substituant successivement les restes. <strong>Aucune étape n\'est omise.</strong></p><ul>');
+
+            let currentEq = {
+                R: d,
+                u: 0, // Coefficient de A
+                v: 0, // Coefficient de B
+                components: new Map() // Utilise une Map pour stocker les composants R
+            };
+            
+            // Dernière identité : d = R_curr = 1*R_curr
+            let lastDiv = divisions[divisions.length - 1];
+            currentEq.components.set(lastDiv.r, 1); // d = 1 * dernier_reste
+            
+            // Initial display of PGCD expression
+            solSteps.push(`<p><strong>Départ :</strong> Le PGCD $d=${d}$ est le dernier reste non nul. Il est exprimé par l'avant-dernière identité (Éq. ${divisions.length}) :</p>`);
+            solSteps.push(`$$\\text{PGCD} = ${getExpression(currentEq.components, A, B, d)}$$`);
+
+            for (let i = divisions.length - 1; i >= 0; i--) {
+                let div = divisions[i];
+                let R_curr = div.R_curr;
+                let R_prev = div.R_prev;
+                let q = div.q;
+                let r = div.r;
+                
+                // Si le reste de cette division (r) est dans l'équation courante
+                if (currentEq.components.has(r)) {
+                    let coeff_r = currentEq.components.get(r);
+                    
+                    // Store current expression before substitution
+                    const previousExpression = getExpression(currentEq.components, A, B, d);
+                    
+                    // Generate the expression that *remains* without the term in 'r'
+                    const remainderExpression = getExpression(currentEq.components, A, B, d, [r]);
+                    
+                    // Construction de la substitution (terme complet)
+                    const substitutionTerm = `${coeff_r} \\left( ${R_prev} - ${R_curr} \\times ${q} \\right)`;
+
+                    // Construction de la ligne de substitution explicite
+                    const expressionAfterSubstitution = (remainderExpression === '') 
+                        ? substitutionTerm
+                        : `${remainderExpression} + (${substitutionTerm})`;
+
+                    // Explication de l'opération
+                    solSteps.push(`
+                        <div style="margin-top: 15px; padding: 10px; border-left: 3px solid #cc0000; background-color: #fff7f7;">
+                            <p><strong>Substition pour $${r}$ (Éq. ${i+1}) :</strong></p>
+                            <p>On remplace le terme contenant $r$ dans l'expression précédente par l'identité $\\mathbf{${r} = ${R_prev} - ${R_curr} \\times ${q}}$ (isolée de l'Éq. ${i+1}).</p>
+                            
+                            <p><strong>Expression avant substitution :</strong></p>
+                            $$\\text{PGCD} = ${previousExpression}$$
+                            
+                            <p><strong>Substitution effectuée (Explicite) :</strong></p>
+                            <p>L'expression devient : $\\text{PGCD} = ${expressionAfterSubstitution}$</p>
+                    `);
+
+                    // 1. Suppression de r
+                    currentEq.components.delete(r);
+                    
+                    // 2. Ajout des nouveaux termes R_prev et R_curr
+                    // Terme en R_prev (qui est R_prev)
+                    let new_coeff_R_prev = coeff_r;
+                    currentEq.components.set(R_prev, (currentEq.components.get(R_prev) || 0) + new_coeff_R_prev);
+                    
+                    // Terme en R_curr (qui est -(q * R_curr))
+                    let new_coeff_R_curr = -coeff_r * q;
+                    currentEq.components.set(R_curr, (currentEq.components.get(R_curr) || 0) + new_coeff_R_curr);
+                    
+                    // Now generate the new expression
+                    const currentExpression = getExpression(currentEq.components, A, B, d);
+
+                    // Display the new, simplified equation
+                    solSteps.push(`
+                        <p><strong>Après développement et regroupement :</strong></p>
+                        $$\\text{PGCD} = ${currentExpression}$$
+                        <p style="font-size: 0.85em; margin-top: 5px;">
+                            (L'expression est maintenant une combinaison linéaire des diviseurs/restes : $\\{${Array.from(currentEq.components.keys()).join(', ')}\\}$)
+                        </p>
+                        </div>
+                    `);
+                }
+            }
+            solSteps.push('</ul>');
+
+            // L'équation finale doit contenir uniquement A et B
+            let final_u = currentEq.components.get(A) || 0;
+            let final_v = currentEq.components.get(B) || 0;
+            
+            // Correction des signes pour la question a*u + b*v = d
+            if (a < 0) final_u = -final_u;
+            if (b < 0) final_v = -final_v;
+            
+            solSteps.push('<hr style="border: none; border-top: 1px dashed #ccc; margin-top: 20px;">');
+            solSteps.push('<p style="font-size: 1.1em; font-weight: <strong>bold</strong>; color: #008080;">Conclusion Finale :</p>>');
+            solSteps.push(`<p>L'identité de Bézout est :</p>`);
+            solSteps.push(`$$\\mathbf{${a} \\times (${final_u}) + ${b} \\times (${final_v}) = ${d}}$$`);
+            solSteps.push(`<p>Nous avons trouvé la solution particulière $\\mathbf{(u_0, v_0) = (${final_u}, ${final_v})}$</p>`);
+            return { html: solSteps.join(''), u: final_u, v: final_v, d: d };
+        } 
+        
+        // --- NOUVELLE FONCTION: DROITS D'AUTEUR (Importée de S1) ---
+        function toggleDisclaimer() {
+            const disclaimer = document.getElementById('disclaimer-content');
+            const button = document.getElementById('show-auteur-btn');
+            const isVisible = disclaimer.style.display !== 'none';
+
+            if (isVisible) {
+                disclaimer.style.display = 'none';
+                button.textContent = 'Auteur et Droits d\'Auteur';
+                button.style.backgroundColor = '#333';
+            } else {
+                disclaimer.style.display = 'block';
+                button.textContent = 'Masquer les Droits d\'Auteur';
+                button.style.backgroundColor = '#dc3545';
+            }
+        }
+        // --- FIN NOUVELLE FONCTION ---
+
+        // --- LOGIQUE DE GÉNÉRATION DES EXERCICES (1 à 5) ---
+        /**
+         * Fonction utilitaire pour masquer l'aide et réinitialiser le texte des boutons d'aide.
+         */
+        function resetHelpState(containerId, indId, solId) {
+            // Masque l'indication si l'ID existe
+            if (indId) {
+                const indicationContent = document.getElementById(indId);
+                if (indicationContent) {
+                    indicationContent.style.display = 'none';
+                }
+            }
+            // Masque la solution si l'ID existe
+            if (solId) {
+                const solutionContent = document.getElementById(solId);
+                if (solutionContent) {
+                    solutionContent.style.display = 'none';
+                }
+            }
+            // Réinitialise le texte des boutons
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.querySelectorAll('.help-button-action').forEach(b => {
+                    // Le data-originalText est initialisé au chargement. On l'utilise pour réinitialiser le bouton.
+                    if (b.dataset.originalText) {
+                        b.textContent = b.dataset.originalText;
+                    }
+                });
+            }
+        }
+        
+        /**
+         * Fonction pour afficher/masquer l'indication/solution.
+         */
+        function toggleHelp(button, contentId, originalText) {
+            const content = document.getElementById(contentId);
+            if (!content) return;
+            
+            const isVisible = content.style.display !== 'none';
+            const container = button.closest('.question-box'); 
+            
+            // 1. Masquer les autres contenus d'aide du même conteneur
+            if (container) {
+                const allHelpContents = container.querySelectorAll('.help-content');
+                allHelpContents.forEach(el => {
+                    if (el.id !== contentId && el.style.display !== 'none') {
+                        el.style.display = 'none';
+                    }
+                });
+            }
+
+            // 2. Changer l'état du contenu cible
+            if (isVisible) {
+                content.style.display = 'none';
+                button.textContent = originalText;
+            } else {
+                content.style.display = 'block';
+                button.textContent = (originalText === 'Indication' ? 'Masquer l\'Indication' : 'Masquer la Solution');
+                
+                // Si MathJax est utilisé, redessiner après affichage
+                if (window.MathJax) {
+                    MathJax.typeset([content]);
+                }
+            }
+            
+            // 3. Stocker le texte original si non déjà fait (pour resetHelpState)
+            if (!button.dataset.originalText) {
+                 button.dataset.originalText = originalText;
+            }
+        }
+        
+        // --- LOGIQUE DE GÉNÉRATION EXERCICE 1 (Algorithme d'Euclide PGCD) ---
+        function generateNewEuclideProblem() {
+            const a = Math.floor(Math.random() * 80) + 15; // [15, 94]
+            const b = Math.floor(Math.random() * 50) + 10; // [10, 59]
+            const d = gcd(a, b);
+
+            const exId = `ex1`;
+            const numbersElement = document.getElementById(`${exId}-numbers`);
+            const indElement = document.getElementById(`help-${exId}-ind1`);
+            const solElement = document.getElementById(`help-${exId}-sol1`);
+            
+            const questionHTML = `Déterminer le Plus Grand Commun Diviseur (PGCD) des nombres suivants en utilisant l'Algorithme d'Euclide :<br>$$\\mathbf{\\text{PGCD}(${a}, ${b}) = ?}$$`;
+            const indicationHTML = `<p><strong>Indication :</strong> <br>1. Le PGCD de $a$ et $b$ est égal au PGCD du diviseur et du reste de la division euclidienne de $a$ par $b$. <br>2. $\\text{PGCD}(a, b) = \\text{PGCD}(b, r)$. <br>3. Le PGCD est le dernier reste non nul.</p>`;
+            const solutionHTML = getEuclideSolutionHTML(a, b);
+
+            numbersElement.innerHTML = questionHTML;
+            indElement.innerHTML = indicationHTML;
+            solElement.innerHTML = solutionHTML;
+            
+            // Masquer l'aide et réinitialiser les boutons après la génération
+            resetHelpState('container-ex1', 'help-ex1-ind1', 'help-ex1-sol1');
+            document.getElementById('dynamic-content-ex1').style.display = 'block';
+
+            if (window.MathJax) MathJax.typeset([numbersElement, indElement, solElement]);
+        }
+
+
+        // --- LOGIQUE DE GÉNÉRATION EXERCICE 2 (Identité de Bézout) ---
+        function generateNewBezoutProblem() {
+            // Génération de nombres avec PGCD > 1 pour un exercice non trivial
+            let a, b, d;
+            do {
+                a = Math.floor(Math.random() * 80) + 15; // [15, 94]
+                b = Math.floor(Math.random() * 50) + 10; // [10, 59]
+                d = gcd(a, b);
+            } while (d <= 1 || a === b);
+
+            const exId = `ex2`;
+            const numbersElement = document.getElementById(`bezout-numbers`);
+            const indElement = document.getElementById(`help-${exId}-ind1`);
+            const solElement = document.getElementById(`help-${exId}-sol1`);
+
+            const bezoutResult = getBezoutSolutionHTML(a, b);
+            const { u: u0, v: v0, d: pgcd } = bezoutResult;
+
+            const questionHTML = `Déterminer $\\text{PGCD}(${a}, ${b}) = ${pgcd}$ et trouver <strong>un couple</strong> d'entiers $(u_0, v_0)$ <strong>solution particulière</strong> de l'équation :<br>$$\\mathbf{${a}u + ${b}v = ${pgcd}}$$`;
+            const indicationHTML = `<p><strong>Indication :</strong> Utilisez l'<strong>Algorithme d'Euclide Étendu</strong> (remontée des divisions) pour exprimer le PGCD comme une <strong>combinaison linéaire</strong> de ${a}$ et ${b}$.</p>`;
+            const solutionHTML = `
+                <span class="statement-title" style="color:#7952b3;">Résolution Complète (Algorithme d'Euclide Étendu)</span>
+                ${bezoutResult.html}
+            `;
+
+            numbersElement.innerHTML = questionHTML;
+            indElement.innerHTML = indicationHTML;
+            solElement.innerHTML = solutionHTML;
+
+            resetHelpState('container-ex2', 'help-ex2-ind1', 'help-ex2-sol1');
+            document.getElementById('dynamic-content-ex2').style.display = 'block';
+
+            if (window.MathJax) MathJax.typeset([numbersElement, indElement, solElement]);
+        }
+        
+        // --- LOGIQUE DE GÉNÉRATION EXERCICE 3 (Théorème de Bézout, Nombres Premiers entre Eux) ---
+        function generateNewCoprimeProblem() {
+             // Génération de nombres avec PGCD = 1 (relativement premiers)
+            let a, b, d;
+            do {
+                a = Math.floor(Math.random() * 80) + 15; // [15, 94]
+                b = Math.floor(Math.random() * 50) + 10; // [10, 59]
+                d = gcd(a, b);
+            } while (d !== 1 || a === b); // Doit être premier avec l'autre (PGCD=1)
+
+            const exId = `ex3`;
+            const numbersElement = document.getElementById(`coprime-numbers`);
+            const indElement = document.getElementById(`help-${exId}-ind1`);
+            const solElement = document.getElementById(`help-${exId}-sol1`);
+
+            const questionHTML = `Prouver que les nombres $\\mathbf{${a}}$ et $\\mathbf{${b}}$ sont <strong>premiers entre eux</strong>. En déduire qu'il existe un couple d'entiers $(u, v)$ tel que :<br>$$\\mathbf{${a}u + ${b}v = 1}$$`;
+            const indicationHTML = `<p><strong>Indication :</strong> <br>1. Deux nombres sont premiers entre eux si leur PGCD est égal à 1. Utilisez l'Algorithme d'Euclide pour le prouver. <br>2. Le <strong>Théorème de Bézout</strong> garantit l'existence d'une identité de Bézout de la forme $au+bv=1$.</p>`;
+            const solutionHTML = `
+                <span class="statement-title" style="color:#00cc66;">Preuve de l'identité de Bézout pour PGCD=1</span>
+                ${getEuclideSolutionHTML(a, b)}
+                <p style="margin-top: 20px;">Puisque $\\text{PGCD}(${a}, ${b}) = 1$, le <strong>Théorème de Bézout</strong> garantit l'existence d'un couple $(u, v) \\in \\mathbb{Z}^2$ tel que ${a}u + ${b}v = 1$.</p>
+                <p>Pour trouver un tel couple $(u, v)$, utilisez l'Algorithme d'Euclide Étendu (voir l'Exercice 2 pour la méthodologie de remontée des divisions).</p>
+                
+                <p><strong>Solution particulière (Trouvée par Algorithme d'Euclide Étendu) :</strong></p>
+                ${getBezoutSolutionHTML(a, b).html}
+                <p>Le PGCD étant 1, la solution particulière trouvée est bien une solution de l'équation $\\mathbf{${a}u + ${b}v = 1}$.</p>
+            `;
+
+            numbersElement.innerHTML = questionHTML;
+            indElement.innerHTML = indicationHTML;
+            solElement.innerHTML = solutionHTML;
+
+            resetHelpState('container-ex3', 'help-ex3-ind1', 'help-ex3-sol1');
+            document.getElementById('dynamic-content-ex3').style.display = 'block';
+
+            if (window.MathJax) MathJax.typeset([numbersElement, indElement, solElement]);
+        }
+        
+        // --- LOGIQUE DE GÉNÉRATION EXERCICE 4 (PGCD d'expressions littérales) ---
+        
+        /** Génère des expressions littérales A et B qui sont toujours premières entre elles. */
+        function generateCoprimeExpressions() {
+            const a1 = Math.floor(Math.random() * 2) + 2; // [2, 3]
+            const b1 = Math.floor(Math.random() * 5) + 1; // [1, 5]
+            const b2 = Math.floor(Math.random() * 3) + 1; // [1, 3]
+            
+            const remainder = Math.abs(b1 - a1 * b2); // R = b1 - a1*b2
+            
+            // Construction des coefficients de Bézout pour l'identité
+            let u0, v0;
+            if (b1 > a1 * b2) {
+                // 1 = A*(-1) + B*(a1) u0 = -1; v0 = a1;
+                 u0 = 1;
+                 v0 = -a1;
+            } else {
+                // 1 = A*(-1) + B*(a1) u0 = -1; v0 = a1;
+                 u0 = -1;
+                 v0 = a1;
+            }
+            
+            // Formatage des expressions pour l'affichage (gestion des signes)
+            const B_expr_display = `n ${b2 > 0 ? '+' : '-'} ${Math.abs(b2)}`;
+            const A_expr_display = `${a1}n ${b1 > 0 ? '+' : '-'} ${Math.abs(b1)}`;
+            
+            return { a1, b1, A_expr: A_expr_display, b2, B_expr: B_expr_display, q: a1, r: remainder, u0, v0 };
+        }
+
+        /** Génère la solution détaillée pour la preuve que deux expressions sont toujours premières entre elles. */
+        function getAlwaysCoprimeSolutionHTML(n, expressions) {
+            const { a1, b1, A_expr, b2, B_expr, q, r, u0, v0 } = expressions;
+            const A_val = a1 * n + b1;
+            const B_val = n + b2;
+            const abs_r = Math.abs(r); // PGCD est 1
+
+            let solSteps = [];
+            
+            solSteps.push(`<span class="statement-title" style="color:#7952b3;">Résolution Complète pour $\\text{PGCD}(${A_expr}, ${B_expr})$</span>`);
+            solSteps.push('<hr style="border: none; border-top: 1px dashed #ccc;">');
+            
+            solSteps.push('<p style="font-size: 1.1em; font-weight: <strong>bold</strong>; color: #008080;">Partie 1 : Algorithme d\'Euclide Littéral</p>');
+            solSteps.push(`<p>Nous appliquons l'Algorithme d'Euclide sur les expressions ${A_expr}$ et ${B_expr}$.</p>`);
+
+            // Étape 1 : Division
+            const division_eq = `$$\\mathbf{\\text{Étape 1}} : \\quad (${A_expr}) = (${B_expr}) \\times ${q} + (${r})$$`;
+            solSteps.push(`
+                <div style="margin-top: 15px; padding: 5px; border-left: 3px solid #007bff; background-color: #f5f8ff;">
+                    ${division_eq}
+                    <p style="font-size: 0.9em; margin-top: -10px; padding-left: 10px;">
+                        <strong>Vérification :</strong> ${a1}n + ${b1} = ${a1}(n + ${b2}) + (${b1 - a1*b2}) = ${a1}n + ${a1*b2} + ${b1 - a1*b2} = ${a1}n + ${b1}$.
+                    </p>
+                </div>
+            `);
+            
+            if (abs_r === 1) {
+                 solSteps.push(`
+                    <div style="margin-top: 15px; padding: 10px; border-left: 3px solid #00cc66; background-color: #f7fff7;">
+                        <p>Le reste est ${r}$.</p>
+                        <p>Comme $${r}$ est le reste de la première division, nous avons $\\text{PGCD}(A, B) = \\text{PGCD}(B, r) = \\text{PGCD}(${B_expr}, ${r})$.</p>
+                        <p>Puisque $\\mathbf{${r}}$ est un diviseur de tout nombre, $\\mathbf{\\text{PGCD}(A, B)}$ est nécessairement égal à $\\mathbf{${abs_r} = 1}$.</p>
+                        <p>Donc, $\\mathbf{A}$ et $\\mathbf{B}$ sont premiers entre eux pour tout $n \\in \\mathbb{N}$.</p>
+                    </div>
+                `);
+            } else {
+                // Case where remainder is a constant > 1
+                 solSteps.push(`
+                    <div style="margin-top: 15px; padding: 10px; border-left: 3px solid #ff9900; background-color: #fffcf5;">
+                        <p>Le reste est $r=${r}$. Le PGCD est donc $\\text{PGCD}(${B_expr}, ${r})$.</p>
+                        <p>Puisque $r$ est une constante, le PGCD est $\\text{PGCD}(n \\pm k, r)$, qui est un diviseur de $r$. Pour que $\\mathbf{A}$ et $\\mathbf{B}$ soient premiers entre eux, $r$ doit être $\\mathbf{1}$.</p>
+                    </div>
+                `);
+            }
+            
+            solSteps.push('<hr style="border: none; border-top: 1px dashed #ccc; margin-top: 20px;">');
+            solSteps.push('<p style="font-size: 1.1em; font-weight: <strong>bold</strong>; color: #008080;">Partie 2 : Détermination de l\'Identité de Bézout</p>');
+            solSteps.push(`<p>D'après le <strong>Théorème de Bézout</strong>, l'existence d'un $\\text{PGCD} = 1$ garantit qu'il existe un couple $(u, v)$ tel que $(${A_expr})u + (${B_expr})v = 1$.</p>`);
+            solSteps.push(`<p>Nous utilisons l'équation de la première division pour exprimer le reste $${r}$ comme une combinaison linéaire de $${A_expr}$ et $${B_expr}$.</p>`);
+
+            // Remontée de l'identité de Bézout
+            const identity_isol = `$$\\mathbf{${r} = 1 \\times (${A_expr}) - ${q} \\times (${B_expr})}$$`;
+            solSteps.push(`
+                <div style="margin-top: 15px; padding: 10px; border-left: 3px solid #cc0000; background-color: #fff7f7;">
+                    <p><strong>Remontée de l'identité (Étape 1) :</strong></p>
+                    <p>De l'équation ${A_expr} = ${B_expr} \\times ${q} + ${r}$, on isole le reste :</p>
+                    ${identity_isol}
+                    <p>Puisque $r=\\pm 1$, on a une solution immédiate. Le couple $(\\mathbf{u_0, v_0})$ est $(\\mathbf{${u0}, ${v0}})$ si $r=1$, ou $(-\\mathbf{${u0}}, -\\mathbf{${v0}})$ si $r=-1$.</p>
+                </div>
+            `);
+            
+            // Conclusion finale
+            solSteps.push('<hr style="border: none; border-top: 1px dashed #ccc; margin-top: 20px;">');
+            solSteps.push(`<p style="font-size: 1.1em; font-weight: <strong>bold</strong>; color: #008080;">Conclusion Finale :</p>`);
+            solSteps.push(`<p>Le couple d'entiers solution particulière est : $\\mathbf{(u_0, v_0) = (${u0}, ${v0})}$</p>`);
+            solSteps.push(`$$\\mathbf{(${A_expr}) \\times (${u0}) + (${B_expr}) \\times (${v0}) = ${r}}$$`);
+
+            return solSteps.join('');
+        }
+
+        function generateNewAlwaysCoprimeProblem() {
+            const n = Math.floor(Math.random() * 16) + 5;
+            const expressions = generateCoprimeExpressions();
+            const { A_expr, B_expr } = expressions;
+
+            const exId = `ex4`;
+            const numbersElement = document.getElementById(`${exId}-numbers`);
+            const indElement = document.getElementById(`help-${exId}-ind1`);
+            const solElement = document.getElementById(`help-${exId}-sol1`);
+            
+            const questionHTML = `Soit $n=${n}$ un entier naturel. Démontrer que les nombres $A=${A_expr}$ et $B=${B_expr}$ sont <strong>premiers entre eux</strong> pour tout $n \\in \\mathbb{N}$, puis trouver l'identité de Bézout correspondante :<br>$$\\mathbf{(${A_expr})u + (${B_expr})v = 1}$$`;
+            const indicationHTML = `<p><strong>Indication :</strong> Appliquez l'<strong>Algorithme d'Euclide</strong> aux expressions littérales $${A_expr}$ et $${B_expr}$ pour prouver que le dernier reste non nul est <strong>toujours égal à 1</strong>, quel que soit $n$.</p>`;
+            const solutionHTML = getAlwaysCoprimeSolutionHTML(n, expressions);
+
+            numbersElement.innerHTML = questionHTML;
+            indElement.innerHTML = indicationHTML;
+            solElement.innerHTML = solutionHTML;
+
+            resetHelpState('container-ex4', 'help-ex4-ind1', 'help-ex4-sol1');
+            document.getElementById('dynamic-content-ex4').style.display = 'block';
+
+            if (window.MathJax) MathJax.typeset([numbersElement, indElement, solElement]);
+        }
+        
+        // --- LOGIQUE DE GÉNÉRATION EXERCICE 5 (Valeur Minimale) ---
+        
+        /** Génère la solution détaillée pour la valeur minimale d'une combinaison linéaire (Théorème de Bézout). */
+        function getMinimizationSolutionHTML(a, b, d, u0, v0) {
+            let solSteps = [];
+            
+            solSteps.push(`<span class="statement-title" style="color:#7952b3;">Résolution Complète (Valeur Minimale d'une Combinaison Linéaire)</span>`);
+            solSteps.push('<hr style="border: none; border-top: 1px dashed #ccc;">');
+
+            solSteps.push('<p style="font-size: 1.1em; font-weight: <strong>bold</strong>; color: #008080;">Partie 1 : Justification que $Z \\ge d$</p>');
+            solSteps.push(`<p>Le <strong>Théorème de Bézout</strong> stipule que l'ensemble de toutes les combinaisons linéaires possibles de $a$ et $b$ ($\mathcal{L} = \{ax+by \mid x, y \in \mathbb{Z}\}$), est l'ensemble des multiples de $\\text{PGCD}(a, b) = d$.</p>`);
+            
+            solSteps.push(`<div style="margin-top: 15px; padding: 10px; border-left: 3px solid #007bff; background-color: #f5f8ff;">
+                <p>Si $d = \\text{PGCD}(a, b)$, alors $\\mathbf{d}$ divise $a$ et $d$ divise $b$.</p>
+                <p>Par la propriété de la combinaison linéaire, $\\mathbf{d}$ divise toute expression de la forme $ax+by$.</p>
+                <p>Si $Z = ax+by$ est une valeur <strong>strictement positive</strong>, cela signifie que $Z$ est un <strong>multiple positif</strong> de $d$.</p>
+                <p style="font-style: italic;">Le plus petit multiple positif possible de $\\mathbf{d}$ est $\\mathbf{d}$ lui-même.</p>
+            </div>`);
+
+            solSteps.push('<hr style="border: none; border-top: 1px dashed #ccc; margin-top: 20px;">');
+            solSteps.push('<p style="font-size: 1.1em; font-weight: <strong>bold</strong>; color: #008080;">Partie 2 : Atteindre le PGCD</p>');
+            solSteps.push(`<p>Le <strong>Théorème de Bézout</strong> garantit que $\\text{PGCD}(a, b) = d$ est effectivement une valeur que l'on peut atteindre, grâce à l'identité de Bézout : $a \\times u_0 + b \\times v_0 = d$ (avec $(u_0, v_0) = ${u0}, ${v0})$ (Partie 2).</p>`);
+
+            solSteps.push(`<p>Par conséquent, la plus petite valeur entière <strong>strictement positive</strong> que peut prendre l'expression $\\mathbf{Z = ${a}x + ${b}y}$ est son $\\text{PGCD}$ :</p>
+            $$\\mathbf{Z_{\\min} = \\text{PGCD}(${a}, ${b}) = ${d}}$$`);
+
+            return { html: solSteps.join('') };
+        }
+
+        function generateNewMinimizationProblem() {
+            // Génération de nombres pour l'exercice
+            const a = Math.floor(Math.random() * 80) + 15; // [15, 94]
+            const b = Math.floor(Math.random() * 50) + 10; // [10, 59]
+            const d = gcd(a, b);
+            
+            const bezoutResult = extendedEuclide(a, b);
+            const { u: u0, v: v0 } = bezoutResult;
+
+            const exId = `ex5`;
+            const numbersElement = document.getElementById(`${exId}-numbers`);
+            const indElement = document.getElementById(`help-${exId}-ind1`);
+            const solElement = document.getElementById(`help-${exId}-sol1`);
+
+            // 1. Énoncé de la question
+            const questionHTML = `Soient $a=${a}$ et $b=${b}$ deux entiers. Déterminer la plus petite valeur entière <strong>strictement positive</strong> que peut prendre l'expression :<br>$$\\mathbf{Z = ${a}x + ${b}y}, \\quad x, y \\in \\mathbb{Z}$$`;
+            
+            // 2. Indication
+            const indicationHTML = `<p><strong>Indication :</strong> <br>1. Quel est le rôle du $\\text{PGCD}(a, b)$ dans l'ensemble des combinaisons linéaires $ax+by$ ? <br>2. Le Théorème de Bézout est la clé de la résolution.</p>`;
+            
+            // 3. Solution
+            const solutionHTML = getMinimizationSolutionHTML(a, b, d, u0, v0).html;
+
+            numbersElement.innerHTML = questionHTML;
+            indElement.innerHTML = indicationHTML;
+            solElement.innerHTML = solutionHTML;
+
+            resetHelpState('container-ex5', 'help-ex5-ind1', 'help-ex5-sol1');
+            document.getElementById('dynamic-content-ex5').style.display = 'block';
+
+            if (window.MathJax) MathJax.typeset([numbersElement, indElement, solElement]);
+        }
+        
+        // --- LOGIQUE DE GÉNÉRATION EXERCICE 6 (PGCD et Fibonacci) ---
+        
+        /** Génère la solution détaillée pour le PGCD de termes consécutifs de Fibonacci. */
+        function getFibonacciPGCDSolutionHTML(Fn_plus_1, Fn, n) {
+            let solSteps = [];
+            
+            solSteps.push(`<span class="statement-title" style="color:#007bff;">Résolution Complète pour $\\text{PGCD}(F_{n+1}, F_n)$</span>`);
+            solSteps.push('<hr style="border: none; border-top: 1px dashed #ccc;">');
+
+            solSteps.push('<p style="font-size: 1.1em; font-weight: <strong>bold</strong>; color: #008080;">Partie 1 : Division Euclidienne Initiale</p>');
+            solSteps.push(`<p>La définition même de la suite de Fibonacci est une division euclidienne : $\\mathbf{F_{k+2} = F_{k+1} \\times 1 + F_k}$.</p>`);
+
+            // Première étape de l'Algorithme d'Euclide
+            const equation_init = `$$\\mathbf{\\text{Étape 1}} : \\quad F_{n+1} = F_n \\times 1 + F_{n-1}$$`;
+            solSteps.push(`
+                <div style="margin-top: 15px; padding: 5px; border-left: 3px solid #007bff; background-color: #f5f8ff;">
+                    ${equation_init}
+                    <p style="font-size: 0.9em; margin-top: -10px; padding-left: 10px;">
+                        Le quotient est 1 et le reste est $\\mathbf{r = F_{n-1}}$.
+                        Par la propriété fondamentale du PGCD, on a $\\text{PGCD}(F_{n+1}, F_n) = \\text{PGCD}(F_n, F_{n-1})$.
+                    </p>
+                </div>
+            `);
+
+            solSteps.push('<p style="margin-top: 20px; font-size: 1.1em; font-weight: <strong>bold</strong>; color: #008080;">Partie 2 : Divisions Successives (Jusqu\'au Reste Nul)</p>');
+            let current_n = n + 1;
+            let current_F = Fn_plus_1;
+            let current_F_prev = Fn;
+            let step_count = 1;
+
+            while (current_F_prev > 1) {
+                let F_next_remainder = current_F - current_F_prev; // F_{k-2}
+                let remainder_index = current_n - 2;
+
+                const equation = `$$\\mathbf{\\text{Étape ${step_count}}} : \\quad F_{${current_n}} = ${current_F} = ${current_F_prev} \\times 1 + ${F_next_remainder}$$`;
+                let comment = `Le reste est $\\mathbf{r=${F_next_remainder} = F_{${remainder_index}}}$. Par la propriété fondamentale du PGCD, on a $\\text{PGCD}(F_{${current_n}}, F_{${current_n-1}}) = \\text{PGCD}(F_{${current_n-1}}, F_{${remainder_index}})$. On continue avec la nouvelle paire de nombres.`;
+
+                solSteps.push(`
+                    <div style="margin-top: 15px;">
+                        ${equation}
+                        <p style="font-size: 0.9em; margin-top: -10px; padding-left: 10px; border-left: 3px solid #ff9900; background-color: #fffcf5; padding: 5px;">
+                            <strong>Explication :</strong> ${comment}
+                        </p>
+                    </div>
+                `);
+
+                current_F = current_F_prev;
+                current_F_prev = F_next_remainder;
+                current_n--;
+                step_count++;
+
+                if (current_F_prev === 1) break; // Le PGCD sera 1
+            }
+
+            // Conclusion
+            solSteps.push('<hr style="border: none; border-top: 1px dashed #ccc; margin-top: 20px;">');
+            solSteps.push(`<p style="font-size: 1.1em; font-weight: <strong>bold</strong>; color: #008080;">Conclusion Finale :</p>`);
+            solSteps.push(`<p>La séquence de divisions se poursuit jusqu'à l'étape $n$, où l'on obtient $\\text{PGCD}(F_2, F_1) = \\text{PGCD}(1, 1) = 1$.</p>`);
+            solSteps.push(`<p>Ainsi, deux termes consécutifs de la suite de Fibonacci sont <strong>toujours premiers entre eux</strong> :</p>`);
+            solSteps.push(`$$\\mathbf{\\text{PGCD}(F_{n+1}, F_n) = 1}$$`);
+
+            return solSteps.join('');
+        }
+
+        function generateNewFibonacciProblem() {
+            const n = Math.floor(Math.random() * 5) + 6; // Génère n entre 6 et 10
+            const Fn = fibonacci(n);
+            const Fn_plus_1 = fibonacci(n + 1);
+
+            const exId = `ex6`;
+            const numbersElement = document.getElementById(`${exId}-numbers`);
+            const indElement = document.getElementById(`help-${exId}-ind1`);
+            const solElement = document.getElementById(`help-${exId}-sol1`);
+
+            const questionHTML = `Soit la suite de Fibonacci $(F_n)$ définie par $F_0=0, F_1=1$ et $F_{k+2} = F_{k+1} + F_k$. En utilisant l'<strong>Algorithme d'Euclide</strong>, déterminer le $\\text{PGCD}$ de deux termes consécutifs $F_{n+1}$ et $F_n$, pour $n=${n}$ (avec $F_{n+1}=${Fn_plus_1}$ et $F_n=${Fn}$).<br>$$\\mathbf{\\text{PGCD}(${Fn_plus_1}, ${Fn}) = ?}$$`;
+            const indicationHTML = `<p><strong>Indication :</strong> <br>1. Écrivez la définition de la suite de Fibonacci comme une division euclidienne. <br>2. Appliquez l'Algorithme d'Euclide. Quel est le reste de la division de $F_{n+1}$ par $F_n$ ?</p>`;
+            const solutionHTML = getFibonacciPGCDSolutionHTML(Fn_plus_1, Fn, n);
+
+            numbersElement.innerHTML = questionHTML;
+            indElement.innerHTML = indicationHTML;
+            solElement.innerHTML = solutionHTML;
+
+            resetHelpState('container-ex6', 'help-ex6-ind1', 'help-ex6-sol1');
+            document.getElementById('dynamic-content-ex6').style.display = 'block';
+
+            if (window.MathJax) MathJax.typeset([numbersElement, indElement, solElement]);
+        }
+
+
+        // --- CHARGEMENT INITIAL ---
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialisation de MathJax
+            if (window.MathJax) MathJax.typeset();
+            
+            // Masquer les placeholders par défaut et générer le premier exercice
+            document.getElementById('placeholder-ex1').style.display = 'none';
+            document.getElementById('placeholder-ex2').style.display = 'none';
+            document.getElementById('placeholder-ex3').style.display = 'none';
+            document.getElementById('placeholder-ex4').style.display = 'none';
+            document.getElementById('placeholder-ex5').style.display = 'none';
+            document.getElementById('placeholder-ex6').style.display = 'none';
+
+            // Génération des premiers exercices au chargement
+            generateNewEuclideProblem();
+            generateNewBezoutProblem();
+            generateNewCoprimeProblem();
+            generateNewAlwaysCoprimeProblem();
+            generateNewMinimizationProblem();
+            generateNewFibonacciProblem();
+        });
+
+    </script>
+
+    <style>
+        /* CHARTE GRAPHIQUE FONDAMENTALE (S4) */
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.6;
+            margin: 0 auto;
+            max-width: 900px;
+            padding: 20px;
+            color: #333;
+        }
+        h1, h2 {
+            font-family: Arial, sans-serif;
+            color: #0056b3;
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        h1.session-title {
+            text-align: center;
+            font-size: 1.8em;
+            border-color: #00aaff;
+        }
+        h2 {
+            font-size: 1.4em;
+            color: #0080cc;
+            border-color: #e0e0e0;
+        }
+        .theme-principal {
+            text-align: center;
+            font-style: italic;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        /* Styles des blocs de Cours */
+        .statement-block {
+            margin: 1.5em 0;
+            padding: 15px;
+            border-left: 5px solid;
+            background-color: #f9f9f9;
+        }
+        .theoreme { border-color: #00cc66; }
+        .definition { border-color: #9933ff; }
+        .statement-title {
+            font-weight: bold;
+            font-style: italic;
+            font-size: 1.1em;
+            margin-bottom: 0.5em;
+            display: block;
+        }
+        .exercice-title {
+            font-size: 1.1em;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+        }
+        /* Styles des Conteneurs d'Exercices */
+        .question-box {
+            background-color: #f0f0ff; 
+            padding: 15px;
+            border: 1px solid #7952b3; 
+            margin-bottom: 15px;
+        }
+        .ex4-euclide-box {
+             border-color: #007bff;
+             background-color: #f5f8ff;
+        }
+        .ex4-bezout-box {
+            border-color: #cc0000;
+            background-color: #fff7f7;
+        }
+        /* Styles des Boutons */
+        .help-buttons {
+            margin-top: 10px;
+            margin-bottom: 10px; 
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px; 
+        }
+        .help-buttons button { 
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.2s;
+            margin-right: 5px;
+        }
+        .btn-generation { 
+            background-color: #007bff; 
+            color: white; 
+            border: none;
+        }
+        .btn-indication { 
+            background-color: #e0f0ff;
+            color: #0056b3;
+            border-color: #0056b3;
+        }
+        .btn-solution { 
+            background-color: #e9fbe9; 
+            color: #28a745; 
+            border-color: #28a745;
+        }
+        /* Contenu d'Aide */
+        .help-content {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none; 
+            line-height: 1.5;
+            font-size: 0.9em;
+        }
+        .help-indication {
+            background-color: #f5faff;
+            border-left: 3px solid #0056b3;
+        }
+        .help-solution {
+            background-color: #fffff0;
+            border-left: 3px solid #999900;
+        }
+        /* Styles spécifiques au contenu */
+        .pgcd-numbers {
+            margin: 0; 
+            padding: 0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1 class="session-title">Séance $S_4$ : Algorithme d'Euclide et Théorème de Bézout</h1>
+    <p class="theme-principal"><strong>Thème Principal :</strong> Les relations entre PGCD et Combinaisons Linéaires</p>
+
+    <h2>I. Cours : Algorithme d'Euclide et Propriétés</h2>
+    <div class="statement-block theoreme">
+        <span class="statement-title">Théorème [Propriété fondamentale du PGCD]</span>
+        <p>Soient $a, b \in \mathbb{Z}$ et $r$ le reste de la division euclidienne de $a$ par $b$. Si $a = bq + r$ (avec $0 \le r < |b|$), alors :</p>
+        \[\text{PGCD}(a, b) = \text{PGCD}(b, r)\]
+    </div>
+    <div class="statement-block theoreme" style="border-color: #ff4500;">
+        <span class="statement-title" style="color: #ff4500;">Lemme d'Euclide (sur la divisibilité par un nombre premier)</span>
+        <p>Si $p$ est un <strong>nombre premier</strong> et que $p$ divise le produit $ab$ de deux entiers, alors $p$ divise au moins l'un des facteurs :</p>
+        \[\text{Si } p | ab \text{ alors } p | a \text{ ou } p | b\]
+        <p>Ce lemme est une conséquence directe du théorème de Bézout et est fondamental pour l'arithmétique.</p>
+    </div>
+    <div class="statement-block definition">
+        <span class="statement-title">Principe [Algorithme d'Euclide]</span>
+        <p>Le <strong>PGCD</strong> de $a$ et $b$ est le <strong>dernier reste non nul</strong> des divisions euclidiennes successives.</p>
+    </div>
+
+    <h2>II. Cours : Identité et Théorème de Bézout</h2>
+    <div class="statement-block theoreme">
+        <span class="statement-title">Théorème [Théorème de Bézout]</span>
+        <p>Soient $a$ et $b$ deux entiers relatifs non tous deux nuls. On pose $d = \text{PGCD}(a, b)$. Alors, il existe un couple d'entiers relatifs $(u, v) \in \mathbb{Z}^2$ tel que :</p>
+        \[au + bv = d\]
+        <p>Cette égalité est appelée <strong>Identité de Bézout</strong>.</p>
+    </div>
+    <div class="statement-block definition" style="border-color: #00bcd4;">
+        <span class="statement-title">Définition [Nombres Premiers entre Eux]</span>
+        <p>Deux entiers $a$ et $b$ sont dits <strong>premiers entre eux</strong> si et seulement si leur $\text{PGCD}$ est égal à 1 :</p>
+        \[\text{PGCD}(a, b) = 1\]
+        <p>Le corollaire du Théorème de Bézout (appelé <strong>Théorème de l'identité de Bézout</strong>) stipule que $a$ et $b$ sont premiers entre eux si et seulement s'il existe $(u, v) \in \mathbb{Z}^2$ tel que $au + bv = 1$.</p>
+    </div>
+    <hr>
+    
+    <h2>III. Exercices $S_4$</h2>
+
+    <h3 class="exercice-title">Exercice 1 : Algorithme d'Euclide (PGCD)</h3>
+    <div id="container-ex1" class="question-box ex4-euclide-box">
+        <div id="dynamic-content-ex1">
+            <p id="ex1-numbers" class="pgcd-numbers">Chargement...</p>
+            <div class="help-buttons">
+                <button onclick="toggleHelp(this, 'help-ex1-ind1', 'Indication')" class="btn-indication help-button-action" data-content-id="help-ex1-ind1">Indication</button>
+                <button onclick="toggleHelp(this, 'help-ex1-sol1', 'Solution (Étapes)')" class="btn-solution help-button-action" data-content-id="help-ex1-sol1">Solution (Étapes)</button>
+                <button onclick="generateNewEuclideProblem()" class="btn-generation">Générer un nouvel exercice</button>
+            </div>
+            <div id="help-ex1-ind1" class="help-content help-indication"></div>
+            <div id="help-ex1-sol1" class="help-content help-solution"></div>
+        </div>
+        <p id="placeholder-ex1" style="display:none;">Cliquer sur le bouton <strong>Générer un nouvel exercice</strong> pour commencer.</p>
+    </div>
+
+    <h3 class="exercice-title">Exercice 2 : Recherche d'un couple de Bézout $(u, v)$</h3>
+    <div id="container-ex2" class="question-box ex4-bezout-box">
+        <div id="dynamic-content-ex2">
+            <p id="bezout-numbers" class="pgcd-numbers">Chargement...</p>
+            <div class="help-buttons">
+                <button onclick="toggleHelp(this, 'help-ex2-ind1', 'Indication')" class="btn-indication help-button-action" data-content-id="help-ex2-ind1">Indication</button>
+                <button onclick="toggleHelp(this, 'help-ex2-sol1', 'Solution (Étapes)')" class="btn-solution help-button-action" data-content-id="help-ex2-sol1">Solution (Étapes)</button>
+                <button onclick="generateNewBezoutProblem()" class="btn-generation">Générer un nouvel exercice</button>
+            </div>
+            <div id="help-ex2-ind1" class="help-content help-indication"></div>
+            <div id="help-ex2-sol1" class="help-content help-solution"></div>
+        </div>
+        <p id="placeholder-ex2" style="display:none;">Cliquer sur le bouton <strong>Générer un nouvel exercice</strong> pour commencer.</p>
+    </div>
+
+    <h3 class="exercice-title">Exercice 3 : Preuve de la Primauté et Identité de Bézout (PGCD=1)</h3>
+    <div id="container-ex3" class="question-box" style="border-color: #00cc66; background-color: #f7fff7;">
+        <div id="dynamic-content-ex3">
+            <p id="coprime-numbers" class="pgcd-numbers">Chargement...</p>
+            <div class="help-buttons">
+                <button onclick="toggleHelp(this, 'help-ex3-ind1', 'Indication')" class="btn-indication help-button-action" data-content-id="help-ex3-ind1">Indication</button>
+                <button onclick="toggleHelp(this, 'help-ex3-sol1', 'Solution (Complète)')" class="btn-solution help-button-action" data-content-id="help-ex3-sol1">Solution (Complète)</button>
+                <button onclick="generateNewCoprimeProblem()" class="btn-generation">Générer un nouvel exercice</button>
+            </div>
+            <div id="help-ex3-ind1" class="help-content help-indication"></div>
+            <div id="help-ex3-sol1" class="help-content help-solution"></div>
+        </div>
+        <p id="placeholder-ex3" style="display:none;">Cliquer sur le bouton <strong>Générer un nouvel exercice</strong> pour commencer.</p>
+    </div>
+
+    <h3 class="exercice-title">Exercice 4 : PGCD et Identité de Bézout Littéraux (Expressions en $n$)</h3>
+    <div id="container-ex4" class="question-box ex4-bezout-box">
+        <div id="dynamic-content-ex4">
+            <p id="ex4-numbers" class="pgcd-numbers">Chargement...</p>
+            <div class="help-buttons">
+                <button onclick="toggleHelp(this, 'help-ex4-ind1', 'Indication')" class="btn-indication help-button-action" data-content-id="help-ex4-ind1">Indication</button>
+                <button onclick="toggleHelp(this, 'help-ex4-sol1', 'Solution (Algorithme Littéral)')" class="btn-solution help-button-action" data-content-id="help-ex4-sol1">Solution (Algorithme Littéral)</button>
+                <button onclick="generateNewAlwaysCoprimeProblem()" class="btn-generation">Générer un nouvel exercice</button>
+            </div>
+            <div id="help-ex4-ind1" class="help-content help-indication"></div>
+            <div id="help-ex4-sol1" class="help-content help-solution"></div>
+        </div>
+        <p id="placeholder-ex4" style="display:none;">Cliquer sur le bouton <strong>Générer un nouvel exercice</strong> pour commencer.</p>
+    </div>
+
+    <h3 class="exercice-title">Exercice 5 : Application du Théorème de Bézout (Valeur Minimale)</h3>
+    <div id="container-ex5" class="question-box" style="border-color: #00bcd4; background-color: #f7ffff;">
+        <div id="dynamic-content-ex5">
+            <p id="ex5-numbers" class="pgcd-numbers">Chargement...</p>
+            <div class="help-buttons">
+                <button onclick="toggleHelp(this, 'help-ex5-ind1', 'Indication')" class="btn-indication help-button-action" data-content-id="help-ex5-ind1">Indication</button>
+                <button onclick="toggleHelp(this, 'help-ex5-sol1', 'Solution (Démonstration)')" class="btn-solution help-button-action" data-content-id="help-ex5-sol1">Solution (Démonstration)</button>
+                <button onclick="generateNewMinimizationProblem()" class="btn-generation">Générer un nouvel exercice</button>
+            </div>
+            <div id="help-ex5-ind1" class="help-content help-indication"></div>
+            <div id="help-ex5-sol1" class="help-content help-solution"></div>
+        </div>
+        <p id="placeholder-ex5" style="display:none;">Cliquer sur le bouton <strong>Générer un nouvel exercice</strong> pour commencer.</p>
+    </div>
+    
+    <h3 class="exercice-title">Exercice 6 : PGCD et Suite de Fibonacci (Cas Particulier d'Euclide)</h3>
+    <div id="container-ex6" class="question-box ex4-euclide-box">
+        <div id="dynamic-content-ex6">
+            <p id="ex6-numbers" class="pgcd-numbers">Chargement...</p>
+            <div class="help-buttons">
+                <button onclick="toggleHelp(this, 'help-ex6-ind1', 'Indication')" class="btn-indication help-button-action" data-content-id="help-ex6-ind1">Indication</button>
+                <button onclick="toggleHelp(this, 'help-ex6-sol1', 'Solution (Exhaustive)')" class="btn-solution help-button-action" data-content-id="help-ex6-sol1">Solution (Exhaustive)</button>
+                <button onclick="generateNewFibonacciProblem()" class="btn-generation">Générer un nouvel exercice</button>
+            </div>
+            <div id="help-ex6-ind1" class="help-content help-indication"></div>
+            <div id="help-ex6-sol1" class="help-content help-solution"></div>
+        </div>
+        <p id="placeholder-ex6" style="display:none;">Cliquer sur le bouton <strong>Générer un nouvel exercice</strong> pour commencer.</p>
+    </div>
+
+    <hr>
+
+    <div style="text-align: center; margin-top: 50px;">
+        <button id="show-auteur-btn" onclick="toggleDisclaimer()" 
+            style="padding: 10px 20px; font-size: 1em; cursor: pointer; border: none; border-radius: 5px; background-color: #333; color: white;">
+            Auteur et Droits d'Auteur
+        </button>
+    </div>
+
+    <div id="disclaimer-content" style="margin-top: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 5px; background-color: #fff; display: none;">
+        <h3>Droits d'Auteur et Source</h3>
+            <p><strong>Auteur du problème :</strong> Yann Merdy</p>
+            <p><strong>Droits d'Auteur et Utilisation :</strong></p>
+            <p>Ce contenu, y compris l'énoncé, les solutions et le code interactif, est protégé par les droits d'auteur. <strong>Toute utilisation à des fins commerciales, y compris la revente, la distribution ou l'intégration dans des produits commerciaux, est strictement interdite.</strong> Utilisation autorisée uniquement pour un usage personnel et éducatif (distribution gratuite par l'enseignant aux élèves).</p>
+            <p style="font-style: italic;"><strong>Ce contenu est une création originale fournie par le modèle d'IA (Gemini) à la demande de l'utilisateur.</strong></p>
+    </div>
+
+</body>
+</html>
